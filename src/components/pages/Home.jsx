@@ -107,7 +107,7 @@ function Home() {
               poster=""
             />
             {/* Mute/Unmute Button */}
-            <button
+              <button
               onClick={handleMuteToggle}
               className="absolute top-4 right-4 bg-white/80 hover:bg-white text-blue-700 rounded-full p-2 shadow transition-all z-10"
               aria-label={muted ? 'Unmute video' : 'Mute video'}
@@ -124,12 +124,12 @@ function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12a7.5 7.5 0 01-7.5 7.5" />
                 </svg>
               )}
-            </button>
+              </button>
           </div>
         </section>
        
       </main>
- 
+
       <div className="w-full">
         <Services/>
       </div>
@@ -142,13 +142,13 @@ function Home() {
       </div>
       <div>
       <Brands/>
-     </div>
-     
+      </div>
+      
       <div id="connect-section" className="w-full">
         <Connect/>
       </div>
       
- 
+     
         
     </div>
   )

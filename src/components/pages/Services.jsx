@@ -114,9 +114,11 @@ function Services() {
           <p className="text-lg sm:text-xl text-black/90 mb-8 sm:mb-10 max-w-2xl mx-auto">
             Let’s discuss your requirements and see how ATS Packaging can deliver the right solution for your business.
           </p>
-          <button className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-blue-600 font-semibold text-lg sm:text-xl rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-            Request a Consultation
-          </button>
+          <a href="/contact">
+            <button className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-blue-600 font-semibold text-lg sm:text-xl rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              Connect with Us
+            </button>
+          </a>
         </div>
       </div>
     </section>

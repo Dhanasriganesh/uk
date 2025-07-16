@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import projectManagementImg from '../../assets/project-mangement.jpg';
+import projectManagementImg from '../../../assets/i2.jpg';
  
 const summary = `For us, Professional, Seamless Project Management is Our Signature Move
 Once your order is received, Our project manager will spearhead the task of processing your project and fulfilling contractual obligations. Collaborating with a team of designers and engineers, we ensure project completion aligns with both yours and our exacting quality standards, within agreed-upon timelines. We prioritize speed, transparency, and flexibility throughout this process. Through a rigorous quality gate process, Our project manager monitors your project and associated milestones.`;

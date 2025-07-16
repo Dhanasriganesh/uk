@@ -33,7 +33,7 @@ function Connect() {
         {/* Right: Form Card */}
         <form onSubmit={handleSubmit} className="flex-1 bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-10 max-w-md w-full min-w-[280px] sm:min-w-[320px] flex flex-col gap-4 sm:gap-6 border border-gray-100">
           <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
-            Request Consultation
+            Submit
           </h3>
           <div>
             <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
@@ -93,7 +93,7 @@ function Connect() {
             type="submit" 
             className="mt-2 sm:mt-4 w-full py-2 sm:py-3 rounded-full bg-blue-700 hover:bg-blue-800 text-white font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
-            Request Consultation
+            Submit
           </button>
         </form>
       </div>

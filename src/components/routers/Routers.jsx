@@ -16,7 +16,10 @@ import Partners from '../pages/glance/Partners'
 import Sectorr from "../pages/Sectorr"
 import Products from '../pages/Products'
 import Consultation from "../pages/Consultation"
-
+import Projectmngmt from "../pages/consultation/Projectmngmt"
+import Turnkeymgmt from '../pages/consultation/T-automation'
+import LifecycleManagement from '../pages/consultation/Lifecycle'
+import ProjectPlanning from '../pages/consultation/Projectplan'
 function Routers() {
     return (
         <Routes>
@@ -36,6 +39,10 @@ function Routers() {
             <Route path="/sectors" element={<Sectorr/>}/>
             <Route path="/products" element={<Products/>}/>
             <Route path="/consultation" element={<Consultation/>}/>
+            <Route path="/project-management" element={<Projectmngmt/>}/>
+            <Route path="/turnkey-automation" element={<Turnkeymgmt/>}/>
+            <Route path='/lifecycle-management' element={<LifecycleManagement/>}/>
+            <Route path='/project-planning' element={<ProjectPlanning/>}/>
         </Routes>
     )
 }
