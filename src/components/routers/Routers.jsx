@@ -15,6 +15,8 @@ import News from '../pages/glance/News'
 import Partners from '../pages/glance/Partners'
 import Sectorr from "../pages/Sectorr"
 import Products from '../pages/Products'
+import Consultation from "../pages/Consultation"
+
 function Routers() {
     return (
         <Routes>
@@ -33,6 +35,7 @@ function Routers() {
             <Route path='/news' element={<News/>}/>
             <Route path="/sectors" element={<Sectorr/>}/>
             <Route path="/products" element={<Products/>}/>
+            <Route path="/consultation" element={<Consultation/>}/>
         </Routes>
     )
 }
