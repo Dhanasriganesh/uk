@@ -16,10 +16,12 @@ function ScrollToTop() {
 function Layout() {
   return (
     <Router>
+      <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'hidden', position: 'relative' }}>
         <ScrollToTop />
         <Header/>
         <Routers/>
         <Footer/>
+      </div>
     </Router>
   )
 }

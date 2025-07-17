@@ -20,9 +20,31 @@ function Ats() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#f8fafc', minHeight: '100vh' }}>
       {/* About Section */}
-      <section style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '3rem 1rem' }}>
+      <section
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '2rem',
+          padding: '2rem 0.5rem',
+        }}
+      >
         {/* Carousel */}
-        <div style={{ width: 400, height: 300, position: 'relative', borderRadius: '1.25rem', overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.10)' }}>
+        <div
+          style={{
+            width: '100%',
+            maxWidth: 400,
+            height: 'auto',
+            aspectRatio: '4/3',
+            position: 'relative',
+            borderRadius: '1.25rem',
+            overflow: 'hidden',
+            boxShadow: '0 2px 16px rgba(0,0,0,0.10)',
+            flex: '1 1 260px',
+            minWidth: 0,
+          }}
+        >
           {carouselImages.map((img, idx) => (
             <img
               key={idx}
@@ -42,7 +64,16 @@ function Ats() {
             />
           ))}
           {/* Carousel dots */}
-          <div style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8 }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: 8,
+            }}
+          >
             {carouselImages.map((_, idx) => (
               <span
                 key={idx}
@@ -61,12 +92,27 @@ function Ats() {
             ))}
           </div>
         </div>
-        {/* Static Image */}
-        
         {/* About Text */}
-        <div style={{ maxWidth: 500 }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#1a202c', marginBottom: '1rem' }}>Our Mission</h2>
-          <p style={{ fontSize: '1.1rem', color: '#374151', marginBottom: '1.2rem' }}>
+        <div style={{ maxWidth: 500, flex: '1 1 260px', minWidth: 0 }}>
+          <h2
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: '#1a202c',
+              marginBottom: '1rem',
+              lineHeight: 1.2,
+            }}
+          >
+            Our Mission
+          </h2>
+          <p
+            style={{
+              fontSize: '1rem',
+              color: '#374151',
+              marginBottom: '1.2rem',
+              lineHeight: 1.6,
+            }}
+          >
             Our main goal is to keep our customers' operations running at peak productivity. We achieve this because of our experienced staff commitment in the areas of pre-sales engineering and after-sales service. We currently support many systems with extremely short response times.<br />
             <span style={{ color: '#2563eb', fontWeight: 600 }}>Worldwide around the clock.</span>
           </p>
@@ -74,56 +120,198 @@ function Ats() {
       </section>
 
       {/* Competence Section */}
-      <section style={{ background: '#fff', padding: '2.5rem 1rem', borderRadius: '1.5rem', margin: '2rem auto', maxWidth: 1200, boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#1a202c', marginBottom: '2rem', textAlign: 'center' }}>Competence</h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center' }}>
-        <img src={ats5} alt="ATS 5" style={{ width: 400, height: 400, objectFit: 'cover', borderRadius: '1.25rem', boxShadow: '0 2px 16px rgba(0,0,0,0.10)' }} />
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#f1f5f9', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>State-of-the-art Technology</h3>
-            <p style={{ color: '#374151' }}>We deliver state-of-the-art technology and best quality – in every single machine or every complete line solution.</p>
+      <section
+        style={{
+          background: '#fff',
+          padding: '2rem 0.5rem',
+          borderRadius: '1.5rem',
+          margin: '2rem auto',
+          maxWidth: 1200,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: '#1a202c',
+            marginBottom: '2rem',
+            textAlign: 'center',
+            lineHeight: 1.2,
+          }}
+        >
+          Competence
+        </h2>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1.5rem',
+            justifyContent: 'center',
+          }}
+        >
+          <img
+            src={ats5}
+            alt="ATS 5"
+            style={{
+              width: '100%',
+              maxWidth: 340,
+              height: 'auto',
+              aspectRatio: '1/1',
+              objectFit: 'cover',
+              borderRadius: '1.25rem',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.10)',
+              flex: '1 1 220px',
+              minWidth: 0,
+            }}
+          />
+          <div
+            style={{
+              flex: '1 1 220px',
+              minWidth: 0,
+              maxWidth: 320,
+              background: '#f1f5f9',
+              borderRadius: '1rem',
+              padding: '1.2rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}
+          >
+            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.1rem' }}>
+              State-of-the-art Technology
+            </h3>
+            <p style={{ color: '#374151', fontSize: '0.98rem' }}>
+              We deliver state-of-the-art technology and best quality – in every single machine or every complete line solution.
+            </p>
           </div>
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#f1f5f9', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>Customer Focus</h3>
-            <p style={{ color: '#374151' }}>Our strong relationships with customers have given us the expertise to understand their needs well. This helps us offer the best solutions tailored to each customer. As a result, we're the leader in established markets and the first choice in new markets.</p>
+          <div
+            style={{
+              flex: '1 1 220px',
+              minWidth: 0,
+              maxWidth: 320,
+              background: '#f1f5f9',
+              borderRadius: '1rem',
+              padding: '1.2rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}
+          >
+            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.1rem' }}>
+              Customer Focus
+            </h3>
+            <p style={{ color: '#374151', fontSize: '0.98rem' }}>
+              Our strong relationships with customers have given us the expertise to understand their needs well. This helps us offer the best solutions tailored to each customer. As a result, we're the leader in established markets and the first choice in new markets.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1rem 2rem', background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
-        <img src={ats4} alt="ATS Hero" style={{ width: '320px', maxWidth: '90vw', borderRadius: '1.5rem', boxShadow: '0 4px 32px rgba(0,0,0,0.10)' }} />
-        <div style={{ marginLeft: '2.5rem', maxWidth: 600 }}>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a202c', marginBottom: '1rem' }}>Where Excellence meets Innovation</h1>
-          <p style={{ fontSize: '1.25rem', color: '#374151', lineHeight: 1.6 }}>
+      <section
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem 0.5rem 1.5rem',
+          background: '#fff',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
+          gap: '2rem',
+        }}
+      >
+        <img
+          src={ats4}
+          alt="ATS Hero"
+          style={{
+            width: '100%',
+            maxWidth: 320,
+            borderRadius: '1.5rem',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.10)',
+            flex: '1 1 220px',
+            minWidth: 0,
+            marginBottom: '1rem',
+          }}
+        />
+        <div style={{ marginLeft: 0, maxWidth: 600, flex: '1 1 260px', minWidth: 0 }}>
+          <h1
+            style={{
+              fontSize: '2rem',
+              fontWeight: 800,
+              color: '#1a202c',
+              marginBottom: '1rem',
+              lineHeight: 1.2,
+            }}
+          >
+            Where Excellence meets Innovation
+          </h1>
+          <p style={{ fontSize: '1.1rem', color: '#374151', lineHeight: 1.6 }}>
             ATS has stood for cutting-edge technology with line integration expertise and high quality machines with excellent performance and maximum reliability in Filling, Capping, Packing and palletising.
           </p>
         </div>
       </section>
 
-
-
-
-
       {/* Corporate Culture Section */}
-      <section style={{ background: '#f8fafc', padding: '2.5rem 1rem', maxWidth: 1200, margin: '2rem auto' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#1a202c', marginBottom: '2rem', textAlign: 'center' }}>Corporate Culture</h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center' }}>
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#fff', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>Pragmatic & Solution-oriented</h3>
-            <p style={{ color: '#374151' }}>We prioritize efficiency, designing what's necessary while striving for the best outcome.</p>
-          </div>
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#fff', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>Passionate</h3>
-            <p style={{ color: '#374151' }}>Mechanical engineering is not just our profession, it's our passion.</p>
-          </div>
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#fff', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>Innovative</h3>
-            <p style={{ color: '#374151' }}>We are constantly exploring new ideas and technologies to stay ahead and provide innovative solutions.</p>
-          </div>
-          <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 320, background: '#fff', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8 }}>Excellence</h3>
-            <p style={{ color: '#374151' }}>We aim for excellence, always setting high standards and working to exceed them.</p>
-          </div>
+      <section
+        style={{
+          background: '#f8fafc',
+          padding: '2rem 0.5rem',
+          maxWidth: 1200,
+          margin: '2rem auto',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: '#1a202c',
+            marginBottom: '2rem',
+            textAlign: 'center',
+            lineHeight: 1.2,
+          }}
+        >
+          Corporate Culture
+        </h2>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1.5rem',
+            justifyContent: 'center',
+          }}
+        >
+          {[
+            {
+              title: 'Pragmatic & Solution-oriented',
+              desc: `We prioritize efficiency, designing what's necessary while striving for the best outcome.`,
+            },
+            {
+              title: 'Passionate',
+              desc: `Mechanical engineering is not just our profession, it's our passion.`,
+            },
+            {
+              title: 'Innovative',
+              desc: `We are constantly exploring new ideas and technologies to stay ahead and provide innovative solutions.`,
+            },
+            {
+              title: 'Excellence',
+              desc: `We aim for excellence, always setting high standards and working to exceed them.`,
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                flex: '1 1 180px',
+                minWidth: 0,
+                maxWidth: 320,
+                background: '#fff',
+                borderRadius: '1rem',
+                padding: '1.2rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                marginBottom: '1rem',
+              }}
+            >
+              <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.05rem' }}>{item.title}</h3>
+              <p style={{ color: '#374151', fontSize: '0.97rem' }}>{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
     </div>

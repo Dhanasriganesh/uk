@@ -40,7 +40,6 @@
 .read-the-docs {
   color: #888;
 }
-
 /* Mobile menu slide-in animation */
 @keyframes slide-in {
   from { transform: translateX(100%); }
@@ -89,3 +88,4 @@ body.menu-open {
   height: 100% !important;
   position: relative !important;
 }
+

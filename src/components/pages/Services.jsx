@@ -60,17 +60,17 @@ function Services() {
   const filteredServices = services;
 
   return (
-    <section className="w-full min-h-screen bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+    <section className="w-full min-h-screen bg-white py-6 sm:py-10 lg:py-20 px-2 sm:px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-20">
           <h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight"
+            className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 tracking-tight"
             style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '0.04em' }}
           >
             Our Services
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Explore our advanced packaging machinery and automation solutions designed to meet the needs of diverse industries.
           </p>
         </div>
@@ -80,7 +80,7 @@ function Services() {
           {filteredServices.map((service, idx) => (
             <Link to={service.path} key={idx} className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus:outline-none focus:ring-4 focus:ring-blue-200">
               {/* Image Container */}
-              <div className="relative overflow-hidden h-48 sm:h-56 lg:h-64">
+              <div className="relative overflow-hidden h-36 xs:h-40 sm:h-48 lg:h-64">
                 <img
                   src={service.img}
                   alt={service.title}
@@ -92,11 +92,11 @@ function Services() {
               </div>
 
               {/* Content */}
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+              <div className="p-3 sm:p-4 md:p-6">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1 sm:mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
                   {service.title}
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed">
                   {service.description}
                 </p>
               </div>
@@ -104,18 +104,18 @@ function Services() {
           ))}
         </div>
   {/* Call to Action */}
-  <div className="text-center  rounded-2xl p-8 sm:p-12 lg:p-16 shadow-xl">
+  <div className="text-center rounded-2xl p-6 sm:p-10 lg:p-16 shadow-xl mt-8 sm:mt-12 bg-blue-50">
           <h3
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4 sm:mb-6"
+            className="text-xl sm:text-2xl lg:text-4xl font-bold text-black mb-3 sm:mb-6"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             Ready to Optimize Your Packaging?
           </h3>
-          <p className="text-lg sm:text-xl text-black/90 mb-8 sm:mb-10 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-black/90 mb-6 sm:mb-10 max-w-2xl mx-auto">
             Let’s discuss your requirements and see how ATS Packaging can deliver the right solution for your business.
           </p>
           <a href="/contact">
-            <button className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-blue-600 font-semibold text-lg sm:text-xl rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button className="px-6 sm:px-10 py-3 sm:py-4 bg-white text-blue-600 font-semibold text-base sm:text-xl rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               Connect with Us
             </button>
           </a>

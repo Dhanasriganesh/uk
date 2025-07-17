@@ -27,29 +27,50 @@ const brands = [
 ];
 
 function Brands() {
+  // Duplicate brands for seamless loop
+  const carouselBrands = [...brands, ...brands];
   return (
-    <section className="w-full py-12 px-4 sm:px-8 lg:px-16">
+    <section className="w-full py-8 px-2 sm:py-12 sm:px-4 md:px-8 lg:px-16">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl mb-10 text-left" style={{ fontFamily: 'Playfair Display, serif' }}>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl mb-6 sm:mb-10 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
           Brands
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
-          {brands.map((brand, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col items-center group"
-            >
-              <div className="rounded-xl shadow-md p-4 flex items-center justify-center w-32 h-24 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:bg-blue-50 group-hover:ring-2 group-hover:ring-blue-200">
-                <img
-                  src={brand.img}
-                  alt={brand.name}
-                  className="max-h-16 max-w-[100px] object-contain transition-all duration-300"
-                  draggable="false"
-                />
+        <div className="relative overflow-x-hidden hide-scrollbar">
+          <div className="flex w-max animate-marquee gap-4 sm:gap-12" style={{ animationDuration: '32s' }}>
+            {carouselBrands.map((brand, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center group w-24 sm:w-32"
+              >
+                <div className=" p-2 sm:p-4 flex items-center justify-center w-24 h-16 sm:w-32 sm:h-24 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl group-hover: group-hover: group-hover: ">
+                  <img
+                    src={brand.img}
+                    alt={brand.name}
+                    className="max-h-10 sm:max-h-16 max-w-[70px] sm:max-w-[100px] object-contain transition-all duration-300"
+                    draggable="false"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        {/* Carousel animation CSS and hide-scrollbar utility */}
+        <style>{`
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee {
+            animation: marquee linear infinite;
+          }
+          .hide-scrollbar {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+          }
+        `}</style>
       </div>
     </section>
   )

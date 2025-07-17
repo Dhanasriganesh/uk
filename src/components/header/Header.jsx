@@ -107,9 +107,9 @@ function Header() {
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
         {/* Logo */}
         <a href="/ ">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="ATS Packaging Logo" className="h-12 w-auto rounded-full shadow-md bg-white p-1" />
-          </div>
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="ATS Packaging Logo" className="h-12 w-auto rounded-full shadow-md bg-white p-1" />
+        </div>
         </a>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6 lg:gap-10 relative">
