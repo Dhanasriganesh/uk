@@ -40,3 +40,52 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Mobile menu slide-in animation */
+@keyframes slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+/* Hamburger icon animation helpers (Tailwind covers most, but for fallback) */
+.hamburger-bar {
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Dropdown expand/collapse for mobile */
+.mobile-dropdown {
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+
+/* Optional: focus ring for accessibility */
+button:focus, a:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Optional: fade-in for dropdowns */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease;
+}
+
+/* Hide scroll on mobile menu open (optional) */
+body.menu-open {
+  overflow: hidden;
+}
+
+html.menu-open,
+body.menu-open {
+  overflow: hidden !important;
+  height: 100% !important;
+  position: relative !important;
+}
