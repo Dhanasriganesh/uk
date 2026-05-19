@@ -11,7 +11,7 @@ if (typeof document !== 'undefined' && !document.getElementById('playfair-font')
 
 const features = [
   {
-    // Gear/Machine icon
+   
     icon: (
       <svg className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.94-2.34l-1.42-1.42a7.03 7.03 0 0 0 0-2.48l1.42-1.42a1 1 0 0 0-1.42-1.42l-1.42 1.42a7.03 7.03 0 0 0-2.48 0l-1.42-1.42a1 1 0 0 0-1.42 1.42l1.42 1.42a7.03 7.03 0 0 0 0 2.48l-1.42 1.42a1 1 0 0 0 1.42 1.42l1.42-1.42a7.03 7.03 0 0 0 2.48 0l1.42 1.42a1 1 0 0 0 1.42-1.42z"/></svg>
     ),
