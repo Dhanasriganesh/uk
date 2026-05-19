@@ -1,155 +1,126 @@
-import React, { useState, useEffect, useRef } from 'react'
-import Services from './Services';
-import Why from './Why';
-import Connect from './Connect';
-import Sectors from './Sectors';
-import atsVideo from '../../assets/ats-uk.mp4';
-import Brands from './Brands';
-// Add Google Fonts import for Playfair Display in the document head
-if (typeof document !== 'undefined' && !document.getElementById('playfair-font')) {
-  const link = document.createElement('link');
-  link.id = 'playfair-font';
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap';
-  document.head.appendChild(link);
-}
-
-const images = [
-  'https://keyvendors.com/blogs/wp-content/uploads/2023/06/simple-living-room-1.jpg',
-  'https://restaurantinteriordesign.eu/wp-content/uploads/2018/04/Hollywood_Roosevelt_Hotel.jpg',
-  'https://d28pk2nlhhgcne.cloudfront.net/assets/app/uploads/sites/3/2023/05/how-to-design-restaurant-interior-help-3d-3-1220x671.jpg',
-  'https://mohhinteriors.com/wp-content/uploads/2024/05/expensive-restaurant-interior-view-with-colorful-illuminating-scaled.jpg',
-];
-
-const heroTexts = [
-  'Flexible linear capping and high-speed rotary capping machines',
-  'Advanced calibrated torque sensor Tightening options',
-  'Screw-on caps / Push-on caps / Pumps / Spray triggers',
-  'Spray Trigger Feeding Systems up to 200upm',
-  'Bottle Unscramblers up to 200bpm',
-];
+import React, { useRef } from 'react'
+import Why from './Why'
+import Connect from './Connect'
+import Brands from './Brands'
+import atsVideo from '../../assets/ats-uk.mp4'
+import WhatWeDo from '../sections/WhatWeDo'
 
 function Home() {
-  const [current, setCurrent] = useState(0);
-  const timeoutRef = useRef(null);
-  // Add state for hero text
-  const [heroIndex, setHeroIndex] = useState(0);
-  // Ref for video
-  const videoRef = useRef(null);
-  // Mute state
-  const [muted, setMuted] = useState(true);
-
-  useEffect(() => {
-    timeoutRef.current = setTimeout(() => {
-      setCurrent((prev) => (prev + 1) % images.length);
-    }, 5000);
-    return () => clearTimeout(timeoutRef.current);
-  }, [current]);
-  // Hero text carousel effect
-  useEffect(() => {
-    const heroTimeout = setTimeout(() => {
-      setHeroIndex((prev) => (prev + 1) % heroTexts.length);
-    }, 10000);
-    return () => clearTimeout(heroTimeout);
-  }, [heroIndex]);
-
-  const handleArrowClick = () => {
-    if (videoRef.current) {
-      videoRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  const handleMuteToggle = () => {
-    setMuted((prev) => !prev);
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-    }
-  };
-
-  const handleConnectClick = () => {
-    const connectSection = document.getElementById('connect-section');
-    if (connectSection) {
-      connectSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  };
+  const videoRef = useRef(null)
 
   return (
-    <div className="w-full overflow-x-hidden">
-      <main className=" min-h-screen w-full p-0 m-0">
-        {/* Redesigned Hero Section */}
-        <section className="w-full flex flex-col items-center justify-center pt-8 pb-8 px-2 sm:px-6 md:px-12">
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 text-center leading-tight mb-4" style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '0.01em' }}>
-            <span className="text-blue-700">Innovating</span> the Future of <span className="text-blue-500">Packaging</span><br/>
-            <span className="text-gray-700">with ATS</span>
-          </h1>
-          {/* Subheading */}
-          <p className="text-base sm:text-lg md:text-xl text-gray-700 text-center max-w-2xl mb-6">
-            Advanced Tooling Systems UK Ltd delivers cutting-edge packaging machinery and automation solutions for every industry. Experience precision, reliability, and innovation with ATS Packaging.
-          </p>
-          {/* Down Arrow Button */}
-          <button className="mb-6 rounded-full border border-gray-300 p-2 hover:bg-gray-100 transition-colors" aria-label="Scroll Down" onClick={handleArrowClick}>
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {/* Boxed Video - now full width */}
-          <div ref={videoRef} className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full relative">
-            <video
-              ref={videoRef}
-              src={atsVideo}
-              className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover"
-              autoPlay
-              loop
-              playsInline
-              muted={muted}
-              poster=""
+    <div className="w-full bg-white text-[#111111]">
+      <main className="m-0 w-full p-0">
+        <section
+          className="relative flex min-h-svh items-center bg-white"
+          aria-label="Hero"
+        >
+          {/* Decorative backgrounds */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            {/* Left ~68% light grey + curved edge */}
+            <div className="absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]" />
+
+            {/* Subtle diagonal overlay */}
+            <div
+              className="absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] opacity-80"
+              style={{
+                background:
+                  'linear-gradient(125deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.35) 45%, rgba(245,245,245,0) 72%)',
+              }}
             />
-            {/* Mute/Unmute Button */}
-              <button
-              onClick={handleMuteToggle}
-              className="absolute top-4 right-4 bg-white/80 hover:bg-white text-blue-700 rounded-full p-2 shadow transition-all z-10"
-              aria-label={muted ? 'Unmute video' : 'Mute video'}
-            >
-              {muted ? (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l6 6m0-6l-6 6" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 8.25v7.5a.75.75 0 01-1.28.53l-3.22-3.22a.75.75 0 010-1.06l3.22-3.22a.75.75 0 011.28.53z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l6 6m0-6l-6 6" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 8.25v7.5a.75.75 0 01-1.28.53l-3.22-3.22a.75.75 0 010-1.06l3.22-3.22a.75.75 0 011.28.53z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12a7.5 7.5 0 01-7.5 7.5" />
-                </svg>
-              )}
-              </button>
+
+            {/* Bottom-left subtle grey dots */}
+            <div
+              className="absolute -left-2 bottom-0 h-[260px] w-[260px] opacity-80"
+              style={{
+                backgroundImage: 'radial-gradient(rgba(0,0,0,0.12) 1px, transparent 1px)',
+                backgroundSize: '11px 11px',
+                WebkitMaskImage: 'radial-gradient(circle at 0% 100%, black 0%, black 55%, transparent 72%)',
+                maskImage: 'radial-gradient(circle at 0% 100%, black 0%, black 55%, transparent 72%)',
+              }}
+            />
+
+            {/* Bottom-right red angled shape */}
+            <div
+              className="absolute bottom-0 right-0 h-[min(22vw,200px)] w-[min(38vw,340px)]"
+              style={{
+                clipPath: 'polygon(100% 0, 100% 100%, 8% 100%)',
+                background: 'linear-gradient(160deg, #f87171 0%, #ef4444 45%, #b91c1c 100%)',
+              }}
+            />
+
+            {/* Bottom-right grey dot grid */}
+            <div
+              className="absolute bottom-0 right-0 h-[260px] w-[260px] opacity-60"
+              style={{
+                backgroundImage: 'radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px)',
+                backgroundSize: '11px 11px',
+                WebkitMaskImage: 'radial-gradient(circle at 100% 100%, black 0%, black 55%, transparent 72%)',
+                maskImage: 'radial-gradient(circle at 100% 100%, black 0%, black 55%, transparent 72%)',
+              }}
+            />
+
+            {/* Right-side red dot grid (as per reference) */}
+            <div
+              className="absolute right-0 top-[140px] hidden h-[260px] w-[260px] opacity-70 lg:block"
+              style={{
+                backgroundImage: 'radial-gradient(rgba(220,38,38,0.32) 1.3px, transparent 1.3px)',
+                backgroundSize: '12px 12px',
+                WebkitMaskImage: 'radial-gradient(circle at 100% 0%, black 0%, black 55%, transparent 72%)',
+                maskImage: 'radial-gradient(circle at 100% 0%, black 0%, black 55%, transparent 72%)',
+              }}
+              aria-hidden
+            />
+          </div>
+
+          <div className="relative z-10 mx-auto w-full max-w-[1280px] px-5 sm:px-8 py-24 lg:py-0">
+            <div className="grid grid-cols-1 items-center gap-8  lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-0">
+
+              {/* Left copy — pushed to left edge */}
+              <div className="w-full min-w-0 justify-self-start text-left md:-ml-10 xl:-ml-36 lg:-ml-28">
+                <h1 className="text-[36px] font-extrabold leading-[1.08] tracking-[-0.02em] text-black sm:text-[48px] lg:text-[56px] xl:text-[64px]">
+                  <span className="block lg:whitespace-nowrap ">
+                    Continuous <span className="text-[#dc2626]">innovation</span>
+                  </span>
+                  <span className="block lg:whitespace-nowrap">
+                    from product <span className="text-[#dc2626]">diversity</span>
+                  </span>
+                </h1>
+                <div className="mt-6 mb-6 h-[3px] w-[300px] rounded-full bg-[#dc2626] "  />
+                <p className="max-w-[380px] text-[20px] font-normal leading-[1.85] text-[#5f5f5f] lg:max-w-[360px] ml-35 mt-15">
+                  Advanced Tooling Systems UK Ltd offers engineering solutions
+                  across multiple and varied business sectors enabling shared
+                  innovation and experience.
+                </p>
+              </div>
+
+              {/* Right video — shifted right with left margin */}
+              <div className="w-full min-w-0 justify-self-center lg:ml-38 lg:pl-0 mt-15">
+                <div className="overflow-hidden rounded-[20px] bg-[#111] shadow-[0_16px_48px_rgba(0,0,0,0.12)] ">
+                  <video
+                    ref={videoRef}
+                    src={atsVideo}
+                    className="h-[240px] w-full object-cover sm:h-[320px] lg:h-[460px]"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls
+                    preload="metadata"
+                    aria-label="Industrial machinery and packaging lines"
+                  />
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
-       
       </main>
 
-      <div className="w-full">
-        <Services/>
-      </div>
-      <div>
-        <Sectors/>
-      </div>
-      {/* Content Sections */}
-      <div className="w-full">
-        <Why/>
-      </div>
-      <div>
-      <Brands/>
-      </div>
-      
-      <div id="connect-section" className="w-full">
-        <Connect/>
-      </div>
-      
-     
-        
+      <div className="w-full"><WhatWeDo /></div>
+      <div className="w-full"><Why /></div>
+      <div className="w-full"><Brands /></div>
+      <div id="connect-section" className="w-full"><Connect /></div>
     </div>
   )
 }

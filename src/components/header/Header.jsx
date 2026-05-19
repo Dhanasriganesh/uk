@@ -21,7 +21,7 @@ const navLinks = [
       { name: 'Capping Machines', path: '/capping' },
       { name: 'Bottle Unscramblers', path: '/bottle' },
       { name: 'Pump & Trigger Feeding Systems', path: '/pump' },
-      { name: 'Turnkey Filling Lines', path: "/turnkey" },
+      { name: 'Turnkey Filling Lines', path: '/turnkey' },
       { name: 'Bespoke Packaging Solutions', path: '/bespoke' },
       { name: 'Food & Beverage Lines (FBL)', path: '/foodbeverage' },
     ],
@@ -38,240 +38,189 @@ const navLinks = [
   },
   { name: 'Sectors', path: '/sectors' },
   { name: 'Contact', path: '/contact' },
-];
+]
+
+function ChevronDown() {
+  return (
+    <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  )
+}
 
 function Header() {
-  const location = useLocation();
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [showHeader, setShowHeader] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [closeTimeout, setCloseTimeout] = useState(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileDropdown, setMobileDropdown] = useState(null);
+  const location = useLocation()
+  const [openDropdown, setOpenDropdown] = useState(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileExpanded, setMobileExpanded] = useState(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        setShowHeader(false); // scrolling down
-      } else {
-        setShowHeader(true); // scrolling up
-      }
-      setLastScrollY(currentScrollY);
-    };
-    window.addEventListener('scroll', handleScroll);
-    // Keyboard accessibility: close mobile menu on Esc
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setMobileMenuOpen(false);
-        setMobileDropdown(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    // Add/remove body and html class to prevent background scroll when menu is open
-    if (mobileMenuOpen) {
-      document.body.classList.add('menu-open');
-      document.documentElement.classList.add('menu-open');
-    } else {
-      document.body.classList.remove('menu-open');
-      document.documentElement.classList.remove('menu-open');
-    }
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.classList.remove('menu-open');
-      document.documentElement.classList.remove('menu-open');
-    };
-  }, [lastScrollY, mobileMenuOpen]);
+    if (!mobileOpen) return
+    document.body.classList.add('overflow-hidden')
+    return () => document.body.classList.remove('overflow-hidden')
+  }, [mobileOpen])
 
-  const handleDropdown = (name) => {
-    if (closeTimeout) clearTimeout(closeTimeout);
-    setOpenDropdown(name);
-  };
+  useEffect(() => {
+    setMobileOpen(false)
+    setMobileExpanded(null)
+  }, [location.pathname])
 
-  const closeDropdown = () => {
-    setCloseTimeout(setTimeout(() => setOpenDropdown(null), 120));
-  };
-
-  const handleMobileDropdown = (name) => {
-    setMobileDropdown(mobileDropdown === name ? null : name);
-  };
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-    setMobileDropdown(null);
-  };
+  const closeMobile = () => {
+    setMobileOpen(false)
+    setMobileExpanded(null)
+  }
 
   return (
-    <header className={`bg-white shadow-lg sticky top-0 z-50 border-b border-blue-100 transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
-        {/* Logo */}
-        <a href="/ ">
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="ATS Packaging Logo" className="h-12 w-auto rounded-full shadow-md bg-white p-1" />
-        </div>
-        </a>
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-6 lg:gap-10 relative">
-          {navLinks.map(link => (
-            <div
-              key={link.name}
-              className="relative"
-              onMouseEnter={() => {
-                if (closeTimeout) clearTimeout(closeTimeout);
-                link.dropdown && handleDropdown(link.name);
-              }}
-              onMouseLeave={closeDropdown}
-              tabIndex={0}
-              onFocus={() => link.dropdown && handleDropdown(link.name)}
-              onBlur={closeDropdown}
-            >
-              <Link
-                to={link.path}
-                className={`text-lg font-medium px-2 py-1 rounded transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700 ${location.pathname === link.path ? 'text-blue-700 font-bold underline underline-offset-4' : 'text-gray-700'} flex items-center gap-1`}
-              >
-                {link.name}
-                {link.dropdown && (
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                )}
-              </Link>
-              {/* Dropdown */}
-              {link.dropdown && openDropdown === link.name && (
-                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-blue-100 py-2 animate-fade-in z-50"
-                  onMouseEnter={() => {
-                    if (closeTimeout) clearTimeout(closeTimeout);
-                  }}
-                  onMouseLeave={closeDropdown}
+    <header className="fixed top-0 left-0 right-0 z-50 h-24 bg-white border-b border-[#f1f1f1]">
+      <div className="mx-auto h-full max-w-[1280px] px-6">
+        <div className="grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+          <Link to="/" className="flex shrink-0 items-center" aria-label="ATS home">
+            <img src={logo} alt="ATS" className="h-14 w-auto object-contain lg:h-[68px]" />
+          </Link>
+
+          <nav className="hidden min-w-0 justify-center justify-self-center lg:flex" aria-label="Main">
+            <ul className="flex items-center gap-[42px]">
+              {navLinks.map((link) => (
+                <li
+                  key={link.name}
+                  className="relative list-none"
+                  onMouseEnter={() => link.dropdown && setOpenDropdown(link.name)}
+                  onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  {link.dropdown.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      className="block px-6 py-3 text-base text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium"
-                      onClick={() => {
-                        if (closeTimeout) clearTimeout(closeTimeout);
-                        closeDropdown();
-                      }}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        {/* CTA Button (Desktop) */}
-        <a href="/contact" className="ml-4 px-6 py-2 bg-blue-700 text-white rounded-full font-semibold shadow hover:bg-blue-800 transition-colors duration-200 hidden sm:inline-block md:inline-block">Request a Quote</a>
-        {/* Hamburger Menu (Mobile) */}
-        <button
-          className={`md:hidden flex flex-col items-center justify-center w-10 h-10 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : ''}`}
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileMenuOpen}
-          aria-controls="mobile-menu"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <span className="relative w-7 h-7 block">
-            <span className={`absolute left-0 top-2 w-7 h-1 bg-blue-700 rounded transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 top-3' : ''}`}></span>
-            <span className={`absolute left-0 top-4 w-7 h-1 bg-blue-700 rounded transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-            <span className={`absolute left-0 top-6 w-7 h-1 bg-blue-700 rounded transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 top-3' : ''}`}></span>
-          </span>
-        </button>
-      </div>
-      {/* Mobile Menu Drawer */}
-      <div
-        id="mobile-menu"
-        className={`fixed inset-0 z-[9999] md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'rgba(0,0,0,0.4)' }}
-        onClick={closeMobileMenu}
-        aria-hidden={!mobileMenuOpen}
-      >
-        <div
-          className={`fixed top-0 right-0 w-4/5 max-w-xs h-full bg-white shadow-lg p-6 flex flex-col gap-4 transition-transform duration-300 overflow-y-auto ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
-          onClick={e => e.stopPropagation()}
-          tabIndex={-1}
-          style={{ minHeight: '100vh', maxHeight: '100vh' }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <img src={logo} alt="ATS Packaging Logo" className="h-10 w-auto rounded-full bg-white p-1" />
-            <button onClick={closeMobileMenu} aria-label="Close menu">
-              <svg className="w-7 h-7 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <nav className="flex flex-col gap-2">
-            {navLinks.map(link => (
-              <div key={link.name} className="relative">
-                <div className="flex items-center justify-between">
                   <Link
                     to={link.path}
-                    className={`block text-lg font-medium px-2 py-2 rounded transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700 ${location.pathname === link.path ? 'text-blue-700 font-bold underline underline-offset-4' : 'text-gray-700'} flex-1 text-left`}
-                    onClick={e => {
-                      if (link.dropdown) {
-                        e.preventDefault();
-                        handleMobileDropdown(link.name);
-                      } else {
-                        closeMobileMenu();
-                      }
-                    }}
-                    tabIndex={0}
-                    onKeyDown={e => {
-                      if ((e.key === 'Enter' || e.key === ' ') && link.dropdown) {
-                        e.preventDefault();
-                        handleMobileDropdown(link.name);
-                      }
-                    }}
+                    className={`relative inline-flex items-center gap-1 text-[14px] font-semibold leading-none transition-colors ${
+                      location.pathname === link.path
+                        ? 'text-[#dc2626]'
+                        : 'text-[#111111] hover:text-[#dc2626]'
+                    }`}
                   >
                     {link.name}
+                    {link.dropdown && <ChevronDown />}
+                    {location.pathname === link.path && (
+                      <span
+                        className="pointer-events-none absolute -bottom-3 left-1/2 h-[2px] w-[28px] -translate-x-1/2 rounded-full bg-[#dc2626]"
+                        aria-hidden
+                      />
+                    )}
                   </Link>
-                  {link.dropdown && (
-                    <button
-                      type="button"
-                      className="ml-2 focus:outline-none"
-                      aria-label={mobileDropdown === link.name ? `Collapse ${link.name}` : `Expand ${link.name}`}
-                      tabIndex={0}
-                      onClick={e => {
-                        e.preventDefault();
-                        handleMobileDropdown(link.name);
-                      }}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleMobileDropdown(link.name);
-                        }
-                      }}
-                    >
-                      <svg className={`w-4 h-4 transition-transform duration-300 ${mobileDropdown === link.name ? 'rotate-180 text-blue-700' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+
+                  {link.dropdown && openDropdown === link.name && (
+                    <div className="absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 rounded-xl border border-[#f1f1f1] bg-white py-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+                      {link.dropdown.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.path}
+                          className="block px-5 py-3 text-[14px] font-medium text-[#111111] transition-colors hover:bg-[#fef2f2] hover:text-[#dc2626]"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
                   )}
-                </div>
-                {/* Mobile Dropdown */}
-                {link.dropdown && (
-                  <div
-                    className={`mobile-dropdown pl-4 mt-1 flex flex-col gap-1 bg-white ${mobileDropdown === link.name ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-                    style={{ willChange: 'max-height' }}
-                  >
-                    {link.dropdown.map(item => (
-                      <Link
-                        key={item.name}
-                        to={item.path}
-                        className="block px-4 py-2 text-base text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium rounded"
-                        onClick={closeMobileMenu}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <a href="/contact" className="mt-4 px-6 py-2 bg-blue-700 text-white rounded-full font-semibold shadow hover:bg-blue-800 transition-colors duration-200 text-center">Request a Quote</a>
+                </li>
+              ))}
+            </ul>
           </nav>
+
+          <div className="flex items-center justify-end gap-3">
+            <Link
+              to="/contact"
+              className="hidden h-[46px] items-center gap-2 rounded-[12px] bg-[#ef4444] px-[26px] text-[14px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
+            >
+              Request a Quote
+              <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7-7 7M21 12H3" />
+              </svg>
+            </Link>
+
+            <button
+              type="button"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] lg:hidden"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              {mobileOpen ? (
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div id="mobile-nav" className="fixed inset-0 z-40 bg-black/40 pt-24 lg:hidden" onClick={closeMobile}>
+          <div
+            className="ml-auto flex h-[calc(100vh-6rem)] w-full max-w-sm flex-col overflow-y-auto border-l border-[#f1f1f1] bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <nav className="flex flex-col p-6" aria-label="Mobile">
+              {navLinks.map((link) => (
+                <div key={link.name} className="border-b border-[#f1f1f1] py-3 last:border-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <Link
+                      to={link.path}
+                      className={`text-[15px] font-semibold ${
+                        location.pathname === link.path ? 'text-[#dc2626]' : 'text-[#111111]'
+                      }`}
+                      onClick={(e) => {
+                        if (link.dropdown) e.preventDefault()
+                        else closeMobile()
+                      }}
+                    >
+                      {link.name}
+                    </Link>
+                    {link.dropdown && (
+                      <button
+                        type="button"
+                        className="p-2 text-[#111111]"
+                        aria-expanded={mobileExpanded === link.name}
+                        aria-label={`Toggle ${link.name}`}
+                        onClick={() => setMobileExpanded((n) => (n === link.name ? null : link.name))}
+                      >
+                        <ChevronDown />
+                      </button>
+                    )}
+                  </div>
+                  {link.dropdown && mobileExpanded === link.name && (
+                    <div className="mt-2 flex flex-col gap-1 pl-2">
+                      {link.dropdown.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.path}
+                          className="py-2 text-[14px] text-[#5f5f5f] hover:text-[#dc2626]"
+                          onClick={closeMobile}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+              <Link
+                to="/contact"
+                onClick={closeMobile}
+                className="mt-4 flex h-[46px] items-center justify-center gap-2 rounded-[12px] bg-[#ef4444] px-[26px] text-[14px] font-semibold text-white hover:bg-[#dc2626]"
+              >
+                Request a Quote
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7-7 7M21 12H3" />
+                </svg>
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
