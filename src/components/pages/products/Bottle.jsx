@@ -53,10 +53,10 @@ function BottleUnscramblers() {
   return (
     <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-14 flex flex-col md:flex-row items-center gap-6 md:gap-14">
-        {/* Left: Text */}
-        <div className="flex-1 max-w-xl w-full text-center md:text-left">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Bottle Unscramblers</h1>
+      <section className="site-container py-8 sm:py-12 lg:py-14">
+        <div className="page-hero-grid">
+        <div className="w-full max-w-xl flex-1 text-center md:text-left">
+          <h1 className="page-hero-title font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Bottle Unscramblers</h1>
           <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">Our bottle unscramblers are designed for seamless integration into your production line, ensuring bottles are correctly oriented and fed for downstream processes. Engineered for efficiency, flexibility, and minimal operator intervention.</p>
           <ul className="list-disc list-inside text-gray-700 text-left mx-auto md:mx-0 mb-4 sm:mb-6 space-y-2 max-w-xs">
             <li>High-speed bottle orientation and feeding</li>
@@ -86,8 +86,7 @@ function BottleUnscramblers() {
                 key={idx}
                 ref={el => thumbRefs.current[idx] = el}
                 onClick={() => handleThumbClick(idx)}
-                className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                style={{ width: 48, height: 48, minWidth: 48, minHeight: 48, '@media (min-width: 640px)': { width: 60, height: 60, minWidth: 60, minHeight: 60 } }}
+                className={`h-12 w-12 min-h-12 min-w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 sm:h-[60px] sm:w-[60px] sm:min-h-[60px] sm:min-w-[60px] ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
                 tabIndex={0}
                 aria-label={`Show image ${idx + 1}`}
               >
@@ -101,13 +100,14 @@ function BottleUnscramblers() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* System Types & Bottle Formats Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col md:flex-row gap-6 md:gap-14 items-center">
+      <section className="site-container py-6 flex flex-col md:flex-row gap-6 md:gap-14 items-center">
         {/* System Types */}
         <div className="flex-1 bg-blue-50/60 rounded-2xl shadow p-4 sm:p-6 flex flex-col items-center border border-blue-100 max-w-xl w-full">
           <img
@@ -153,7 +153,7 @@ function BottleUnscramblers() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Supporting Info Cards */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col md:flex-row gap-4 md:gap-8 justify-center items-stretch">
+      <section className="site-container py-6 flex flex-col md:flex-row gap-4 md:gap-8 justify-center items-stretch">
         {/* Vacuum Conveyor Card */}
         <div className="flex-1 bg-blue-100/60 rounded-xl shadow p-4 sm:p-5 flex flex-col items-center border border-blue-200 min-w-[140px] transition-transform transition-shadow duration-300 hover:scale-105 hover:shadow-2xl">
           <svg className="w-7 h-7 sm:w-8 sm:h-8 text-blue-500 mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12h18M3 12l4-4m-4 4l4 4" /></svg>
@@ -172,7 +172,7 @@ function BottleUnscramblers() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* CTA Section */}
-      <section className="w-full flex flex-col items-center justify-center py-8 px-2 sm:px-6">
+      <section className="site-container flex w-full flex-col items-center justify-center py-8">
         <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
           <a
             href="/src/assets/pdf_1718978495.pdf"

@@ -71,15 +71,15 @@ function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-24 bg-white border-b border-[#f1f1f1]">
-      <div className="mx-auto h-full max-w-[1280px] px-6">
-        <div className="grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 h-[var(--header-height)] border-b border-[#f1f1f1] bg-white">
+      <div className="mx-auto h-full max-w-[1280px] px-6 top-2">
+        <div className="grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
           <Link to="/" className="flex shrink-0 items-center" aria-label="ATS home">
-            <img src={logo} alt="ATS" className="h-14 w-auto object-contain lg:h-[68px]" />
+            <img src={logo} alt="ATS" className="h-24 w-auto max-h-24 object-contain " />
           </Link>
 
           <nav className="hidden min-w-0 justify-center justify-self-center lg:flex" aria-label="Main">
-            <ul className="flex items-center gap-[42px]">
+            <ul className="flex items-center gap-6 xl:gap-8">
               {navLinks.map((link) => (
                 <li
                   key={link.name}
@@ -89,7 +89,7 @@ function Header() {
                 >
                   <Link
                     to={link.path}
-                    className={`relative inline-flex items-center gap-1 text-[14px] font-semibold leading-none transition-colors ${
+                    className={`relative inline-flex items-center gap-1 text-[13px] font-semibold leading-none transition-colors ${
                       location.pathname === link.path
                         ? 'text-[#dc2626]'
                         : 'text-[#111111] hover:text-[#dc2626]'
@@ -99,7 +99,7 @@ function Header() {
                     {link.dropdown && <ChevronDown />}
                     {location.pathname === link.path && (
                       <span
-                        className="pointer-events-none absolute -bottom-3 left-1/2 h-[2px] w-[28px] -translate-x-1/2 rounded-full bg-[#dc2626]"
+                        className="pointer-events-none absolute -bottom-2 left-1/2 h-[2px] w-6 -translate-x-1/2 rounded-full bg-[#dc2626]"
                         aria-hidden
                       />
                     )}
@@ -126,7 +126,7 @@ function Header() {
           <div className="flex items-center justify-end gap-3">
             <Link
               to="/contact"
-              className="hidden h-[46px] items-center gap-2 rounded-[12px] bg-[#ef4444] px-[26px] text-[14px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
+              className="hidden h-9 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
             >
               Request a Quote
               <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
@@ -136,7 +136,7 @@ function Header() {
 
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] lg:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] lg:hidden"
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -158,9 +158,9 @@ function Header() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div id="mobile-nav" className="fixed inset-0 z-40 bg-black/40 pt-24 lg:hidden" onClick={closeMobile}>
+        <div id="mobile-nav" className="fixed inset-0 z-40 bg-black/40 pt-[var(--header-height)] lg:hidden" onClick={closeMobile}>
           <div
-            className="ml-auto flex h-[calc(100vh-6rem)] w-full max-w-sm flex-col overflow-y-auto border-l border-[#f1f1f1] bg-white shadow-xl"
+            className="ml-auto flex h-[calc(100vh-var(--header-height))] w-full max-w-sm flex-col overflow-y-auto border-l border-[#f1f1f1] bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col p-6" aria-label="Mobile">
@@ -210,7 +210,7 @@ function Header() {
               <Link
                 to="/contact"
                 onClick={closeMobile}
-                className="mt-4 flex h-[46px] items-center justify-center gap-2 rounded-[12px] bg-[#ef4444] px-[26px] text-[14px] font-semibold text-white hover:bg-[#dc2626]"
+                className="mt-4 flex h-9 items-center justify-center gap-2 rounded-[10px] bg-[#ef4444] px-4 text-[13px] font-semibold text-white hover:bg-[#dc2626]"
               >
                 Request a Quote
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
- 
-const sectors = [
+import { useCmsPage } from '../../hooks/useCmsPage';
+
+const defaultSectors = [
   {
     name: 'Pharmaceutical & Cosmetic',
     icon: (
@@ -99,17 +100,19 @@ const cardVariants = {
 };
  
 export default function Sectors() {
+  const { content } = useCmsPage('sectors');
+  const sectors = content.sectors?.length ? content.sectors : defaultSectors;
   return (
-    <div className="min-h-screen bg-[#f9fafb] py-12 px-4 flex flex-col items-center">
-      <h1 className="text-2xl md:text-2xl font-semibold text-gray-900 mb-2 text-center">Sectors</h1>
-      <p className="text-lg text-gray-600 mb-10 text-center max-w-2xl">
-        We provide advanced packaging and automation solutions for a wide range of industries.
+    <div className="site-container section-py flex flex-col items-center bg-[#f9fafb]">
+      <h1 className="page-title mb-2 text-center font-semibold text-gray-900">{content.title || 'Sectors'}</h1>
+      <p className="mb-8 max-w-2xl px-2 text-center text-sm text-gray-600 sm:mb-10 sm:text-base lg:text-lg">
+        {content.intro || 'We provide advanced packaging and automation solutions for a wide range of industries.'}
       </p>
       <div className="w-full max-w-3xl flex flex-col gap-4">
         {sectors.map((sector, i) => (
           <motion.div
             key={sector.name}
-            className="relative bg-white rounded-2xl shadow-lg flex items-start gap-4 border border-gray-100 p-4 overflow-hidden sector-card-glow group"
+            className="sector-card-glow group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-lg sm:gap-4 sm:p-5"
             custom={i}
             initial="hidden"
             whileInView="visible"
@@ -122,7 +125,7 @@ export default function Sectors() {
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              {sector.icon}
+              {defaultSectors[i]?.icon}
             </motion.div>
             <div className="flex-1">
               <h2 className="text-base font-bold text-gray-800 mb-1">{sector.name}</h2>

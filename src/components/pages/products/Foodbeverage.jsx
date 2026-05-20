@@ -52,10 +52,11 @@ function Foodbeverage() {
   return (
     <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-14 flex flex-col md:flex-row items-center gap-6 md:gap-14">
+      <section className="site-container py-8 sm:py-12 lg:py-14">
+        <div className="page-hero-grid">
         {/* Left: Text */}
-        <div className="flex-1 max-w-xl w-full text-center md:text-left">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Food & Beverage Lines (FBL)</h1>
+        <div className="w-full max-w-xl flex-1 text-center md:text-left">
+          <h1 className="page-hero-title font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Food & Beverage Lines (FBL)</h1>
           <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">Our Food & Beverage Line equipment is the most complete range of food manufacturing machinery available in the UK & Ireland from a single source supplier. This unique and comprehensive brand of machinery is designed to provide either individual or turnkey food & beverage production lines for products that need to be packed in glass jars, bottles or metal cans.</p>
         </div>
         {/* Right: Carousel */}
@@ -79,8 +80,7 @@ function Foodbeverage() {
                 key={idx}
                 ref={el => thumbRefs.current[idx] = el}
                 onClick={() => handleThumbClick(idx)}
-                className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                style={{ width: 48, height: 48, minWidth: 48, minHeight: 48, '@media (min-width: 640px)': { width: 60, height: 60, minWidth: 60, minHeight: 60 } }}
+                className={`h-12 w-12 min-h-12 min-w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 sm:h-[60px] sm:w-[60px] sm:min-h-[60px] sm:min-w-[60px] ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
                 tabIndex={0}
                 aria-label={`Show image ${idx + 1}`}
               >
@@ -94,13 +94,14 @@ function Foodbeverage() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Machine Sections */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col gap-6 items-center">
+      <section className="site-container py-6 flex flex-col gap-6 items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Depalletiser</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">An automatic solution for the unpacking of jars, bottles or cans directly onto the production line.</p>
@@ -135,7 +136,7 @@ function Foodbeverage() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* CTA Section */}
-      <section className="w-full flex flex-col items-center justify-center py-8 px-2 sm:px-6">
+      <section className="site-container flex w-full flex-col items-center justify-center py-8">
         <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
           <a
             href="/src/assets/pdf_1718978495.pdf"

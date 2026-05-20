@@ -70,13 +70,13 @@ const containerVariants = {
 export default function ProjectPlanning() {
   return (
     <motion.div
-      className="min-h-screen bg-[#f5f5f5] py-12 px-4 flex flex-col items-center"
+      className="site-container flex min-h-screen flex-col items-center bg-[#f5f5f5] py-12"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
       variants={containerVariants}
     >
-      <div className="w-full max-w-5xl mx-auto">
+      <div className="w-full">
         <motion.div
           className="w-full flex flex-col md:flex-row items-center gap-8 mb-8"
           initial={{ opacity: 0, y: 40 }}

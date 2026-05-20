@@ -1,21 +1,34 @@
 import React from 'react'
+import { useCmsPage } from '../../../hooks/useCmsPage'
+import { CmsImage } from '../../cms/CmsMedia'
 import news1 from '../../../assets/news.png'
 import news2 from '../../../assets/news2.png'
 
+const fallbacks = [news1, news2]
+
 function News() {
+  const { content } = useCmsPage('news')
+  const articles = content.articles?.length ? content.articles : [{ title: 'News 1' }, { title: 'News 2' }]
+
   return (
-    <section className="max-w-5xl mx-auto py-16 px-4">
-      <h1 className="text-4xl font-bold text-blue-800 mb-4 text-center">News</h1>
-      <p className="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-10">
-        Stay up to date with the latest developments, achievements, and updates from Advanced Tooling Systems UK Ltd. Explore our recent news and highlights below.
+    <section className="site-container section-py">
+      <h1 className="page-title mb-3 text-center font-bold text-blue-800 sm:mb-4">{content.title || 'News'}</h1>
+      <p className="mx-auto mb-8 max-w-2xl text-center text-sm text-gray-700 sm:mb-10 sm:text-base lg:text-lg">
+        {content.intro || 'Stay up to date with the latest developments from Advanced Tooling Systems UK Ltd.'}
       </p>
-      <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
-        <div className="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden">
-          <img src={news1} alt="News 1" className="w-full h-80 object-cover object-center" />
-        </div>
-        <div className="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden">
-          <img src={news2} alt="News 2" className="w-full h-80 object-cover object-center" />
-        </div>
+      <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
+        {articles.map((article, i) => (
+          <div key={i} className="overflow-hidden rounded-2xl bg-white shadow-lg">
+            <CmsImage src={article.imageUrl} fallback={fallbacks[i]} alt={article.title} className="aspect-video w-full object-cover object-center sm:aspect-[16/10]" />
+            {article.title && (
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-900">{article.title}</h3>
+                {article.date && <p className="text-sm text-gray-500">{article.date}</p>}
+                {article.excerpt && <p className="mt-2 text-sm text-gray-600">{article.excerpt}</p>}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </section>
   )

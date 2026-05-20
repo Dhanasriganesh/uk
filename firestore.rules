@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /cms_pages/{pageId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /cms_settings/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn() && docId == 'global';
+    }
+
+    // Images stored as base64 data URLs
+    match /cms_media/{mediaId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

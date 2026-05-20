@@ -45,13 +45,13 @@ function PremiumCheckIcon() {
 export default function Trunkey() {
   return (
     <motion.div
-      className="min-h-screen bg-[#f8fafc] py-12 px-4 flex flex-col items-center"
+      className="site-container flex min-h-screen flex-col items-center bg-[#f8fafc] py-12"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
       variants={containerVariants}
     >
-      <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
+      <div className="flex w-full flex-col items-center">
         <motion.img
           src={trunkeyImg}
           alt="Turnkey Automation"

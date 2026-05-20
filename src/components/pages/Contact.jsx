@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import { useCmsPage } from '../../hooks/useCmsPage'
+import { useSiteSettings } from '../../context/CmsContext'
 
-// Add Google Fonts import for Playfair Display in the document head
 if (typeof document !== 'undefined' && !document.getElementById('playfair-font')) {
   const link = document.createElement('link');
   link.id = 'playfair-font';
@@ -10,6 +11,8 @@ if (typeof document !== 'undefined' && !document.getElementById('playfair-font')
 }
 
 function Contact() {
+  const { content } = useCmsPage('contact')
+  const { settings } = useSiteSettings()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,7 +31,7 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you for contacting ATS! We will get back to you soon.');
+    alert(content.formSuccessMessage || 'Thank you for contacting ATS! We will get back to you soon.');
     setFormData({
       name: '',
       email: '',
@@ -39,31 +42,11 @@ function Contact() {
     });
   };
 
-  const contactInfo = [
-    {
-      icon: "📍",
-      title: "Head Office",
-      details: "ATS UK Ltd, South East England, United Kingdom",
-      description: "Our main headquarters and manufacturing facility."
-    },
-    {
-      icon: "📞",
-      title: "Call Us",
-      details: "+44 1234 567890",
-      description: "Speak directly with our team for sales, support, or service."
-    },
-    {
-      icon: "✉️",
-      title: "Email Us",
-      details: "info@ats-uk.com",
-      description: "Send us your enquiry and our team will respond promptly."
-    },
-    {
-      icon: "⏰",
-      title: "Business Hours",
-      details: "Mon - Fri: 8:30 AM - 5:30 PM",
-      description: "We're available during these hours for consultations and support."
-    }
+  const contactInfo = content.contactCards?.length ? content.contactCards : [
+    { icon: '📍', title: 'Head Office', details: settings.contact?.address || settings.footer?.address, description: 'Our main headquarters and manufacturing facility.' },
+    { icon: '📞', title: 'Call Us', details: settings.contact?.phone || settings.footer?.phone, description: 'Speak directly with our team for sales, support, or service.' },
+    { icon: '✉️', title: 'Email Us', details: settings.contact?.email || settings.footer?.email, description: 'Send us your enquiry and our team will respond promptly.' },
+    { icon: '⏰', title: 'Business Hours', details: settings.contact?.businessHours || 'Mon - Fri: 8:30 AM - 5:30 PM', description: "We're available during these hours for consultations and support." },
   ];
 
   const socialLinks = [
@@ -74,25 +57,24 @@ function Contact() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900 to-blue-700 text-white">
+      <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 py-12 text-white sm:py-16 lg:py-20">
         <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 max-w-6xl mx-auto text-center">
+        <div className="site-container relative z-10 text-center">
           <h1 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6"
+            className="page-hero-title mb-4 font-bold sm:mb-6"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
-            Contact ATS
+            {content.heroTitle || 'Contact ATS'}
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
-            Have a question about our packaging solutions, machinery, or services? Get in touch with our team and we’ll be happy to assist you.
+            {content.heroSubtitle || 'Have a question about our packaging solutions, machinery, or services? Get in touch with our team.'}
           </p>
         </div>
       </section>
 
       {/* Contact Information Cards */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-12 sm:py-16 lg:py-20">
+        <div className="site-container">
           <h2 
             className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
             style={{ fontFamily: 'Playfair Display, serif' }}
@@ -113,8 +95,8 @@ function Contact() {
       </section>
 
       {/* Contact Form and Map Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
+      <section className="bg-white py-12 sm:py-16 lg:py-20">
+        <div className="site-container">
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-12">
             {/* Contact Form */}
             <div className="bg-gray-50 p-6 sm:p-8 rounded-2xl shadow-lg">
@@ -271,8 +253,8 @@ function Contact() {
 
 
       {/* FAQ Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gray-100">
-        <div className="max-w-4xl mx-auto">
+      <section className="bg-gray-100 py-12 sm:py-16 lg:py-20">
+        <div className="site-container">
           <h2 
             className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
             style={{ fontFamily: 'Playfair Display, serif' }}

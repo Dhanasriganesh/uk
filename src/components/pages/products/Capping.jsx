@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useCmsPage } from '../../../hooks/useCmsPage';
 import i1 from '../../../assets/i1.jpg';
 import i3 from '../../../assets/i3.png';
 import i4 from '../../../assets/i4.jpg';
@@ -17,6 +18,14 @@ const images = [i1, i3, i4, i5, i7, i8, i9, i10];
 const AUTO_SLIDE_INTERVAL = 3500;
  
 function CappingMachines() {
+  const { content } = useCmsPage('capping');
+  const hero = content.hero || {};
+  const heroBullets = hero.bullets?.length ? hero.bullets : [
+    'High-speed, high-precision capping',
+    'Supports screw, press-on, and specialty caps',
+    'Easy changeover and minimal downtime',
+    'Customizable for your production needs',
+  ];
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const autoSlideRef = useRef(null);
@@ -60,17 +69,15 @@ function CappingMachines() {
  
   return (
     <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
-      {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-14 flex flex-col md:flex-row items-center gap-6 md:gap-14">
-        {/* Left: Text */}
-        <div className="flex-1 max-w-xl w-full text-center md:text-left">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Capping Machines</h1>
-          <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">Discover our advanced capping machines, engineered for precision, speed, and reliability. From linear to rotary systems, our solutions ensure secure, consistent closures for a wide range of products and industries.</p>
+      <section className="site-container py-8 sm:py-12 lg:py-14">
+        <div className="page-hero-grid">
+        <div className="w-full max-w-xl flex-1 text-center md:text-left">
+          <h1 className="page-hero-title font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">{hero.title || 'Capping Machines'}</h1>
+          <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">{hero.intro || 'Discover our advanced capping machines, engineered for precision, speed, and reliability.'}</p>
           <ul className="list-disc list-inside text-gray-700 text-left mx-auto md:mx-0 mb-4 sm:mb-6 space-y-2 max-w-xs">
-            <li>High-speed, high-precision capping</li>
-            <li>Supports screw, press-on, and specialty caps</li>
-            <li>Easy changeover and minimal downtime</li>
-            <li>Customizable for your production needs</li>
+            {heroBullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
           </ul>
         </div>
         {/* Right: Carousel */}
@@ -94,8 +101,7 @@ function CappingMachines() {
                 key={idx}
                 ref={el => thumbRefs.current[idx] = el}
                 onClick={() => handleThumbClick(idx)}
-                className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                style={{ width: 48, height: 48, minWidth: 48, minHeight: 48, '@media (min-width: 640px)': { width: 60, height: 60, minWidth: 60, minHeight: 60 } }}
+                className={`h-12 w-12 min-h-12 min-w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 sm:h-[60px] sm:w-[60px] sm:min-h-[60px] sm:min-w-[60px] ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
                 tabIndex={0}
                 aria-label={`Show image ${idx + 1}`}
               >
@@ -109,13 +115,14 @@ function CappingMachines() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Features/Benefits Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+      <section className="site-container py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-start aspect-square min-w-[140px] w-full h-auto transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-blue-100">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-3 flex items-center gap-2"><FaGears className="text-blue-500 text-lg sm:text-xl" /> Unique Systems</h3>
           <ul className="space-y-1 sm:space-y-2 w-full list-disc list-inside text-gray-700 text-sm sm:text-base">
@@ -149,7 +156,8 @@ function CappingMachines() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
  
       {/* Rotary Capping Machines Section */}
-      <section className="w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-center items-center gap-6 md:gap-14 px-2 sm:px-6 py-6">
+      <section className="site-container py-8 sm:py-10 lg:py-12">
+        <div className="page-hero-grid">
         {/* Left: Text Content */}
         <div className="flex-1 max-w-xl min-w-[180px] w-full mb-4 md:mb-0">
           <h2 className="text-lg sm:text-2xl md:text-4xl font-semibold text-blue-900 mb-2 sm:mb-4 flex items-center gap-2 sm:gap-3"><FaGears className="text-gray-700 text-lg sm:text-2xl md:text-3xl" /> Rotary Capping Machines</h2>
@@ -171,8 +179,7 @@ function CappingMachines() {
             muted={isMuted}
             loop
             playsInline
-            className="rounded-2xl shadow-lg border border-gray-200 w-full h-auto object-contain bg-white cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-blue-400"
-            style={{ maxHeight: '240px', background: 'white' }}
+            className="max-h-[200px] w-full cursor-pointer rounded-2xl border border-gray-200 bg-white object-contain shadow-lg transition-all duration-300 hover:scale-105 hover:border-blue-400 hover:shadow-2xl sm:max-h-[280px] lg:max-h-[360px]"
             onClick={() => setIsMuted(false)}
             title={isMuted ? 'Click to unmute' : 'Click to mute'}
           />
@@ -191,13 +198,15 @@ function CappingMachines() {
             )}
           </button>
         </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
  
       {/* Linear Capping Machines Section */}
-      <section className="w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-center items-center gap-6 md:gap-14 px-2 sm:px-6 py-6">
+      <section className="site-container py-8 sm:py-10 lg:py-12">
+        <div className="page-hero-grid">
         {/* Left: Text Content */}
         <div className="flex-1 max-w-xl min-w-[180px] w-full mb-4 md:mb-0">
           <h2 className="text-lg sm:text-2xl md:text-4xl font-semibold text-blue-900 mb-2 sm:mb-4">Linear Capping Machines</h2>
@@ -219,8 +228,7 @@ function CappingMachines() {
             muted={isLinearMuted}
             loop
             playsInline
-            className="rounded-2xl shadow-lg border border-gray-200 bg-white cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-blue-400 w-full h-auto"
-            style={{ maxHeight: '240px', background: 'white', display: 'block' }}
+            className="block max-h-[200px] w-full cursor-pointer rounded-2xl border border-gray-200 bg-white object-contain shadow-lg transition-all duration-300 hover:scale-105 hover:border-blue-400 hover:shadow-2xl sm:max-h-[280px] lg:max-h-[360px]"
             title="Linear Capping Machine Video"
           />
           {/* Mute/Unmute Icon */}
@@ -238,13 +246,14 @@ function CappingMachines() {
             )}
           </button>
         </div>
+        </div>
       </section>
  
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* CTA Section */}
-      <section className="w-full flex flex-col items-center justify-center py-8 px-2 sm:px-6">
+      <section className="site-container flex w-full flex-col items-center justify-center py-8">
         <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
           <a
             href="/src/assets/pdf_1718978495.pdf"

@@ -60,12 +60,12 @@ function Services() {
   const filteredServices = services;
 
   return (
-    <section className="w-full min-h-screen bg-white py-6 sm:py-10 lg:py-20 px-2 sm:px-4 md:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section className="section-py w-full bg-white">
+      <div className="site-container">
         {/* Header Section */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-20">
           <h2
-            className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 tracking-tight"
+            className="section-title mb-3 font-bold tracking-tight text-gray-900 sm:mb-4 md:mb-6"
             style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '0.04em' }}
           >
             Our Services

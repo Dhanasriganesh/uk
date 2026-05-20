@@ -1,5 +1,141 @@
 @import "tailwindcss";
 
+:root {
+  --header-height: 4rem; /* compact header (h-16) */
+  --site-max-width: 1600px;
+  --site-padding-x: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --site-padding-x: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --site-padding-x: 1.25rem;
+  }
+}
+
+/* Shared horizontal layout */
+.site-container {
+  width: 100%;
+  max-width: var(--site-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--site-padding-x);
+  padding-right: var(--site-padding-x);
+}
+
+/* Reusable section spacing */
+.section-py {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .section-py {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-py {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Page hero titles */
+.page-hero-title {
+  font-size: clamp(1.75rem, 5vw, 3.75rem);
+  line-height: 1.1;
+}
+
+.page-title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.2;
+}
+
+.section-title {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  line-height: 1.15;
+}
+
+/* Product / content page hero row */
+.page-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .page-hero-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+}
+
+/* Hide scrollbars for horizontal thumb strips */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scroll-padding-top: var(--header-height);
+  overflow-x: hidden;
+}
+
 body {
+  margin: 0;
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.site-main {
+  padding-top: var(--header-height);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Marquee animation (Brands) */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
 }

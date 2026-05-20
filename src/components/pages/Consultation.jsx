@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
- 
-const pages = [
+import { useCmsPage } from '../../hooks/useCmsPage';
+
+const defaultPages = [
   {
     title: 'Project Management',
     desc: 'Professional, seamless project execution and coordination.',
@@ -37,7 +38,7 @@ const pages = [
         <circle cx="19" cy="19" r="18" stroke="#38bdf8" strokeWidth="2"/>
       </svg>
     ),
-    path: '/trunkey-automation',
+    path: '/turnkey-automation',
   },
   {
     title: 'Lifecycle Management',
@@ -72,39 +73,46 @@ const containerVariants = {
  
 export default function Consultation() {
   const navigate = useNavigate();
+  const { content } = useCmsPage('consultation');
+  const services = content.services?.length ? content.services : defaultPages;
+  const pages = services.map((s, idx) => ({
+    title: s.title || defaultPages[idx]?.title,
+    desc: s.description || s.desc || defaultPages[idx]?.desc,
+    path: s.path || defaultPages[idx]?.path,
+    icon: defaultPages[idx]?.icon,
+  }));
   return (
     <motion.div
-      className="min-h-screen bg-[#f5f5f5] py-16 px-4 flex flex-col items-center"
+      className="site-container flex min-h-0 flex-col items-center bg-[#f5f5f5] py-10 sm:py-14 lg:py-16"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
       variants={containerVariants}
     >
       <motion.h1
-        className="text-2xl md:text-3xl font-semibold font-sans text-gray-900 mb-8 text-center"
+        className="page-title mb-4 text-center font-semibold text-gray-900 sm:mb-6"
         variants={sectionVariants}
         custom={0}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        Consultation & Solutions Hub
+        {content.title || 'Consultation & Solutions Hub'}
       </motion.h1>
       <motion.p
-        className="text-lg text-gray-700 max-w-2xl mb-12 text-center"
+        className="mb-8 max-w-2xl px-2 text-center text-sm text-gray-700 sm:mb-12 sm:text-base lg:text-lg"
         variants={sectionVariants}
         custom={0.1}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        Explore our core services and solutions. Click a logo to learn more about each area and get started with our expert team.
+        {content.intro || 'Explore our core services and solutions. Click a logo to learn more about each area and get started with our expert team.'}
       </motion.p>
       {/* Logo Grid */}
       <motion.div
-        className="relative grid grid-cols-1 md:grid-cols-2 gap-x-0 gap-y-0 w-full max-w-4xl"
+        className="relative grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-0"
         variants={containerVariants}
-        style={{ minHeight: '420px', background: 'transparent', boxShadow: 'none', borderRadius: 0, padding: 0 }}
       >
         {/* Horizontal line */}
         <div className="hidden md:block absolute left-0 right-0 top-1/2 border-t border-gray-200 z-10" style={{ height: 0 }} />
@@ -124,8 +132,7 @@ export default function Consultation() {
             viewport={{ once: true, amount: 0.2 }}
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.4, type: 'spring' }}
-            className="flex flex-col items-center justify-center bg-transparent border-0 p-0 m-0 min-h-[180px] h-full w-full cursor-pointer focus:outline-none group relative z-20"
-            style={{ minWidth: 0, background: 'transparent', boxShadow: 'none', borderRadius: 0 }}
+            className="group relative z-20 flex min-h-[140px] w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:min-h-[180px] sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none"
           >
             <span className="mb-3" style={{ width: 44, height: 44 }}>{page.icon}</span>
             <span className="text-lg md:text-xl font-bold font-sans text-gray-900 mb-1 text-center" style={{ color: idx === 0 ? '#B71C1C' : idx === 1 ? '#0A3A60' : idx === 2 ? '#F59E00' : '#059669' }}>{page.title}</span>

@@ -1,28 +1,27 @@
 import React from 'react'
-import { BrowserRouter as Router, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import Routers from '../routers/Routers'
 import Footer from '../footer/Footer'
 import Header from '../header/Header'
 
-// ScrollToTop component
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname } = useLocation()
   React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
 }
 
 function Layout() {
   return (
-    <Router>
-      <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'hidden', position: 'relative' }}>
-        <ScrollToTop />
-        <Header/>
-        <Routers/>
-        <Footer/>
-      </div>
-    </Router>
+    <div className="relative w-full max-w-full overflow-x-hidden">
+      <ScrollToTop />
+      <Header />
+      <main className="site-main w-full">
+        <Routers />
+      </main>
+      <Footer />
+    </div>
   )
 }
 

@@ -53,10 +53,11 @@ function Bespoke() {
   return (
     <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-14 flex flex-col md:flex-row items-center gap-6 md:gap-14">
+      <section className="site-container py-8 sm:py-12 lg:py-14">
+        <div className="page-hero-grid">
         {/* Left: Text */}
-        <div className="flex-1 max-w-xl w-full text-center md:text-left">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Bespoke Packaging and Automation & Assembly Systems</h1>
+        <div className="w-full max-w-xl flex-1 text-center md:text-left">
+          <h1 className="page-hero-title font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Bespoke Packaging and Automation & Assembly Systems</h1>
           <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">From general conveyors, product feeding & handling, ultrasonic cap welding, vibrator bowls, assembly systems etc.</p>
         </div>
         {/* Right: Carousel */}
@@ -80,8 +81,7 @@ function Bespoke() {
                 key={idx}
                 ref={el => thumbRefs.current[idx] = el}
                 onClick={() => handleThumbClick(idx)}
-                className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                style={{ width: 48, height: 48, minWidth: 48, minHeight: 48, '@media (min-width: 640px)': { width: 60, height: 60, minWidth: 60, minHeight: 60 } }}
+                className={`h-12 w-12 min-h-12 min-w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 sm:h-[60px] sm:w-[60px] sm:min-h-[60px] sm:min-w-[60px] ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
                 tabIndex={0}
                 aria-label={`Show image ${idx + 1}`}
               >
@@ -95,13 +95,14 @@ function Bespoke() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Automation & Assembly Systems Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col items-center">
+      <section className="site-container py-6 flex flex-col items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Automation & Assembly Systems</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">Our Smart Feeder product is an intelligent system for the feeding and assembly of a wide range of packaging material products. Robotic control, collaborative or otherwise, is part of our DNA with an amazing and experienced team ready for your next automation or assembly application. We have huge experience with Fanuc, Staubli, Adept, Kuka etc. Together with our 'time served' automotive skills we can provide a turnkey solution to exceed any requirement and our vision system inspection (VSI) systems guarantee your product has been handled, assembled and checked before dispatch.</p>
@@ -112,7 +113,7 @@ function Bespoke() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Packaging Automation Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col items-center">
+      <section className="site-container py-6 flex flex-col items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Packaging Automation</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">ATS Packaging automation revolutionizes production efficiency, streamlining processes and ensuring consistent quality. With ATS automated solutions, businesses experience heightened productivity and reduced labor costs, optimizing their packaging operations for success.</p>
@@ -129,7 +130,7 @@ function Bespoke() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Case Erecting/Packing Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col items-center">
+      <section className="site-container py-6 flex flex-col items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Automatic Case Erecting and Packing</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">Automatic Packing and Case Erecting will be carried out by robots equipped with suitable tooling and grippers for box erecting and picking and placing jerry cans or bottles. This robot’s main task will be to keep up with the throughputs of filling station and maintain smooth operation without stopping.</p>
@@ -144,7 +145,7 @@ function Bespoke() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Case Sealing Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col items-center">
+      <section className="site-container py-6 flex flex-col items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Automated Case Sealing</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">The ATS Automated Case Sealer is designed as a fixed format solution, requiring manual adjustments for precise operation. Ideal for long production runs with consistent box dimensions, this machine seamlessly applies two self-adhesive tape stripes along the upper and lower middle lines of boxes. With intuitive controls and straightforward operation, the ATS Automated Case Sealer ensures efficiency, simplicity, and rapid adjustment for optimized packaging processes.</p>
@@ -155,7 +156,7 @@ function Bespoke() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* Palletising Section */}
-      <section className="max-w-6xl mx-auto px-2 sm:px-6 py-6 flex flex-col items-center">
+      <section className="site-container py-6 flex flex-col items-center">
         <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
           <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4">Automated Palletising</h3>
           <p className="text-xs sm:text-base text-gray-700 text-center mb-2">ATS Automated Palletising employs a versatile robot equipped with a gripper tailored for handling multiple configurations, with specific design confirmation upon order. The primary function of this robot is to seamlessly integrate with the packing station, maintaining uninterrupted operation to keep pace with production throughputs. A single roller conveyor connects the cell to the taping machine, facilitating the smooth flow of products to the robot for palletising.</p>
@@ -170,7 +171,7 @@ function Bespoke() {
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
       {/* CTA Section */}
-      <section className="w-full flex flex-col items-center justify-center py-8 px-2 sm:px-6">
+      <section className="site-container flex w-full flex-col items-center justify-center py-8">
         <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
           <a
             href="/src/assets/pdf_1718978495.pdf"
