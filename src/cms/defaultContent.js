@@ -55,14 +55,70 @@ export const defaultHomeWhatWeDo = {
   intro:
     'Explore the varied nature of our business below and see how we can support your industry with precision engineering and innovative solutions.',
   cards: [
-    { title: 'CAD Design and DFM', description: 'Injection moulding and post mould process DFM and design service to the Automotive and Aerospace industries.', imageUrl: '' },
-    { title: 'Inspection Equipment', description: 'Quality assurance equipment from gap and flush gauges to fully automated, recording surface measurement equipment.', imageUrl: '' },
-    { title: 'Aerospace Models', description: 'Aircraft interior mock-ups and monuments from special models to full scale, show standard fuselage structures.', imageUrl: '' },
-    { title: 'Automotive Engineering', description: 'A complete package of post mould processing equipment, from Pressure Laminators and Ultrasonic Welders to Punching and Assembly Stations.', imageUrl: '' },
-    { title: 'Foundry Patterns', description: 'The reverse engineering and recreation of heritage building casting patterns for the building renovation industry.', imageUrl: '' },
-    { title: 'Injection Moulding', description: 'Plastic injection moulding tools manufactured to all budgets and volumes, maintained in our UK toolroom.', imageUrl: '' },
-    { title: 'Packaging Solutions', description: 'From capping and filling to robotised packing and palletisation, including pallet wrapping.', imageUrl: '' },
-    { title: 'Machining and Prototyping', description: 'Full support of low volume manufacture including moulding, machining, assembly and painting.', imageUrl: '' },
+    {
+      title: 'CAD Design and DFM',
+      description:
+        'Injection moulding and post mould process DFM and design service to the Automotive and Aerospace industries.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'cad',
+    },
+    {
+      title: 'Inspection Equipment',
+      description:
+        'Quality assurance equipment from gap and flush gauges to fully automated, recording surface measurement equipment.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'inspection',
+    },
+    {
+      title: 'Aerospace Models',
+      description:
+        'Aircraft interior mock-ups and monuments from spatial models to full scale, show standard fuselage structures.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'aerospace',
+    },
+    {
+      title: 'Automotive Engineering',
+      description:
+        'A complete package of post mould processing equipment, from Pressure Laminators and Ultrasonic Welders to Punching and Assembly Stations.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'automotive',
+    },
+    {
+      title: 'Foundry Patterns',
+      description:
+        'The reverse engineering and recreation of heritage building casting patterns for the building renovation industry.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'foundry',
+    },
+    {
+      title: 'Injection Moulding',
+      description:
+        'Plastic injection moulding tools manufactured to all budgets and volumes, maintained in our UK toolroom.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'moulding',
+    },
+    {
+      title: 'Packaging Solutions',
+      description:
+        'From capping and filling to robotised packing and palletisation, including pallet wrapping.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'packaging',
+    },
+    {
+      title: 'Machining and Prototyping',
+      description:
+        'Full support of low volume manufacture including moulding, machining, assembly and painting.',
+      imageUrl:
+        'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=800&h=500&q=80',
+      icon: 'machining',
+    },
   ],
 }
 
