@@ -1,4 +1,4 @@
-import atsVideo from '../assets/ats-uk.mp4'
+import { HERO_VIDEO_URL } from './mediaPaths'
 import logo from '../assets/logo.png'
 
 /** Global site settings */
@@ -43,7 +43,7 @@ export const defaultHome = {
     line2Highlight: 'diversity',
     description:
       'Advanced Tooling Systems UK Ltd offers engineering solutions across multiple and varied business sectors enabling shared innovation and experience.',
-    videoUrl: atsVideo,
+    videoUrl: HERO_VIDEO_URL,
     videoAriaLabel: 'Industrial machinery and packaging lines',
   },
 }
