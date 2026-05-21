@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const [seedMessage, setSeedMessage] = useState('')
 
   const seedDatabase = async () => {
-    if (!confirm('This will upload default content to Firestore for all pages. Existing content will be merged/overwritten per page. Continue?')) {
+    if (!confirm('This will upload default content for all pages. Existing content will be merged/overwritten per page. Continue?')) {
       return
     }
     setSeeding(true)
@@ -38,7 +38,7 @@ export default function DashboardPage() {
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Content Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage all website pages, images, and text from Firestore.</p>
+          <p className="mt-1 text-sm text-gray-500">Manage all website pages, images, and text from the content library.</p>
         </div>
         <button
           type="button"

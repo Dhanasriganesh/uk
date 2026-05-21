@@ -1,41 +1,78 @@
 import React from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
-import par1 from '../../../assets/par1.png'
-import par2 from '../../../assets/par2.png'
-import par3 from '../../../assets/par3.png'
-import par4 from '../../../assets/par4.png'
-import par5 from '../../../assets/par5.png'
-import par6 from '../../../assets/par6.png'
-import par7 from '../../../assets/par7.png'
-import par8 from '../../../assets/par8.png'
-import par9 from '../../../assets/par9.png'
+import {
+  DEFAULT_SUPPORTED_CUSTOMERS,
+  DEFAULT_TRUSTED_PARTNERS,
+  supportedCustomerFallbacks,
+  trustedPartnerFallbacks,
+} from '../../../cms/partnerFallbacks'
 
-const fallbacks = [par1, par2, par3, par4, par5, par6, par7, par8, par9]
+const serif = { fontFamily: 'Playfair Display, serif' }
+
+function LogoMarquee({ items, fallbacks }) {
+  const track = [...items, ...items]
+
+  return (
+    <div className="relative w-full overflow-x-hidden">
+      <ul className="animate-marquee-slow flex w-max list-none gap-8 sm:gap-10 lg:gap-14">
+        {track.map((item, idx) => (
+          <li
+            key={`${item.name}-${idx}`}
+            className="flex h-14 w-[7.5rem] shrink-0 items-center justify-center sm:h-16 sm:w-32 md:h-[4.5rem] md:w-36 lg:w-40"
+          >
+            <CmsImage
+              src={item.logoUrl}
+              fallback={fallbacks[idx % items.length]}
+              alt={item.name}
+              className="max-h-full max-w-full object-contain"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function Partners() {
   const { content } = useCmsPage('partners')
-  const partners = content.partners?.length ? content.partners : fallbacks.map((_, i) => ({ name: `Partner ${i + 1}` }))
+
+  const supportedCustomers = content.supportedCustomers?.length
+    ? content.supportedCustomers
+    : DEFAULT_SUPPORTED_CUSTOMERS
+
+  const trustedPartners = content.trustedPartners?.length
+    ? content.trustedPartners
+    : content.partners?.length
+      ? content.partners
+      : DEFAULT_TRUSTED_PARTNERS
 
   return (
-    <section className="site-container section-py">
-      <h1 className="page-title mb-6 text-center font-bold text-blue-800 sm:mb-10">{content.title || 'Our Partners'}</h1>
-      <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 md:gap-8">
-        {partners.map((partner, idx) => (
-          <div
-            key={idx}
-            className="flex min-h-[80px] items-center justify-center rounded-2xl bg-white p-2 shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-2xl sm:p-4"
+    <div className="w-full overflow-x-hidden bg-white">
+      <section className="pb-8 sm:pb-12">
+        <div className="site-container section-py pb-6 sm:pb-8">
+          <h2
+            className="section-title text-center font-bold text-black"
+            style={serif}
           >
-            <CmsImage
-              src={partner.logoUrl}
-              fallback={fallbacks[idx]}
-              alt={partner.name || `Partner ${idx + 1}`}
-              className="mx-auto max-h-14 w-auto object-contain sm:max-h-20"
-            />
-          </div>
-        ))}
-      </div>
-    </section>
+            {content.supportedCustomersHeading || 'Supported Customers'}
+          </h2>
+        </div>
+        <LogoMarquee items={supportedCustomers} fallbacks={supportedCustomerFallbacks} />
+      </section>
+
+      <section className="pb-12 sm:pb-16 lg:pb-20">
+        <div className="site-container pb-6 sm:pb-8">
+          <h2
+            className="section-title text-center font-bold text-black"
+            style={serif}
+          >
+            {content.trustedPartnersHeading || 'Trusted Partners'}
+          </h2>
+        </div>
+        <LogoMarquee items={trustedPartners} fallbacks={trustedPartnerFallbacks} />
+      </section>
+    </div>
   )
 }
 

@@ -39,11 +39,13 @@ function StringField({ path, value, onChange }) {
           />
         )}
         {isUrl && !/video/i.test(key) && (
-          <MediaUploader onUploaded={(url) => onChange(path, url)} />
+          <div className="shrink-0">
+            <MediaUploader onUploaded={(url) => onChange(path, url)} />
+          </div>
         )}
       </div>
       {/video/i.test(key) && (
-        <p className="mt-1 text-xs text-gray-500">Videos: paste a hosted URL (YouTube, CDN, or /public path). Images upload to Firestore.</p>
+        <p className="mt-1 text-xs text-gray-500">Videos: paste a hosted URL (YouTube, CDN, or /public path). Images use the media library (max 680 KB).</p>
       )}
       {isUrl && value && (
         <a href={value} target="_blank" rel="noreferrer" className="mt-1 block truncate text-xs text-blue-600">

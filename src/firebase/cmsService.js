@@ -10,11 +10,12 @@ import {
 } from 'firebase/firestore'
 import { db, auth, isFirebaseConfigured } from './config'
 import { waitForAuthReady } from './authHelpers'
-
-const HEIC_TYPES = ['image/heic', 'image/heif']
-const HEIC_EXT = /\.(heic|heif)$/i
-/** Firestore document limit is 1 MiB; base64 adds ~33% overhead */
-const MAX_IMAGE_BYTES = 750 * 1024
+import {
+  STORAGE_RECORD_MAX_BYTES,
+  validateImageFile,
+  isStorageSizeError,
+  storageLimitExceededMessage,
+} from '../cms/mediaLimits'
 
 const PAGES_COLLECTION = 'cms_pages'
 const MEDIA_COLLECTION = 'cms_media'
@@ -22,7 +23,13 @@ const MEDIA_COLLECTION = 'cms_media'
 export function formatMediaError(error) {
   const code = error?.code || ''
   if (code === 'permission-denied') {
-    return 'Permission denied. Sign in at /admin/login and publish Firestore rules (see FIREBASE_SETUP.md).'
+    return 'Permission denied. Sign in at /admin/login before uploading.'
+  }
+  if (isStorageSizeError(error)) {
+    return storageLimitExceededMessage()
+  }
+  if (error?.hint) {
+    return `${error.message} ${error.hint}`
   }
   return error?.message || 'Upload failed'
 }
@@ -39,19 +46,11 @@ async function ensureUploadAuth() {
 }
 
 function assertImageFile(file) {
-  const type = (file.type || '').toLowerCase()
-  if (HEIC_TYPES.includes(type) || HEIC_EXT.test(file.name)) {
-    throw new Error('HEIC/HEIF is not supported. Convert to JPG or PNG first.')
-  }
-  const isImage =
-    type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(file.name)
-  if (!isImage) {
-    throw new Error(
-      'Only images are stored in Firestore (PNG, JPG, WebP, GIF, SVG). For videos, paste an external URL in the content field.'
-    )
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    throw new Error(`Image is too large (max ${Math.round(MAX_IMAGE_BYTES / 1024)} KB for Firestore storage).`)
+  const result = validateImageFile(file)
+  if (!result.ok) {
+    const err = new Error(result.error)
+    if (result.hint) err.hint = result.hint
+    throw err
   }
 }
 
@@ -160,6 +159,13 @@ export async function uploadMedia(file) {
   const user = await ensureUploadAuth()
 
   const dataUrl = await fileToDataUrl(file)
+  const encodedBytes = new Blob([dataUrl]).size
+  if (encodedBytes + 512 > STORAGE_RECORD_MAX_BYTES) {
+    const err = new Error(storageLimitExceededMessage())
+    err.hint = 'Compress the file further or use a smaller resolution.'
+    throw err
+  }
+
   const id = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
   const record = {

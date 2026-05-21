@@ -22,11 +22,11 @@ export default function MediaPage() {
 
   const copyUrl = (url) => {
     navigator.clipboard.writeText(url)
-    alert('Base64 image URL copied. Paste into any imageUrl field in the page editor.')
+    alert('Image link copied. Paste it into any image field in the page editor.')
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this image from Firestore?')) return
+    if (!confirm('Delete this image from the media library?')) return
     await deleteMediaItem(id)
     refresh()
   }
@@ -35,15 +35,15 @@ export default function MediaPage() {
     <div className="p-8">
       <AdminAuthStatus />
 
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Media Library</h1>
-          <p className="mt-1 max-w-xl text-sm text-gray-500">
-            Images are stored in Firestore as base64 data URLs (no Firebase Storage). Max ~750 KB per image.
-            For videos, use a text field and paste an external URL (e.g. YouTube or your CDN).
-          </p>
-        </div>
-        <MediaUploader onUploaded={() => refresh()} />
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Media Library</h1>
+        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+          Upload images for use in page content. Files over the size limit are rejected before upload.
+        </p>
+      </div>
+
+      <div className="mb-10">
+        <MediaUploader variant="full" onUploaded={() => refresh()} />
       </div>
 
       {loading ? (

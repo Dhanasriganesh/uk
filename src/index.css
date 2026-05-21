@@ -134,8 +134,13 @@ video {
   animation: marquee 32s linear infinite;
 }
 
+.animate-marquee-slow {
+  animation: marquee 55s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-marquee-slow {
     animation: none;
   }
 }

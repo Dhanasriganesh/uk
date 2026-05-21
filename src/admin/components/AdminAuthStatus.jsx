@@ -26,7 +26,7 @@ export default function AdminAuthStatus() {
     >
       {status.email ? (
         <p>
-          Signed in as <strong>{status.email}</strong> — images are saved to Firestore as base64 URLs.
+          Signed in as <strong>{status.email}</strong> — images must be under 680 KB each.
         </p>
       ) : (
         <p>

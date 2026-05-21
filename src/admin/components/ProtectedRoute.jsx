@@ -9,9 +9,9 @@ export default function ProtectedRoute({ children }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100 p-8">
         <div className="max-w-md rounded-xl bg-white p-8 shadow-lg text-center">
-          <h2 className="text-lg font-bold text-gray-900">Firebase not configured</h2>
+          <h2 className="text-lg font-bold text-gray-900">Admin is not configured</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Copy <code className="bg-gray-100 px-1">.env.example</code> to <code className="bg-gray-100 px-1">.env.local</code> and add your Firebase keys, then restart the dev server.
+            Copy <code className="bg-gray-100 px-1">.env.example</code> to <code className="bg-gray-100 px-1">.env.local</code> and add your project keys, then restart the dev server.
           </p>
         </div>
       </div>

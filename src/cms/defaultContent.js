@@ -1,4 +1,5 @@
 import { HERO_VIDEO_URL } from './mediaPaths'
+import { DEFAULT_SUPPORTED_CUSTOMERS, DEFAULT_TRUSTED_PARTNERS } from './partnerFallbacks'
 import logo from '../assets/logo.png'
 
 /** Global site settings */
@@ -294,28 +295,42 @@ export const defaultCapping = {
 }
 
 export const defaultTeam = {
-  title: 'Our Team',
-  intro: 'Meet the experienced professionals behind ATS Packaging.',
+  title: 'ATS At a Glance',
+  sectionHeading: 'Our Senior Management Team',
+  intro:
+    'Our senior management team brings together extensive experience across engineering, manufacturing, and customer support.\nCommitted to innovation and excellence, they provide strategic leadership across all areas of the business.\nTogether, they ensure Advanced Tooling Systems UK Ltd continues to deliver outstanding results for our clients worldwide.',
   members: [
-    { name: 'Richard Aitchison', title: 'Technical Sales', imageUrl: '' },
-    { name: 'Adrian Gander', title: 'Group MD', imageUrl: '' },
-    { name: 'Rob Ward', title: 'Project Engineering', imageUrl: '' },
-    { name: 'Dominic Cust', title: 'Projects & Service', imageUrl: '' },
+    { name: 'Adrian Gander', title: 'Group Managing Director', imageUrl: '' },
+    { name: 'Rob Ward', title: 'General Manager', imageUrl: '' },
+    { name: 'Cara Davidson', title: 'Group Head of Finance', imageUrl: '' },
+    { name: 'Matt Kerby', title: 'Technical Sales Manager', imageUrl: '' },
+    { name: 'Dominic Cust', title: 'Head of Project Management', imageUrl: '' },
+    { name: 'Steve Holt', title: 'Works Manager', imageUrl: '' },
   ],
 }
 
 export const defaultNews = {
   title: 'News',
-  intro: 'Stay up to date with the latest developments, achievements, and updates from Advanced Tooling Systems UK Ltd.',
+  intro: '',
   articles: [
-    { title: 'News 1', imageUrl: '', date: '', excerpt: '' },
-    { title: 'News 2', imageUrl: '', date: '', excerpt: '' },
+    {
+      title: 'Boeing EnCore Clearly Ahead Award',
+      date: '',
+      imageUrl: '',
+      body:
+        'It is with great pleasure that we accept the Boeing EnCore Clearly Ahead award after many years of supporting both Boeing and EnCore with some of the largest and most visually impressive projects we\'ve delivered.\n\nHere\'s to many more years, supporting a company that make it so easy to go the extra mile for!\n\nPlease see the link below to our LinkedIn Post:',
+      linkedInUrl:
+        'https://www.linkedin.com/feed/update/urn:li:activity:7437123987547189248',
+      linkedInLabel: 'View on LinkedIn',
+    },
   ],
 }
 
 export const defaultPartners = {
-  title: 'Our Partners',
-  partners: Array.from({ length: 9 }, (_, i) => ({ name: `Partner ${i + 1}`, logoUrl: '' })),
+  supportedCustomersHeading: 'Supported Customers',
+  trustedPartnersHeading: 'Trusted Partners',
+  supportedCustomers: DEFAULT_SUPPORTED_CUSTOMERS,
+  trustedPartners: DEFAULT_TRUSTED_PARTNERS,
 }
 
 export const defaultAts = {

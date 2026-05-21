@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         {!isFirebaseConfigured && (
           <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            Firebase is not configured. Create <strong>.env.local</strong> from <strong>.env.example</strong> and add your project keys.
+            Admin sign-in is not configured. Create <strong>.env.local</strong> from <strong>.env.example</strong> and add your project keys.
           </div>
         )}
 

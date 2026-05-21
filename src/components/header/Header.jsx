@@ -124,41 +124,49 @@ function Header() {
         <nav className="hidden min-w-0 flex-1 items-center justify-center lg:flex" aria-label="Main">
           <ul className="flex items-center gap-6 xl:gap-[42px]">
             {navLinks.map((link) => (
-              <li
-                key={link.name}
-                className="relative flex items-center list-none"
-                onMouseEnter={() => link.dropdown && setOpenDropdown(link.name)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <Link
-                  to={link.path}
-                  className={`relative inline-flex items-center gap-1 py-1 text-[13px] font-semibold leading-none transition-colors xl:text-[14px] ${
-                    isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
-                  }`}
+              <li key={link.name} className="relative flex list-none items-center">
+                <div
+                  className="relative"
+                  onMouseEnter={() => link.dropdown && setOpenDropdown(link.name)}
+                  onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  {link.name}
-                  {link.dropdown && <ChevronDown />}
-                  {isActive(link.path) && (
-                    <span
-                      className="pointer-events-none absolute -bottom-1 left-1/2 h-[2px] w-7 -translate-x-1/2 rounded-full bg-[#dc2626]"
-                      aria-hidden
-                    />
-                  )}
-                </Link>
+                  <Link
+                    to={link.path}
+                    className={`relative inline-flex items-center gap-1 py-1 text-[13px] font-semibold leading-none transition-colors xl:text-[14px] ${
+                      isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
+                    }`}
+                  >
+                    {link.name}
+                    {link.dropdown && <ChevronDown />}
+                    {isActive(link.path) && (
+                      <span
+                        className="pointer-events-none absolute -bottom-1 left-1/2 h-[2px] w-7 -translate-x-1/2 rounded-full bg-[#dc2626]"
+                        aria-hidden
+                      />
+                    )}
+                  </Link>
 
-                {link.dropdown && openDropdown === link.name && (
-                  <div className="absolute left-1/2 top-[calc(100%+0.5rem)] z-50 w-72 -translate-x-1/2 rounded-xl border border-[#f1f1f1] bg-white py-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
-                    {link.dropdown.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.path}
-                        className="block px-5 py-3 text-[14px] font-medium text-[#111111] transition-colors hover:bg-[#fef2f2] hover:text-[#dc2626]"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                  {link.dropdown && openDropdown === link.name && (
+                    <div
+                      className="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-2"
+                      role="menu"
+                      aria-label={`${link.name} submenu`}
+                    >
+                      <div className="rounded-xl border border-[#f1f1f1] bg-white py-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+                        {link.dropdown.map((item) => (
+                          <Link
+                            key={item.name}
+                            to={item.path}
+                            role="menuitem"
+                            className="block px-5 py-3 text-[14px] font-medium text-[#111111] transition-colors hover:bg-[#fef2f2] hover:text-[#dc2626]"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
