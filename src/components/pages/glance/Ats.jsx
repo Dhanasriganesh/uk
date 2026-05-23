@@ -1,321 +1,176 @@
-import React, { useState } from 'react';
-import ats1 from '../../../assets/ats1.png';
-import ats2 from '../../../assets/ats2.png';
-import ats3 from '../../../assets/ats3.png';
-import ats4 from '../../../assets/ats4.png';
-import ats5 from '../../../assets/ats5.png';
+import React from 'react'
+
+const serif = { fontFamily: 'Playfair Display, serif' }
+const RED = '#c00000'
+
+const IMAGES = {
+  heroAircraft:
+    'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=960&h=640&q=80',
+  cabinInterior:
+    'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=960&h=560&q=80',
+  wingClouds:
+    'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=320&h=240&q=80',
+  carInterior:
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=320&h=240&q=80',
+  turbine:
+    'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=320&h=240&q=80',
+  manufacturing:
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=320&h=240&q=80',
+}
+
+const WELCOME_PARAGRAPHS = [
+  'The ATS group was originally founded in 2002 with the goal of becoming a complete solution provider to a wide range of industry sectors.',
+  'After over 20 years, ATS has invested heavily in technology, completed a number of acquisitions and have ultimately sought the skilled personnel required to become the leading industry experts in product design, development and manufacturing for both production parts and turn-key processes.',
+  'Our increasing range of services, all housed within our 2 manufacturing sites based in Maidstone & Folkestone in Kent, give ATS the unique ability to take on projects from initial concept to delivered, production parts or processes with close management throughout by our team of engineers and project managers.',
+  'Adrian Gander – Group MD comments "We recognise the importance of trust in our industry and our ethos has always been to grow relationships with our customers by ensuring they return, thus creating long-term partnerships and opportunities for both parties. Our impressive client base is testament to our success in this goal"',
+  'ATS are a ISO9001-2015 quality and standards certified company, committed to customer service and satisfaction',
+]
+
+const RIGHT_PARAGRAPHS = [
+  'Projects over the last 20 years in the Aerospace, Automotive, Packaging and Injection Moulding space in both prototype and production guises, have brought in-depth experience and expertise across such a variety of business sectors, giving a competitive edge due to the significant cross-sector initiatives and learning, ensuring project exceeds expectation.',
+  'Whether it be producing high quality, individual components to customer drawings, or the design and build of complete production processes and equipment for final, high-volume manufacture, the cross-sector expertise offer the scope for fresh new ideas for manufacture methods, complex engineering solutions and confidence in our products.',
+  'This, in turn brings ATS the diversity that is essential to maintaining consistent sales growth and work flow without the fluctuations all too familiar in the alternative, monoculture style of business.',
+]
+
+const THUMBNAILS = [
+  { src: IMAGES.wingClouds, alt: 'Aircraft wing above the clouds' },
+  { src: IMAGES.carInterior, alt: 'Automotive interior' },
+  { src: IMAGES.turbine, alt: 'Precision engineering component' },
+  { src: IMAGES.manufacturing, alt: 'Industrial manufacturing' },
+]
+
+function MailIcon() {
+  return (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  )
+}
+
+function CenterNav() {
+  return (
+    <nav className="mx-auto w-full max-w-[140px] border border-[#d8d8d8] bg-[#ebebeb] lg:mx-0">
+      <a
+        href="#company-history"
+        className="block border-b border-[#d8d8d8] px-3 py-4 text-center text-[13px] font-bold leading-tight text-[#c00000] hover:bg-[#e0e0e0] sm:px-4 sm:text-sm"
+      >
+        Company History
+      </a>
+      <a
+        href="#why-ats-uk"
+        className="block bg-white px-3 py-4 text-center text-[13px] font-bold leading-tight text-[#c00000] hover:bg-[#fafafa] sm:px-4 sm:text-sm"
+      >
+        Why ATS UK?
+      </a>
+    </nav>
+  )
+}
 
 function Ats() {
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const carouselImages = [ats1, ats2, ats3];
-
-  // Carousel auto-slide every 3s
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [carouselImages.length]);
-
   return (
-    <div style={{ fontFamily: 'inherit', background: '#f8fafc', minHeight: '100vh' }}>
-      {/* About Section */}
-      <section
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '2rem',
-          padding: '2rem 0.5rem',
-        }}
-      >
-        {/* Carousel */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: 400,
-            height: 'auto',
-            aspectRatio: '4/3',
-            position: 'relative',
-            borderRadius: '1.25rem',
-            overflow: 'hidden',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.10)',
-            flex: '1 1 260px',
-            minWidth: 0,
-          }}
-        >
-          {carouselImages.map((img, idx) => (
+    <section className="site-container bg-white pb-12 pt-8 sm:pb-16 sm:pt-10 lg:pb-20">
+      <header className="mb-8 text-center lg:mb-10">
+        <h1 className="text-[1.75rem] font-bold tracking-tight text-black sm:text-4xl lg:text-[2.35rem]" style={serif}>
+          ATS At a Glance
+        </h1>
+      </header>
+
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(110px,0.22fr)_minmax(0,1fr)] lg:gap-x-3 xl:gap-x-4">
+        {/* Row 1 — left hero */}
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <h2 className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]" style={serif}>
+            ATS
+          </h2>
+          <div className="relative overflow-hidden bg-neutral-200">
             <img
-              key={idx}
-              src={img}
-              alt={`ATS ${idx + 2}`}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: carouselIndex === idx ? 1 : 0,
-                transition: 'opacity 0.7s',
-                zIndex: carouselIndex === idx ? 2 : 1,
-              }}
+              src={IMAGES.heroAircraft}
+              alt="Commercial aircraft in flight"
+              className="block aspect-[16/11] w-full object-cover sm:aspect-[16/10]"
             />
-          ))}
-          {/* Carousel dots */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 12,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              display: 'flex',
-              gap: 8,
-            }}
-          >
-            {carouselImages.map((_, idx) => (
-              <span
-                key={idx}
-                onClick={() => setCarouselIndex(idx)}
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  background: carouselIndex === idx ? '#1a202c' : '#cbd5e1',
-                  cursor: 'pointer',
-                  border: '2px solid #fff',
-                  boxShadow: carouselIndex === idx ? '0 0 0 2px #1a202c' : 'none',
-                  transition: 'background 0.3s',
-                }}
-              />
+            <div className="absolute bottom-3 left-3 max-w-[200px] bg-white/95 px-3 py-2.5 sm:bottom-4 sm:left-4 sm:max-w-[230px] sm:px-3.5 sm:py-3">
+              <p className="text-[11px] font-bold leading-snug text-[#c00000] sm:text-xs">
+                A World Leading Engineering Service Provider
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 1 — center nav */}
+        <div className="flex items-end justify-center lg:col-start-2 lg:row-start-1 lg:self-end">
+          <CenterNav />
+        </div>
+
+        {/* Row 1 — right hero */}
+        <div className="min-w-0 lg:col-start-3 lg:row-start-1">
+          <div className="mb-2 flex justify-end">
+            <a
+              href="mailto:info@atsuk.com"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
+              style={{ backgroundColor: RED }}
+            >
+              <MailIcon />
+              info@atsuk.com
+            </a>
+          </div>
+          <p className="mb-2 text-[11px] italic text-[#888888] sm:mb-2.5 sm:text-xs">
+            A World Leading Engineering Service Provider
+          </p>
+          <div className="overflow-hidden bg-neutral-200">
+            <img
+              src={IMAGES.cabinInterior}
+              alt="Luxury aircraft cabin interior"
+              className="block aspect-[16/10] w-full object-cover"
+            />
+          </div>
+          <div className="mt-3 h-px w-full sm:mt-4" style={{ backgroundColor: RED }} aria-hidden />
+        </div>
+
+        {/* Row 2 — left body */}
+        <div id="company-history" className="scroll-mt-28 lg:col-start-1 lg:row-start-2 lg:pt-6">
+          <h3 className="mb-2 text-lg font-bold text-[#555555] sm:text-xl lg:text-[1.35rem]">
+            Welcome to Advanced Tooling Systems UK
+          </h3>
+          <div className="mb-4 h-px w-full sm:mb-5" style={{ backgroundColor: RED }} aria-hidden />
+          <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
+            {WELCOME_PARAGRAPHS.map((text, i) => (
+              <p key={i}>{text}</p>
             ))}
           </div>
         </div>
-        {/* About Text */}
-        <div style={{ maxWidth: 500, flex: '1 1 260px', minWidth: 0 }}>
-          <h2
-            style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: '#1a202c',
-              marginBottom: '1rem',
-              lineHeight: 1.2,
-            }}
-          >
-            Our Mission
-          </h2>
-          <p
-            style={{
-              fontSize: '1rem',
-              color: '#374151',
-              marginBottom: '1.2rem',
-              lineHeight: 1.6,
-            }}
-          >
-            Our main goal is to keep our customers' operations running at peak productivity. We achieve this because of our experienced staff commitment in the areas of pre-sales engineering and after-sales service. We currently support many systems with extremely short response times.<br />
-            <span style={{ color: '#2563eb', fontWeight: 600 }}>Worldwide around the clock.</span>
-          </p>
-        </div>
-      </section>
 
-      {/* Competence Section */}
-      <section
-        style={{
-          background: '#fff',
-          padding: '2rem 0.5rem',
-          borderRadius: '1.5rem',
-          margin: '2rem auto',
-          maxWidth: 1200,
-          boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: '#1a202c',
-            marginBottom: '2rem',
-            textAlign: 'center',
-            lineHeight: 1.2,
-          }}
-        >
-          Competence
-        </h2>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1.5rem',
-            justifyContent: 'center',
-          }}
-        >
-          <img
-            src={ats5}
-            alt="ATS 5"
-            style={{
-              width: '100%',
-              maxWidth: 340,
-              height: 'auto',
-              aspectRatio: '1/1',
-              objectFit: 'cover',
-              borderRadius: '1.25rem',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.10)',
-              flex: '1 1 220px',
-              minWidth: 0,
-            }}
-          />
-          <div
-            style={{
-              flex: '1 1 220px',
-              minWidth: 0,
-              maxWidth: 320,
-              background: '#f1f5f9',
-              borderRadius: '1rem',
-              padding: '1.2rem',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            }}
-          >
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.1rem' }}>
-              State-of-the-art Technology
-            </h3>
-            <p style={{ color: '#374151', fontSize: '0.98rem' }}>
-              We deliver state-of-the-art technology and best quality – in every single machine or every complete line solution.
-            </p>
-          </div>
-          <div
-            style={{
-              flex: '1 1 220px',
-              minWidth: 0,
-              maxWidth: 320,
-              background: '#f1f5f9',
-              borderRadius: '1rem',
-              padding: '1.2rem',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            }}
-          >
-            <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.1rem' }}>
-              Customer Focus
-            </h3>
-            <p style={{ color: '#374151', fontSize: '0.98rem' }}>
-              Our strong relationships with customers have given us the expertise to understand their needs well. This helps us offer the best solutions tailored to each customer. As a result, we're the leader in established markets and the first choice in new markets.
-            </p>
-          </div>
-        </div>
-      </section>
+        {/* Row 2 — center empty */}
+        <div className="hidden lg:col-start-2 lg:row-start-2 lg:block" aria-hidden />
 
-      {/* Hero Section */}
-      <section
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem 0.5rem 1.5rem',
-          background: '#fff',
-          boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-          gap: '2rem',
-        }}
-      >
-        <img
-          src={ats4}
-          alt="ATS Hero"
-          style={{
-            width: '100%',
-            maxWidth: 320,
-            borderRadius: '1.5rem',
-            boxShadow: '0 4px 32px rgba(0,0,0,0.10)',
-            flex: '1 1 220px',
-            minWidth: 0,
-            marginBottom: '1rem',
-          }}
-        />
-        <div style={{ marginLeft: 0, maxWidth: 600, flex: '1 1 260px', minWidth: 0 }}>
-          <h1
-            style={{
-              fontSize: '2rem',
-              fontWeight: 800,
-              color: '#1a202c',
-              marginBottom: '1rem',
-              lineHeight: 1.2,
-            }}
+        {/* Row 2 — right body (invisible heading spacer aligns text with left column) */}
+        <div id="why-ats-uk" className="scroll-mt-28 lg:col-start-3 lg:row-start-2 lg:pt-6">
+          <h3
+            className="pointer-events-none mb-2 hidden text-lg font-bold sm:text-xl lg:invisible lg:block lg:text-[1.35rem]"
+            aria-hidden
           >
-            Where Excellence meets Innovation
-          </h1>
-          <p style={{ fontSize: '1.1rem', color: '#374151', lineHeight: 1.6 }}>
-            ATS has stood for cutting-edge technology with line integration expertise and high quality machines with excellent performance and maximum reliability in Filling, Capping, Packing and palletising.
-          </p>
-        </div>
-      </section>
-
-      {/* Corporate Culture Section */}
-      <section
-        style={{
-          background: '#f8fafc',
-          padding: '2rem 0.5rem',
-          maxWidth: 1200,
-          margin: '2rem auto',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: '#1a202c',
-            marginBottom: '2rem',
-            textAlign: 'center',
-            lineHeight: 1.2,
-          }}
-        >
-          Corporate Culture
-        </h2>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1.5rem',
-            justifyContent: 'center',
-          }}
-        >
-          {[
-            {
-              title: 'Pragmatic & Solution-oriented',
-              desc: `We prioritize efficiency, designing what's necessary while striving for the best outcome.`,
-            },
-            {
-              title: 'Passionate',
-              desc: `Mechanical engineering is not just our profession, it's our passion.`,
-            },
-            {
-              title: 'Innovative',
-              desc: `We are constantly exploring new ideas and technologies to stay ahead and provide innovative solutions.`,
-            },
-            {
-              title: 'Excellence',
-              desc: `We aim for excellence, always setting high standards and working to exceed them.`,
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                flex: '1 1 180px',
-                minWidth: 0,
-                maxWidth: 320,
-                background: '#fff',
-                borderRadius: '1rem',
-                padding: '1.2rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                marginBottom: '1rem',
-              }}
-            >
-              <h3 style={{ fontWeight: 600, color: '#2563eb', marginBottom: 8, fontSize: '1.05rem' }}>{item.title}</h3>
-              <p style={{ color: '#374151', fontSize: '0.97rem' }}>{item.desc}</p>
+            Welcome to Advanced Tooling Systems UK
+          </h3>
+          <div className="mb-4 hidden h-px w-full sm:mb-5 lg:invisible lg:block" aria-hidden />
+          <div className="flex gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1 space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
+              {RIGHT_PARAGRAPHS.map((text, i) => (
+                <p key={i}>{text}</p>
+              ))}
             </div>
-          ))}
+            <div className="flex w-[68px] shrink-0 flex-col gap-1.5 sm:w-[76px] sm:gap-2 lg:w-[82px]">
+              {THUMBNAILS.map((img) => (
+                <img
+                  key={img.alt}
+                  src={img.src}
+                  alt={img.alt}
+                  className="aspect-square w-full object-cover"
+                />
+              ))}
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
-  );
+      </div>
+    </section>
+  )
 }
 
-export default Ats;
+export default Ats
