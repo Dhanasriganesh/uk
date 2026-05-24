@@ -334,34 +334,52 @@ export const defaultPartners = {
 }
 
 export const defaultAts = {
-  mission: {
-    title: 'Our Mission',
-    body: 'To deliver world-class packaging machinery and engineering solutions with innovation, reliability, and customer focus.',
-    tagline: 'Worldwide around the clock.',
-    carouselImageUrls: [],
-  },
-  competence: {
-    title: 'Our Competence',
-    imageUrl: '',
-    cards: [
-      { title: 'State-of-the-art Technology', description: 'Advanced engineering and manufacturing capabilities.' },
-      { title: 'Customer Focus', description: 'Dedicated support and tailored solutions for every client.' },
-    ],
-  },
-  hero: {
-    title: 'Where Excellence meets Innovation',
-    body: 'Advanced Tooling Systems UK Ltd combines decades of experience with cutting-edge technology.',
-    imageUrl: '',
-  },
-  culture: {
-    title: 'Corporate Culture',
-    values: [
-      { title: 'Pragmatic', description: 'Practical solutions that work in real production environments.' },
-      { title: 'Passionate', description: 'Dedicated to excellence in every project we undertake.' },
-      { title: 'Innovative', description: 'Continuous improvement and forward-thinking engineering.' },
-      { title: 'Excellence', description: 'Quality without compromise in design and delivery.' },
-    ],
-  },
+  pageTitle: 'ATS At a Glance',
+  leftHeading: 'ATS',
+  heroTagline: 'A World Leading Engineering Service Provider',
+  heroImageUrl:
+    'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=960&h=640&q=80',
+  welcomeHeading: 'Welcome to Advanced Tooling Systems UK',
+  welcomeParagraphs: [
+    'The ATS group was originally founded in 2002 with the goal of becoming a complete solution provider to a wide range of industry sectors.',
+    'After over 20 years, ATS has invested heavily in technology, completed a number of acquisitions and have ultimately sought the skilled personnel required to become the leading industry experts in product design, development and manufacturing for both production parts and turn-key processes.',
+    'Our increasing range of services, all housed within our 2 manufacturing sites based in Maidstone & Folkestone in Kent, give ATS the unique ability to take on projects from initial concept to delivered, production parts or processes with close management throughout by our team of engineers and project managers.',
+    'Adrian Gander – Group MD comments "We recognise the importance of trust in our industry and our ethos has always been to grow relationships with our customers by ensuring they return, thus creating long-term partnerships and opportunities for both parties. Our impressive client base is testament to our success in this goal"',
+    'ATS are a ISO9001-2015 quality and standards certified company, committed to customer service and satisfaction',
+  ],
+  rightTagline: 'A World Leading Engineering Service Provider',
+  contactEmail: 'info@atsuk.com',
+  rightHeroImageUrl:
+    'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=960&h=560&q=80',
+  rightParagraphs: [
+    'Projects over the last 20 years in the Aerospace, Automotive, Packaging and Injection Moulding space in both prototype and production guises, have brought in-depth experience and expertise across such a variety of business sectors, giving a competitive edge due to the significant cross-sector initiatives and learning, ensuring project exceeds expectation.',
+    'Whether it be producing high quality, individual components to customer drawings, or the design and build of complete production processes and equipment for final, high-volume manufacture, the cross-sector expertise offer the scope for fresh new ideas for manufacture methods, complex engineering solutions and confidence in our products.',
+    'This, in turn brings ATS the diversity that is essential to maintaining consistent sales growth and work flow without the fluctuations all too familiar in the alternative, monoculture style of business.',
+  ],
+  thumbnails: [
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=320&h=240&q=80',
+      alt: 'Aircraft wing above the clouds',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=320&h=240&q=80',
+      alt: 'Automotive interior',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=320&h=240&q=80',
+      alt: 'Precision engineering component',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=320&h=240&q=80',
+      alt: 'Industrial manufacturing',
+    },
+  ],
+  navCompanyHistory: 'Company History',
+  navWhyAts: 'Why ATS UK?',
 }
 
 export const PAGE_DEFAULTS = {

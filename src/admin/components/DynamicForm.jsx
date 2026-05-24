@@ -1,4 +1,5 @@
 import React from 'react'
+import { LuPlus, LuTrash2, LuExternalLink } from 'react-icons/lu'
 import MediaUploader from './MediaUploader'
 
 const URL_KEY_PATTERN = /(url|image|video|logo|src|background|brochure|embed)/i
@@ -7,49 +8,72 @@ function isUrlField(key) {
   return URL_KEY_PATTERN.test(key)
 }
 
+function formatLabel(key) {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/[_-]/g, ' ')
+    .replace(/^\w/, (c) => c.toUpperCase())
+}
+
 function FieldLabel({ label }) {
   return (
-    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-      {label}
+    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+      {formatLabel(label)}
     </label>
   )
 }
 
+const inputClass =
+  'w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-base text-slate-900 transition-colors placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 sm:text-sm'
+
 function StringField({ path, value, onChange }) {
   const key = path[path.length - 1]
-  const isLong = (value?.length || 0) > 80 || key === 'body' || key === 'summary' || key === 'intro' || key === 'description'
+  const isLong =
+    (value?.length || 0) > 80 ||
+    key === 'body' ||
+    key === 'summary' ||
+    key === 'intro' ||
+    key === 'description'
   const isUrl = isUrlField(key)
 
   return (
-    <div className="mb-4">
+    <div className="mb-5">
       <FieldLabel label={key} />
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
         {isLong ? (
           <textarea
-            className="min-h-[100px] flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className={`${inputClass} min-h-[120px] flex-1 resize-y`}
             value={value ?? ''}
             onChange={(e) => onChange(path, e.target.value)}
           />
         ) : (
           <input
             type="text"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className={`${inputClass} flex-1`}
             value={value ?? ''}
             onChange={(e) => onChange(path, e.target.value)}
           />
         )}
         {isUrl && !/video/i.test(key) && (
-          <div className="shrink-0">
+          <div className="shrink-0 sm:pt-0">
             <MediaUploader onUploaded={(url) => onChange(path, url)} />
           </div>
         )}
       </div>
       {/video/i.test(key) && (
-        <p className="mt-1 text-xs text-gray-500">Videos: paste a hosted URL (YouTube, CDN, or /public path). Images use the media library (max 680 KB).</p>
+        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+          Videos: paste a hosted URL (YouTube, CDN, or /public path). Images use the media library (max 680 KB).
+        </p>
       )}
       {isUrl && value && (
-        <a href={value} target="_blank" rel="noreferrer" className="mt-1 block truncate text-xs text-blue-600">
+        <a
+          href={value}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
+        >
           Preview link
+          <LuExternalLink className="h-3 w-3" aria-hidden />
         </a>
       )}
     </div>
@@ -59,34 +83,38 @@ function StringField({ path, value, onChange }) {
 function ArrayOfStrings({ path, value, onChange }) {
   const items = Array.isArray(value) ? value : []
   return (
-    <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+    <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
       <FieldLabel label={`${path[path.length - 1]} (list)`} />
-      {items.map((item, i) => (
-        <div key={i} className="mb-2 flex gap-2">
-          <input
-            className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
-            value={item}
-            onChange={(e) => {
-              const next = [...items]
-              next[i] = e.target.value
-              onChange(path, next)
-            }}
-          />
-          <button
-            type="button"
-            className="text-xs text-red-600"
-            onClick={() => onChange(path, items.filter((_, j) => j !== i))}
-          >
-            Remove
-          </button>
-        </div>
-      ))}
+      <div className="space-y-2">
+        {items.map((item, i) => (
+          <div key={i} className="flex gap-2">
+            <input
+              className={inputClass}
+              value={item}
+              onChange={(e) => {
+                const next = [...items]
+                next[i] = e.target.value
+                onChange(path, next)
+              }}
+            />
+            <button
+              type="button"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-600 transition-colors hover:bg-red-50"
+              onClick={() => onChange(path, items.filter((_, j) => j !== i))}
+              aria-label="Remove item"
+            >
+              <LuTrash2 className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+      </div>
       <button
         type="button"
-        className="text-xs font-medium text-blue-600"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700"
         onClick={() => onChange(path, [...items, ''])}
       >
-        + Add item
+        <LuPlus className="h-3.5 w-3.5" aria-hidden />
+        Add item
       </button>
     </div>
   )
@@ -97,17 +125,18 @@ function ArrayOfObjects({ path, value, onChange }) {
   const sample = items[0] || {}
 
   return (
-    <div className="mb-4 space-y-4">
+    <div className="mb-5 space-y-4">
       <FieldLabel label={`${path[path.length - 1]} (${items.length} items)`} />
       {items.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700">Item {i + 1}</span>
+        <div key={i} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <span className="text-sm font-semibold text-slate-800">Item {i + 1}</span>
             <button
               type="button"
-              className="text-xs text-red-600"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700"
               onClick={() => onChange(path, items.filter((_, j) => j !== i))}
             >
+              <LuTrash2 className="h-3.5 w-3.5" aria-hidden />
               Remove
             </button>
           </div>
@@ -116,13 +145,19 @@ function ArrayOfObjects({ path, value, onChange }) {
       ))}
       <button
         type="button"
-        className="rounded-lg border border-dashed border-blue-400 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-600 transition-colors hover:border-red-300 hover:bg-red-50/50 hover:text-red-700"
         onClick={() => {
-          const empty = Object.fromEntries(Object.keys(sample).map((k) => [k, typeof sample[k] === 'string' ? '' : Array.isArray(sample[k]) ? [] : '']))
+          const empty = Object.fromEntries(
+            Object.keys(sample).map((k) => [
+              k,
+              typeof sample[k] === 'string' ? '' : Array.isArray(sample[k]) ? [] : '',
+            ])
+          )
           onChange(path, [...items, empty])
         }}
       >
-        + Add {path[path.length - 1].replace(/s$/, '')}
+        <LuPlus className="h-4 w-4" aria-hidden />
+        Add {formatLabel(path[path.length - 1].replace(/s$/, ''))}
       </button>
     </div>
   )
@@ -159,9 +194,16 @@ function DynamicFormFields({ data, path = [], onChange }) {
         }
         if (typeof val === 'object') {
           return (
-            <div key={fieldPath.join('.')} className="mb-6 rounded-xl border border-gray-200 p-4">
-              <h4 className="mb-3 text-sm font-bold capitalize text-gray-800">{key}</h4>
-              <ObjectFields path={fieldPath} value={val} onChange={onChange} />
+            <div
+              key={fieldPath.join('.')}
+              className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/30"
+            >
+              <div className="border-b border-slate-200 bg-white px-4 py-3">
+                <h4 className="text-sm font-bold text-slate-800">{formatLabel(key)}</h4>
+              </div>
+              <div className="p-4">
+                <ObjectFields path={fieldPath} value={val} onChange={onChange} />
+              </div>
             </div>
           )
         }
@@ -183,7 +225,7 @@ export default function DynamicForm({ data, onChange }) {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full min-w-0 max-w-4xl">
       <DynamicFormFields data={data} path={[]} onChange={handleChange} />
     </div>
   )
