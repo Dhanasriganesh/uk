@@ -172,7 +172,7 @@ function Header() {
           </ul>
         </nav>
 
-        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+        <div className="ml-auto flex shrink-0 items-center justify-end gap-2 sm:gap-3 lg:ml-0">
           <Link
             to="/contact"
             className="hidden h-9 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
