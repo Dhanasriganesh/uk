@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import trunkeyImg from '../../../assets/i1.jpg';
  
 const summary = `Turn-Key Automation - a Backbone for your Plant\nATS offers turnkey automation solutions leveraging industry experience and expertise to deliver swift automation and packaging applications that meet rigorous standards. Our professionals combine a diverse packaging experience and technical knowledge with disciplined implementation, providing and securing robust automated solutions across all sectors.`;

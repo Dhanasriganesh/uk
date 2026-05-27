@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import projectManagementImg from '../../../assets/i2.jpg';
  
 const summary = `For us, Professional, Seamless Project Management is Our Signature Move

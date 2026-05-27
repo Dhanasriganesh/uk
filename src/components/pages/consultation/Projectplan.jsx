@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import projectPlanningImg from '../../../assets/i2.jpg';
  
 const steps = [

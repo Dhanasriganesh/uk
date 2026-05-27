@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import cappingImg from '../../assets/capping.png'
 import bottle from "../../assets/bottle.png"
@@ -55,8 +55,6 @@ const services = [
 ];
 
 function Services() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  // No categories for services, so always show all
   const filteredServices = services;
 
   return (

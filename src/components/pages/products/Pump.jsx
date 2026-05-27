@@ -7,12 +7,14 @@ import pump5 from '../../../assets/pump5.png';
 import pump6 from '../../../assets/pump6.png';
 import pump7 from '../../../assets/pump7.png';
 import pump8 from '../../../assets/pump8.png';
-import { FaFilePdf } from 'react-icons/fa';
+import { useCmsPage } from '../../../hooks/useCmsPage';
+import ProductCta from '../../products/ProductCta';
 
 const images = [pump1, pump2, pump3, pump4, pump5, pump6, pump7, pump8];
 const AUTO_SLIDE_INTERVAL = 3500;
 
 function Pump() {
+  const { content } = useCmsPage('pump');
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const autoSlideRef = useRef(null);
@@ -146,25 +148,7 @@ function Pump() {
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
-      {/* CTA Section */}
-      <section className="site-container flex w-full flex-col items-center justify-center py-8">
-        <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
-          <a
-            href="/src/assets/pdf_1718978495.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-3 px-6 rounded-full bg-black text-white font-semibold text-base sm:text-lg shadow-lg hover:shadow-2xl hover:bg-blue-900 transition-all duration-300 text-center"
-          >
-            <FaFilePdf className="inline-block mr-2 text-lg sm:text-xl align-middle" /> Download Brochure
-          </a>
-          <a
-            href="/contact"
-            className="w-full py-3 px-6 rounded-full bg-white text-blue-700 font-semibold text-base sm:text-lg shadow-lg hover:shadow-2xl hover:bg-blue-50 border border-blue-200 transition-all duration-300 text-center"
-          >
-            Enquire about this Product
-          </a>
-        </div>
-      </section>
+      <ProductCta cta={content.cta} />
     </div>
   );
 }

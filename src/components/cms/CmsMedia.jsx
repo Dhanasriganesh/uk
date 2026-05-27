@@ -1,5 +1,7 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import { resolveHeroVideoUrl } from '../../cms/mediaPaths'
+import { getVideoPlayback } from '../../utils/videoEmbed'
+import VideoEmbed from './VideoEmbed'
 
 export function CmsImage({ src, fallback, alt = '', className = '', ...props }) {
   const url = src || fallback
@@ -21,14 +23,17 @@ export const CmsVideo = forwardRef(function CmsVideo(
 
   if (!url) return null
 
+  const playback = getVideoPlayback(url)
+
   const handleError = () => {
-    if (url !== resolvedFallback) setUrl(resolvedFallback)
+    if (playback.kind === 'file' && url !== resolvedFallback) {
+      setUrl(resolvedFallback)
+    }
   }
 
   return (
-    <video
+    <VideoEmbed
       ref={ref}
-      key={url}
       src={url}
       className={className}
       onError={handleError}

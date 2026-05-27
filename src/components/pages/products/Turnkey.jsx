@@ -8,12 +8,14 @@ import turnkey6 from '../../../assets/turnkey6.png';
 import turnkey7 from '../../../assets/turnkey7.png';
 import turnkey8 from '../../../assets/turnkey8.png';
 import turnkey9 from '../../../assets/turnkey9.png';
-import { FaFilePdf } from 'react-icons/fa';
+import { useCmsPage } from '../../../hooks/useCmsPage';
+import ProductCta from '../../products/ProductCta';
 
 const images = [turnkey1, turnkey2, turnkey3, turnkey4, turnkey5, turnkey6, turnkey7, turnkey8, turnkey9];
 const AUTO_SLIDE_INTERVAL = 3500;
 
 function Turnkey() {
+  const { content } = useCmsPage('turnkey');
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const autoSlideRef = useRef(null);
@@ -161,25 +163,7 @@ function Turnkey() {
       {/* Divider */}
       <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
 
-      {/* CTA Section */}
-      <section className="site-container flex w-full flex-col items-center justify-center py-8">
-        <div className="flex flex-col gap-3 w-full max-w-xs sm:max-w-xl justify-center">
-          <a
-            href="/src/assets/pdf_1718978495.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-3 px-6 rounded-full bg-black text-white font-semibold text-base sm:text-lg shadow-lg hover:shadow-2xl hover:bg-blue-900 transition-all duration-300 text-center"
-          >
-            <FaFilePdf className="inline-block mr-2 text-lg sm:text-xl align-middle" /> Download Brochure
-          </a>
-          <a
-            href="/contact"
-            className="w-full py-3 px-6 rounded-full bg-white text-blue-700 font-semibold text-base sm:text-lg shadow-lg hover:shadow-2xl hover:bg-blue-50 border border-blue-200 transition-all duration-300 text-center"
-          >
-            Enquire about this Product
-          </a>
-        </div>
-      </section>
+      <ProductCta cta={content.cta} />
       </div>
   );
 }

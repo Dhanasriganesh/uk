@@ -1,6 +1,10 @@
 # Firebase CMS Setup — ATS UK
 
-Uses **Firestore only** for content and images. Images are stored as **base64 data URLs** in the `cms_media` collection. Firebase Storage is **not used**.
+Uses **Firestore** for page content and a **`media` collection** for short media URLs only.
+
+- **No Firebase Storage**
+- **No base64** in the database
+- Files live on your site (`public/media/`, `public/videos/`) or on a CDN; Firestore stores the URL string
 
 ## 1. Environment variables
 
@@ -20,83 +24,57 @@ Restart the dev server after saving: `npm run dev`
 
 1. **Authentication** → enable **Email/Password** → add admin user
 2. **Firestore Database** → create database
-3. You do **not** need Firebase Storage for this CMS
+3. You do **not** need Firebase Storage
 
 ## 3. Firestore security rules (required)
 
-Firebase Console → **Firestore** → **Rules** → paste from `firestore.rules` → **Publish**:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    match /cms_pages/{pageId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-
-    match /cms_settings/{docId} {
-      allow read: if true;
-      allow write: if isSignedIn() && docId == 'global';
-    }
-
-    match /cms_media/{mediaId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-  }
-}
-```
+Firebase Console → **Firestore** → **Rules** → paste from `firestore.rules` → **Publish**
 
 | Collection | Read | Write |
 |------------|------|-------|
 | `cms_pages` | Public | Admin (signed in) |
 | `cms_settings` | Public | Admin |
-| `cms_media` | Public | Admin (base64 images) |
+| `media` | Public | Admin (short URLs only) |
+| `cms_media` | Public | Admin (legacy — migrate then ignore) |
 
 ## 4. Admin panel
 
 | URL | Purpose |
 |-----|---------|
 | `/admin/login` | Sign in |
-| `/admin` | Dashboard |
+| `/admin` | Dashboard — **Seed defaults** (pages + media URLs) |
 | `/admin/pages/{pageId}` | Edit content |
-| `/admin/media` | Upload images (Firestore base64) |
+| `/admin/media` | Add / seed media URLs |
 
-After login, use **Seed defaults to Firestore** once to load initial content.
+### CLI seed (pages + `media` collection)
 
-## 5. Images vs videos
+1. Create an **Email/Password** admin in Firebase Auth.
+2. Add to `uk/.env`:
+   ```
+   SEED_ADMIN_EMAIL=you@example.com
+   SEED_ADMIN_PASSWORD=your-password
+   ```
+3. Publish `firestore.rules` (includes `media` collection).
+4. Run from `uk/`:
 
-| Type | How to manage |
-|------|----------------|
-| **Images** | Upload in admin (max ~750 KB) → saved as base64 in `cms_media` → copy URL into `imageUrl` fields |
-| **Videos** | Paste a URL in text fields (`videoUrl`, etc.) — e.g. `/videos/file.mp4`, YouTube, or CDN. Not uploaded to Firestore |
+   ```bash
+   npm run seed:local
+   ```
+
+This writes default page content to `cms_pages`, settings to `cms_settings/global`, and short media URLs to the **`media`** collection. Files must live under `public/media/` and `public/videos/` on the site.
+
+## 5. Media workflow
+
+1. **Admin → Media Library → Upload file** (images & videos)
+   - **Local dev:** files save to `public/media/` or `public/videos/` → short URLs like `/media/photo.jpg`
+   - **Production:** uses **Firebase Storage** (`cms/…`) when `VITE_FIREBASE_STORAGE_BUCKET` is set
+2. Or paste an existing URL, or click **Seed local media**
+3. Copy the URL into page fields (`imageUrl`, `videoUrl`, etc.)
+
+Publish **`storage.rules`** in Firebase Console (same as `uk/storage.rules`) so signed-in admins can upload.
 
 ## 6. Firestore collections
 
-| Collection | Document | Content |
-|------------|----------|---------|
-| `cms_pages` | `home`, `about`, `capping`, … | `{ content: {...}, updatedAt, updatedBy }` |
-| `cms_settings` | `global` | Footer, contact, logo URL |
-| `cms_media` | auto ID | `{ name, url, dataUrl, type, size, … }` |
-
-## 7. Troubleshooting
-
-### `permission-denied`
-
-Publish Firestore rules (section 3) and sign in at `/admin/login`.
-
-### Image upload fails / too large
-
-- Max size ~750 KB per image (Firestore 1 MiB document limit)
-- Use JPG/PNG/WebP, not HEIC
-- Compress large images before upload
-
-### Admin cannot save
-
-Sign in at `/admin/login`. Rules must allow `write: if request.auth != null`.
+- `cms_pages` — page JSON content
+- `cms_settings` — global settings
+- `media` — `{ name, url, type, source, uploadedBy, createdAt }` (url is always a short string)

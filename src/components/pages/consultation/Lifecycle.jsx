@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import lifecycleImg from '../../../assets/i3.png';
  
 const summary = `Proactive Maintenance and Strategic Upgrades\nOur team takes a proactive approach to maintenance, conducting regular inspections and implementing strategic upgrades to keep your systems operating at their best upon request. By staying ahead of potential issues, we help you avoid costly downtime and maintain productivity.`;

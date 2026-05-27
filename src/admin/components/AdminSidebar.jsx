@@ -2,18 +2,13 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import {
   LuExternalLink,
-  LuImage,
   LuLayoutDashboard,
   LuLogOut,
   LuPanelLeft,
   LuSettings2,
   LuX,
 } from 'react-icons/lu'
-
-export const ADMIN_NAV = [
-  { to: '/admin', label: 'Dashboard', description: 'Pages & content', icon: LuLayoutDashboard, end: true },
-  { to: '/admin/media', label: 'Media Library', description: 'Images & assets', icon: LuImage, end: false },
-]
+import { ADMIN_NAV } from '../adminNav'
 
 export default function AdminSidebar({
   location,
