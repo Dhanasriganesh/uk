@@ -49,28 +49,43 @@ export const trustedPartnerFallbacks = [
 ]
 
 export const DEFAULT_SUPPORTED_CUSTOMERS = [
-  { name: 'Auria', logoUrl: auria },
-  { name: 'JLR', logoUrl: jlr },
-  { name: 'Grupo Antolin', logoUrl: antolin },
-  { name: 'Artifex', logoUrl: artifex },
-  { name: 'Bentley', logoUrl: bentley },
-  { name: 'Boeing', logoUrl: boeing },
-  { name: 'Rolls-Royce', logoUrl: rollsRoyce },
-  { name: 'Adient', logoUrl: adient },
-  { name: 'Safran', logoUrl: safran },
-  { name: 'Avic Cabin Systems', logoUrl: cabin },
-  { name: 'Thompson Aero Seating', logoUrl: thompson },
-  { name: 'BAE Systems', logoUrl: baesystems },
+  { name: 'Auria', logoUrl: '' },
+  { name: 'JLR', logoUrl: '' },
+  { name: 'Grupo Antolin', logoUrl: '' },
+  { name: 'Artifex', logoUrl: '' },
+  { name: 'Bentley', logoUrl: '' },
+  { name: 'Boeing', logoUrl: '' },
+  { name: 'Rolls-Royce', logoUrl: '' },
+  { name: 'Adient', logoUrl: '' },
+  { name: 'Safran', logoUrl: '' },
+  { name: 'Avic Cabin Systems', logoUrl: '' },
+  { name: 'Thompson Aero Seating', logoUrl: '' },
+  { name: 'BAE Systems', logoUrl: '' },
 ]
 
 export const DEFAULT_TRUSTED_PARTNERS = [
-  { name: 'GMS Feeding Systems', logoUrl: gms },
-  { name: 'SMC', logoUrl: smc },
-  { name: 'Balluff', logoUrl: balluff },
-  { name: 'Keyence', logoUrl: keyence },
-  { name: 'Siemens', logoUrl: siemens },
-  { name: 'Matco International', logoUrl: matco },
-  { name: 'Chao Da', logoUrl: chaoda },
-  { name: 'Sick Sensor Intelligence', logoUrl: sick },
-  { name: 'GTMA', logoUrl: gtma },
+  { name: 'GMS Feeding Systems', logoUrl: '' },
+  { name: 'SMC', logoUrl: '' },
+  { name: 'Balluff', logoUrl: '' },
+  { name: 'Keyence', logoUrl: '' },
+  { name: 'Siemens', logoUrl: '' },
+  { name: 'Matco International', logoUrl: '' },
+  { name: 'Chao Da', logoUrl: '' },
+  { name: 'Sick Sensor Intelligence', logoUrl: '' },
+  { name: 'GTMA', logoUrl: '' },
 ]
+
+/** Map partner name → bundled logo for reliable display in all environments. */
+export function partnerLogoByName(defaults, fallbacks) {
+  return Object.fromEntries(defaults.map((item, i) => [item.name.toLowerCase(), fallbacks[i]]))
+}
+
+export const supportedCustomerLogoByName = partnerLogoByName(
+  DEFAULT_SUPPORTED_CUSTOMERS,
+  supportedCustomerFallbacks
+)
+
+export const trustedPartnerLogoByName = partnerLogoByName(
+  DEFAULT_TRUSTED_PARTNERS,
+  trustedPartnerFallbacks
+)

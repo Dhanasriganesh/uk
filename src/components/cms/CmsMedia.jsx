@@ -1,10 +1,22 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import { resolveHeroVideoUrl } from '../../cms/mediaPaths'
+import { resolveCmsImageUrl } from '../../cms/resolveCmsImageUrl'
 
 export function CmsImage({ src, fallback, alt = '', className = '', ...props }) {
-  const url = src || fallback
+  const initial = resolveCmsImageUrl(src, fallback)
+  const [url, setUrl] = useState(initial)
+
+  useEffect(() => {
+    setUrl(resolveCmsImageUrl(src, fallback))
+  }, [src, fallback])
+
   if (!url) return null
-  return <img src={url} alt={alt} className={className} {...props} />
+
+  const handleError = () => {
+    if (fallback && url !== fallback) setUrl(fallback)
+  }
+
+  return <img src={url} alt={alt} className={className} onError={handleError} {...props} />
 }
 
 export const CmsVideo = forwardRef(function CmsVideo(
