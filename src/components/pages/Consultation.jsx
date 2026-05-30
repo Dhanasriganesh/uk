@@ -89,7 +89,7 @@ export default function Consultation() {
       variants={containerVariants}
     >
       <motion.h1
-        className="page-title mb-4 text-center font-semibold text-gray-900 sm:mb-6"
+        className="page-title font-serif-title mb-4 text-center font-bold tracking-tight text-gray-900 sm:mb-6"
         variants={sectionVariants}
         custom={0}
         initial="hidden"
@@ -99,7 +99,7 @@ export default function Consultation() {
         {content.title || 'Consultation & Solutions Hub'}
       </motion.h1>
       <motion.p
-        className="mb-8 max-w-2xl px-2 text-center text-sm text-gray-700 sm:mb-12 sm:text-base lg:text-lg"
+        className="mb-8 max-w-2xl px-2 text-center text-sm leading-relaxed text-gray-600 sm:mb-12 sm:text-base lg:text-xl"
         variants={sectionVariants}
         custom={0.1}
         initial="hidden"
@@ -134,8 +134,8 @@ export default function Consultation() {
             className="group relative z-20 flex min-h-[140px] w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:min-h-[180px] sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none"
           >
             <span className="mb-3" style={{ width: 44, height: 44 }}>{page.icon}</span>
-            <span className="text-lg md:text-xl font-bold font-sans text-gray-900 mb-1 text-center" style={{ color: idx === 0 ? '#B71C1C' : idx === 1 ? '#0A3A60' : idx === 2 ? '#F59E00' : '#059669' }}>{page.title}</span>
-            <span className="text-gray-500 text-sm text-center leading-tight font-medium" style={{ color: idx === 0 ? '#757575' : idx === 1 ? '#0A3A60' : idx === 2 ? '#0A3A60' : '#059669' }}>{page.desc}</span>
+            <span className="font-serif-heading mb-1 text-center text-lg font-bold text-gray-900 md:text-xl" style={{ color: idx === 0 ? '#B71C1C' : idx === 1 ? '#0A3A60' : idx === 2 ? '#F59E00' : '#059669' }}>{page.title}</span>
+            <span className="text-center text-sm font-medium leading-relaxed text-gray-600" style={{ color: idx === 0 ? '#757575' : idx === 1 ? '#0A3A60' : idx === 2 ? '#0A3A60' : '#059669' }}>{page.desc}</span>
           </motion.button>
         ))}
       </motion.div>

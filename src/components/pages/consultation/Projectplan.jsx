@@ -112,9 +112,9 @@ export default function ProjectPlanning() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-2xl md:text-2xl font-semibold font-sans text-gray-900 mb-4 leading-tight"
+              className="font-serif-title text-2xl font-bold tracking-tight text-gray-900 mb-4 leading-tight md:text-3xl"
             >
-              INNOVATION STARTS WITH FORESIGHT
+              Innovation Starts with Foresight
             </motion.h1>
             <motion.p
               variants={sectionVariants}
@@ -122,7 +122,7 @@ export default function ProjectPlanning() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-lg text-gray-700 max-w-3xl mb-8"
+              className="max-w-3xl mb-8 text-base leading-relaxed text-gray-600 sm:text-lg"
             >
               At ATS, we prioritize efficiency and excellence in every step of the process. We outline the key tasks that drive the success of this project:
             </motion.p>
@@ -138,8 +138,8 @@ export default function ProjectPlanning() {
               className="flex flex-col gap-2 border-r last:border-none border-gray-200 pr-6 last:pr-0"
             >
               <div className="text-2xl font-bold text-red-700 mb-1">{step.number}</div>
-              <div className="text-lg font-bold text-gray-900 mb-1">{step.title}</div>
-              <div className="text-gray-700 text-base">{step.desc}</div>
+              <div className="font-serif-heading mb-1 text-lg font-bold text-gray-900">{step.title}</div>
+              <div className="text-base leading-relaxed text-gray-600">{step.desc}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -152,8 +152,8 @@ export default function ProjectPlanning() {
               className="flex flex-col gap-2 border-r last:border-none border-gray-200 pr-6 last:pr-0"
             >
               <div className="text-2xl font-bold text-red-700 mb-1">{step.number}</div>
-              <div className="text-lg font-bold text-gray-900 mb-1">{step.title}</div>
-              <div className="text-gray-700 text-base">{step.desc}</div>
+              <div className="font-serif-heading mb-1 text-lg font-bold text-gray-900">{step.title}</div>
+              <div className="text-base leading-relaxed text-gray-600">{step.desc}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -171,8 +171,8 @@ export default function ProjectPlanning() {
             >
               <span className="mt-2 w-3 h-3 rounded-full bg-red-700 flex-shrink-0"></span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{section.title}</h2>
-                <p className="text-gray-700 text-base">{section.text}</p>
+                <h2 className="font-serif-heading mb-2 text-xl font-bold text-gray-900">{section.title}</h2>
+                <p className="text-base leading-relaxed text-gray-600">{section.text}</p>
               </div>
             </motion.div>
           ))}

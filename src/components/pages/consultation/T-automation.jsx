@@ -77,7 +77,7 @@ export default function Trunkey() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="text-2xl md:text-3xl font-bold font-sans text-gray-900 mb-4 leading-tight text-center"
+          className="font-serif-title mb-4 text-center text-2xl font-bold tracking-tight text-gray-900 leading-tight md:text-3xl"
         >
           A Backbone for Your Plant
         </motion.h1>
@@ -87,7 +87,7 @@ export default function Trunkey() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="text-lg text-gray-700 max-w-3xl mb-10 text-center"
+          className="mx-auto mb-10 max-w-3xl text-center text-base leading-relaxed text-gray-600 sm:text-lg"
         >
           {summary}
         </motion.p>
@@ -112,7 +112,7 @@ export default function Trunkey() {
                   <path d="M4 8.5L7 11.5L12 5.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </span>
-              <span className="text-lg md:text-xl font-semibold text-gray-900 leading-tight">{item}</span>
+              <span className="font-serif-heading text-lg font-bold leading-tight text-gray-900 md:text-xl">{item}</span>
             </motion.div>
           ))}
         </motion.div>

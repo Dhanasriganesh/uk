@@ -59,6 +59,16 @@
   line-height: 1.2;
 }
 
+/* Headings — matches Services, Sectors, Connect, etc. */
+.font-serif-title {
+  font-family: "Playfair Display", serif;
+  letter-spacing: 0.04em;
+}
+
+.font-serif-heading {
+  font-family: "Playfair Display", serif;
+}
+
 .section-title {
   font-size: clamp(1.5rem, 3.5vw, 2.5rem);
   line-height: 1.15;

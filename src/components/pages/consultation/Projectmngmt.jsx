@@ -131,9 +131,9 @@ export default function ProjectManagement() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-2xl md:text-2xl font-semibold font-sans text-gray-900 mb-4 leading-tight"
+              className="font-serif-title text-2xl font-bold tracking-tight text-gray-900 mb-4 leading-tight md:text-3xl"
             >
-              PROFESSIONALISM IN EVERY STEP
+              Professionalism in Every Step
             </motion.h1>
             <motion.p
               variants={sectionVariants}
@@ -141,7 +141,7 @@ export default function ProjectManagement() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-lg text-gray-700 max-w-3xl mb-8"
+              className="max-w-3xl mb-8 text-base leading-relaxed text-gray-600 sm:text-lg"
             >
               {summary}
             </motion.p>
@@ -166,8 +166,8 @@ export default function ProjectManagement() {
                 <PremiumCheckIcon />
               </span>
               <div>
-                <div className="text-lg font-semibold text-gray-900 mb-1">{task.title}</div>
-                <div className="text-gray-600 text-base">{task.desc}</div>
+                <div className="font-serif-heading mb-1 text-lg font-bold text-gray-900">{task.title}</div>
+                <div className="text-base leading-relaxed text-gray-600">{task.desc}</div>
               </div>
             </motion.div>
           ))}
@@ -186,8 +186,8 @@ export default function ProjectManagement() {
             >
               <span className="mt-2 w-3 h-3 rounded-full bg-blue-700 flex-shrink-0"></span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{section.title}</h2>
-                <p className="text-gray-700 text-base">{section.text}</p>
+                <h2 className="font-serif-heading mb-2 text-xl font-bold text-gray-900">{section.title}</h2>
+                <p className="text-base leading-relaxed text-gray-600">{section.text}</p>
               </div>
             </motion.div>
           ))}

@@ -87,9 +87,9 @@ export default function LifecycleManagement() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-2xl md:text-2xl font-semibold font-sans text-gray-900 mb-4 leading-tight"
+              className="font-serif-title text-2xl font-bold tracking-tight text-gray-900 mb-4 leading-tight md:text-3xl"
             >
-              PROACTIVE, STRATEGIC, COMPREHENSIVE
+              Proactive, Strategic, Comprehensive
             </motion.h1>
             <motion.p
               variants={sectionVariants}
@@ -97,7 +97,7 @@ export default function LifecycleManagement() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="text-lg text-gray-700 max-w-3xl mb-8"
+              className="max-w-3xl mb-8 text-base leading-relaxed text-gray-600 sm:text-lg"
             >
               {summary}
             </motion.p>
@@ -122,8 +122,8 @@ export default function LifecycleManagement() {
                 <PremiumCheckIcon />
               </span>
               <div>
-                <div className="text-lg font-semibold text-gray-900 mb-1">{card.title}</div>
-                <div className="text-gray-600 text-base whitespace-pre-line">{card.desc}</div>
+                <div className="font-serif-heading mb-1 text-lg font-bold text-gray-900">{card.title}</div>
+                <div className="whitespace-pre-line text-base leading-relaxed text-gray-600">{card.desc}</div>
               </div>
             </motion.div>
           ))}
