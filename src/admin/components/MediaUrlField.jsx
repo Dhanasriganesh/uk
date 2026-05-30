@@ -82,8 +82,7 @@ export default function MediaUrlField({ path, value, onChange }) {
           }}
         />
         <p className="mt-2 text-[11px] text-slate-500">
-          Saves to <code className="rounded bg-slate-100 px-1">public/media</code> or{' '}
-          <code className="rounded bg-slate-100 px-1">public/videos</code> (dev), then fills this field.
+          Images are stored in Firestore (max ~700 KB each). Save the page after uploading.
         </p>
       </div>
 

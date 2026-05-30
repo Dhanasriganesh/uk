@@ -72,7 +72,9 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
         accept,
         onProgress: setProgress,
       })
-      setSuccess(`Uploaded “${result.name}” → ${result.url}`)
+      const urlLabel =
+        result.url?.startsWith('data:') ? 'image saved in Firestore' : result.url
+      setSuccess(`Uploaded “${result.name}” → ${urlLabel}`)
       onUploaded?.(result.url, result)
     } catch (err) {
       setError(formatMediaError(err) || err.message || 'Upload failed')
@@ -90,10 +92,10 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
       </div>
       <p className="mb-3 text-xs text-slate-500">
         {accept === 'video'
-          ? 'Videos → /videos/ (or Firebase Storage when deployed)'
+          ? 'Videos: dev public folder or paste YouTube/Vimeo on live site'
           : accept === 'image'
-            ? 'Images → /media/'
-            : 'Images and videos — saved as URLs in the media library'}
+            ? 'Images: saved in Firestore as base64 (max ~700 KB)'
+            : 'Images in Firestore; videos via URL or dev upload'}
       </p>
       <input
         ref={fileInputRef}

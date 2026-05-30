@@ -1,14 +1,48 @@
 # Firebase CMS Setup — ATS UK
 
-Uses **Firestore** for page content and a **`media` collection** for short media URLs only.
+- **Firestore** (Spark / free) — page text and **URL strings** only  
+- **Firebase Storage** — requires **Blaze (pay-as-you-go)** on many projects; your console shows “Upgrade project” to use Storage  
+- **Do not store videos as base64 in Firestore** — see below  
 
-- **No Firebase Storage**
-- **No base64** in the database
-- Files live on your site (`public/media/`, `public/videos/`) or on a CDN; Firestore stores the URL string
+## Why not base64 in Firestore?
 
-## 1. Environment variables
+| Issue | Detail |
+|--------|--------|
+| **Size limit** | Each Firestore document is max **~1 MB** total |
+| **Base64 overhead** | File grows ~33% when encoded |
+| **Your videos** | A phone/screen recording MP4 is often **5–150 MB** |
+| **Performance** | The whole site would download the entire video from Firestore on every visit |
 
-Copy `.env.example` to `.env`:
+So base64 works only for **very small** assets (tiny icons). It is **not** a solution for hero or product videos.
+
+## What works without paying for Storage
+
+### Option A — YouTube or Vimeo (easiest for hero video)
+
+1. Upload the video to YouTube (unlisted is fine).  
+2. Admin → **Home Hero** → paste the watch URL in `videoUrl`.  
+3. **Save** — the site already embeds YouTube/Vimeo players.
+
+### Option B — Ship the file with the website
+
+1. Put `your-video.mp4` in `public/videos/` in the project.  
+2. Commit, push, redeploy Vercel.  
+3. Admin → set `videoUrl` to `/videos/your-video.mp4` → **Save**.  
+
+Works on the live site; no Storage bucket needed.
+
+### Option C — Enable Firebase Storage (Blaze)
+
+1. Firebase Console → **Upgrade to Blaze** (pay-as-you-go; includes free usage, you only pay if you exceed quotas).  
+2. Enable **Storage** → publish `storage.rules`.  
+3. Vercel env: `FIREBASE_SERVICE_ACCOUNT_JSON` + `VITE_FIREBASE_STORAGE_BUCKET`.  
+4. Then admin **Upload** on the live site works (server uploads to Storage, Firestore stores the HTTPS URL).
+
+## Local development
+
+`npm run dev` — **Upload** saves files to `public/media/` or `public/videos/` and stores paths like `/videos/file.mp4` in Firestore.
+
+## Environment variables (`.env`)
 
 ```env
 VITE_FIREBASE_API_KEY=
@@ -18,89 +52,14 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-Restart the dev server after saving: `npm run dev`
+`VITE_FIREBASE_STORAGE_BUCKET` is only needed if you use Storage (Blaze).
 
-## 2. Firebase Console
+## Firestore rules
 
-1. **Authentication** → enable **Email/Password** → add admin user
-2. **Firestore Database** → create database
-3. You do **not** need Firebase Storage
+Publish `firestore.rules` for `cms_pages`, `cms_settings`, and `media`.
 
-## 3. Firestore security rules (required)
+## Collections
 
-Firebase Console → **Firestore** → **Rules** → paste from `firestore.rules` → **Publish**
-
-| Collection | Read | Write |
-|------------|------|-------|
-| `cms_pages` | Public | Admin (signed in) |
-| `cms_settings` | Public | Admin |
-| `media` | Public | Admin (short URLs only) |
-| `cms_media` | Public | Admin (legacy — migrate then ignore) |
-
-## 4. Admin panel
-
-| URL | Purpose |
-|-----|---------|
-| `/admin/login` | Sign in |
-| `/admin` | Dashboard — **Seed defaults** (pages + media URLs) |
-| `/admin/pages/{pageId}` | Edit content |
-| `/admin/media` | Add / seed media URLs |
-
-### CLI seed (pages + `media` collection)
-
-1. Create an **Email/Password** admin in Firebase Auth.
-2. Add to `uk/.env`:
-   ```
-   SEED_ADMIN_EMAIL=you@example.com
-   SEED_ADMIN_PASSWORD=your-password
-   ```
-3. Publish `firestore.rules` (includes `media` collection).
-4. Run from `uk/`:
-
-   ```bash
-   npm run seed:local
-   ```
-
-This writes default page content to `cms_pages`, settings to `cms_settings/global`, and short media URLs to the **`media`** collection. Files must live under `public/media/` and `public/videos/` on the site.
-
-## 5. Media workflow
-
-1. **Admin → Media Library → Upload file** (images & videos)
-   - **Local dev (`npm run dev`):** files save to `public/media/` or `public/videos/` → `/media/photo.jpg`
-   - **Production (Vercel):** uploads go through **`/api/admin/upload`** (server-side Firebase Storage) so browser CORS does not block large videos
-2. Or paste an existing URL, or click **Seed local media**
-3. Copy the URL into page fields (`imageUrl`, `videoUrl`, etc.)
-
-Publish **`storage.rules`** in Firebase Console (same as `uk/storage.rules`) so signed-in admins can upload.
-
-### Production uploads on Vercel (required)
-
-In Vercel → **Project → Settings → Environment Variables**, add:
-
-| Variable | Value |
-|----------|--------|
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | Full JSON from Firebase Console → Project settings → Service accounts → Generate new private key (paste as one line) |
-| `FIREBASE_STORAGE_BUCKET` | Same as `VITE_FIREBASE_STORAGE_BUCKET` (e.g. `your-project.firebasestorage.app`) |
-| `VITE_FIREBASE_API_KEY` | Same as in `.env` (used to verify admin login on upload) |
-
-Redeploy after saving env vars.
-
-### Storage CORS (if browser uploads still fail)
-
-If uploads fall back to the browser SDK, configure the bucket once (Google Cloud SDK):
-
-```bash
-gcloud storage buckets update gs://YOUR_BUCKET_NAME --cors-file=storage.cors.json
-```
-
-Replace `YOUR_BUCKET_NAME` with your `VITE_FIREBASE_STORAGE_BUCKET` value. Add your exact Vercel preview URL to `storage.cors.json` if needed.
-
-### Fix a broken hero video URL
-
-If the home page video URL in Firestore looks like `.../o?name=cms%2F...` (upload API shape, not a file link), open **Admin → Home Hero**, upload again or paste a valid URL (`/videos/…` or a full `…?alt=media&token=…` link), then **Save**.
-
-## 6. Firestore collections
-
-- `cms_pages` — page JSON content
-- `cms_settings` — global settings
-- `media` — `{ name, url, type, source, uploadedBy, createdAt }` (url is always a short string)
+- `cms_pages` — page JSON  
+- `cms_settings` — global settings  
+- `media` — `{ name, url, type, ... }` — **url must be a short link**, not file bytes  

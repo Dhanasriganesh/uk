@@ -16,7 +16,7 @@ service cloud.firestore {
       allow write: if isSignedIn() && docId == 'global';
     }
 
-    // Media library — short URL strings only (no file bytes)
+    // Media library — https paths or base64 image data URLs
     match /media/{mediaId} {
       allow read: if true;
       allow write: if isSignedIn();

@@ -28,7 +28,9 @@ const URL_FIELD_PATTERN = /(https?:\/\/[^\s"'<>]+|\/[a-zA-Z0-9_./%-]+)/g
 export function isShortMediaUrl(value) {
   if (typeof value !== 'string') return false
   const trimmed = value.trim()
-  if (!trimmed || trimmed.startsWith('data:')) return false
+  if (!trimmed) return false
+  if (trimmed.startsWith('data:image/')) return true
+  if (trimmed.startsWith('data:')) return false
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return true
   if (trimmed.startsWith('/')) return true
   return false
@@ -37,6 +39,7 @@ export function isShortMediaUrl(value) {
 export function normalizeShortUrl(url) {
   const trimmed = (url || '').trim()
   if (!trimmed) return ''
+  if (trimmed.startsWith('data:image/')) return trimmed
   if (trimmed.startsWith('data:')) return ''
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     try {
@@ -51,7 +54,12 @@ export function normalizeShortUrl(url) {
 }
 
 export function guessMediaType(url, fallback = '') {
-  const path = (url || '').split('?')[0].toLowerCase()
+  const trimmed = (url || '').trim()
+  if (trimmed.startsWith('data:image/')) {
+    const match = trimmed.match(/^data:(image\/[^;]+)/i)
+    return match ? match[1].toLowerCase() : 'image/jpeg'
+  }
+  const path = trimmed.split('?')[0].toLowerCase()
   if (path.endsWith('.mp4') || path.endsWith('.webm') || path.endsWith('.mov')) return 'video/mp4'
   if (path.endsWith('.pdf')) return 'application/pdf'
   if (path.endsWith('.svg')) return 'image/svg+xml'

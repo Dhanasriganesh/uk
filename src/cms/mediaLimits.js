@@ -21,7 +21,8 @@ export const ACCEPTED_MEDIA_INPUT = [
   ...ACCEPTED_PDF_MIME,
 ].join(',')
 
-export const MAX_IMAGE_BYTES = 12 * 1024 * 1024
+/** Raw file size before base64 (Firestore ~1 MB field limit). */
+export const MAX_IMAGE_BYTES = 700 * 1024
 export const MAX_VIDEO_BYTES = 150 * 1024 * 1024
 export const MAX_PDF_BYTES = 25 * 1024 * 1024
 
@@ -29,9 +30,9 @@ export const MEDIA_LIMITS_COPY = {
   headline: 'Media library',
   whyTitle: 'How uploads work',
   whyBody:
-    'Upload images or videos here. Files are stored on the site (dev: `public/media` and `public/videos`) or in Firebase Storage when deployed. Only the URL is saved in the `media` collection — not file bytes.',
-  maxFile: `Images up to ${MAX_IMAGE_BYTES / (1024 * 1024)} MB, videos up to ${MAX_VIDEO_BYTES / (1024 * 1024)} MB.`,
-  maxSaved: 'Only the URL string is saved in Firestore.',
+    'Images are saved in Firestore as base64 (no Storage bucket needed). Keep each image under ~700 KB. Videos on the live site: paste YouTube/Vimeo or use /videos/… after deploying the file in your repo.',
+  maxFile: `Images up to ${Math.round(MAX_IMAGE_BYTES / 1024)} KB (Firestore), videos up to ${MAX_VIDEO_BYTES / (1024 * 1024)} MB (dev only).`,
+  maxSaved: 'Image data is stored in Firestore; videos use URLs only.',
   formats: 'JPEG, PNG, WebP, GIF, SVG, MP4, WebM — or paste an existing URL.',
   heic: 'HEIC/HEIF (iPhone photos) are not supported — export as JPG or WebP first.',
   videoNote: 'Use MP4 files under `/videos/`, or paste a YouTube/Vimeo link (embedded player).',
@@ -125,7 +126,7 @@ export function validateMediaFile(file, { accept = 'any' } = {}) {
       ok: false,
       error: isVideo
         ? `Video is too large (max ${MAX_VIDEO_BYTES / (1024 * 1024)} MB).`
-        : `Image is too large (max ${MAX_IMAGE_BYTES / (1024 * 1024)} MB).`,
+        : `Image is too large (max ${Math.round(MAX_IMAGE_BYTES / 1024)} KB for Firestore).`,
       hint: isVideo ? 'Compress the video or use a shorter clip.' : 'Resize the image or save as WebP.',
       fileBytes: file.size,
     }
@@ -150,7 +151,7 @@ export function isStorageSizeError(error) {
 }
 
 export function storageLimitExceededMessage() {
-  return 'Upload failed — file may be too large, or Storage rules may need publishing. See FIREBASE_SETUP.md.'
+  return 'Upload failed — image may be too large for Firestore (max ~700 KB per image). Resize or compress and try again.'
 }
 
 export function isVideoUrl(url) {

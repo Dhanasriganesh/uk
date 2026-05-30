@@ -19,7 +19,7 @@ import {
 } from '../cms/mediaSeed'
 
 const PAGES_COLLECTION = 'cms_pages'
-/** Firestore "media" table — short URL strings only (no base64, no Storage). */
+/** Firestore "media" table — https/ paths or base64 image data URLs. */
 export const MEDIA_COLLECTION = 'media'
 const LEGACY_MEDIA_COLLECTION = 'cms_media'
 
@@ -49,14 +49,26 @@ async function ensureUploadAuth() {
 }
 
 function assertMediaUrl(url) {
+  const trimmed = (url || '').trim()
+  if (trimmed.startsWith('data:image/')) {
+    return trimmed
+  }
   const normalized = normalizeShortUrl(url)
   if (!normalized || !isShortMediaUrl(normalized)) {
-    throw new Error('Please paste a valid short URL (https://… or /media/… on this site).')
+    throw new Error('Please paste a valid image URL (https://…, /media/…, or upload an image file).')
   }
   return normalized
 }
 
 function mediaIdFromUrl(url) {
+  if (url.startsWith('data:image/')) {
+    let hash = 0
+    const sample = `${url.length}:${url.slice(64, 128)}`
+    for (let i = 0; i < sample.length; i++) {
+      hash = (hash * 31 + sample.charCodeAt(i)) | 0
+    }
+    return `b64_${Math.abs(hash)}_${url.length}`
+  }
   const base = url
     .replace(/^https?:\/\//, '')
     .replace(/[^a-zA-Z0-9._-]+/g, '_')
@@ -154,11 +166,15 @@ export async function saveSiteSettings(settings, userEmail) {
 }
 
 function normalizeMediaDoc(id, data) {
-  const url = normalizeShortUrl(data.url || data.dataUrl || '')
-  if (!url || url.startsWith('data:')) return null
+  const raw = (data.url || data.dataUrl || '').trim()
+  const url = raw.startsWith('data:image/') ? raw : normalizeShortUrl(raw)
+  if (!url) return null
+  const name =
+    data.name ||
+    (url.startsWith('data:') ? 'Uploaded image' : url.split('/').pop() || 'media')
   return {
     id,
-    name: data.name || url.split('/').pop() || 'media',
+    name,
     url,
     type: data.type || guessMediaType(url),
     size: data.size ?? null,
@@ -169,7 +185,7 @@ function normalizeMediaDoc(id, data) {
 }
 
 /**
- * Save a media row: short URL + metadata only (no file bytes, no Storage).
+ * Save a media row: https/ path or base64 image data URL in Firestore.
  */
 export async function uploadMedia({ url, name, type, size, source, storagePath } = {}) {
   if (!db) throw new Error('Firestore is not configured')
