@@ -66,12 +66,38 @@ This writes default page content to `cms_pages`, settings to `cms_settings/globa
 ## 5. Media workflow
 
 1. **Admin → Media Library → Upload file** (images & videos)
-   - **Local dev:** files save to `public/media/` or `public/videos/` → short URLs like `/media/photo.jpg`
-   - **Production:** uses **Firebase Storage** (`cms/…`) when `VITE_FIREBASE_STORAGE_BUCKET` is set
+   - **Local dev (`npm run dev`):** files save to `public/media/` or `public/videos/` → `/media/photo.jpg`
+   - **Production (Vercel):** uploads go through **`/api/admin/upload`** (server-side Firebase Storage) so browser CORS does not block large videos
 2. Or paste an existing URL, or click **Seed local media**
 3. Copy the URL into page fields (`imageUrl`, `videoUrl`, etc.)
 
 Publish **`storage.rules`** in Firebase Console (same as `uk/storage.rules`) so signed-in admins can upload.
+
+### Production uploads on Vercel (required)
+
+In Vercel → **Project → Settings → Environment Variables**, add:
+
+| Variable | Value |
+|----------|--------|
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Full JSON from Firebase Console → Project settings → Service accounts → Generate new private key (paste as one line) |
+| `FIREBASE_STORAGE_BUCKET` | Same as `VITE_FIREBASE_STORAGE_BUCKET` (e.g. `your-project.firebasestorage.app`) |
+| `VITE_FIREBASE_API_KEY` | Same as in `.env` (used to verify admin login on upload) |
+
+Redeploy after saving env vars.
+
+### Storage CORS (if browser uploads still fail)
+
+If uploads fall back to the browser SDK, configure the bucket once (Google Cloud SDK):
+
+```bash
+gcloud storage buckets update gs://YOUR_BUCKET_NAME --cors-file=storage.cors.json
+```
+
+Replace `YOUR_BUCKET_NAME` with your `VITE_FIREBASE_STORAGE_BUCKET` value. Add your exact Vercel preview URL to `storage.cors.json` if needed.
+
+### Fix a broken hero video URL
+
+If the home page video URL in Firestore looks like `.../o?name=cms%2F...` (upload API shape, not a file link), open **Admin → Home Hero**, upload again or paste a valid URL (`/videos/…` or a full `…?alt=media&token=…` link), then **Save**.
 
 ## 6. Firestore collections
 

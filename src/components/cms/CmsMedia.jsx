@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import { resolveHeroVideoUrl } from '../../cms/mediaPaths'
 import { resolveCmsImageUrl } from '../../cms/resolveCmsImageUrl'
+import { resolveFirebaseStorageMediaUrl } from '../../firebase/resolveStorageMediaUrl'
 import { getVideoPlayback } from '../../utils/videoEmbed'
 import VideoEmbed from './VideoEmbed'
 
@@ -9,7 +10,21 @@ export function CmsImage({ src, fallback, alt = '', className = '', ...props }) 
   const [url, setUrl] = useState(initial)
 
   useEffect(() => {
-    setUrl(resolveCmsImageUrl(src, fallback))
+    let cancelled = false
+    const sync = resolveCmsImageUrl(src, fallback)
+    setUrl(sync)
+
+    async function resolveStorage() {
+      const trimmed = typeof src === 'string' ? src.trim() : ''
+      if (!trimmed || !trimmed.includes('firebasestorage')) return
+      const resolved = await resolveFirebaseStorageMediaUrl(trimmed)
+      if (!cancelled && resolved) setUrl(resolved)
+    }
+
+    resolveStorage()
+    return () => {
+      cancelled = true
+    }
   }, [src, fallback])
 
   if (!url) return null
@@ -26,11 +41,25 @@ export const CmsVideo = forwardRef(function CmsVideo(
   ref
 ) {
   const resolvedFallback = fallback || resolveSrc()
-  const initialUrl = resolveSrc(src, resolvedFallback)
-  const [url, setUrl] = useState(initialUrl)
+  const syncUrl = resolveSrc(src, resolvedFallback)
+  const [url, setUrl] = useState(syncUrl)
 
   useEffect(() => {
-    setUrl(resolveSrc(src, resolvedFallback))
+    let cancelled = false
+    const nextSync = resolveSrc(src, resolvedFallback)
+    setUrl(nextSync)
+
+    async function resolveStorage() {
+      const trimmed = typeof src === 'string' ? src.trim() : ''
+      if (!trimmed || !trimmed.includes('firebasestorage')) return
+      const resolved = await resolveFirebaseStorageMediaUrl(trimmed)
+      if (!cancelled && resolved) setUrl(resolved)
+    }
+
+    resolveStorage()
+    return () => {
+      cancelled = true
+    }
   }, [src, resolvedFallback, resolveSrc])
 
   if (!url) return null

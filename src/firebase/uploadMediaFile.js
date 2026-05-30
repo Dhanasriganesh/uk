@@ -13,8 +13,8 @@ async function getIdToken() {
   return user.getIdToken(true)
 }
 
-/** Dev server: write file to public/media or public/videos */
-async function uploadToLocalPublic(file, { onProgress } = {}) {
+/** Dev: public folder. Production (Vercel): Firebase Storage via server API (no browser CORS). */
+async function uploadViaServerApi(file, { onProgress } = {}) {
   const token = await getIdToken()
   onProgress?.(5)
 
@@ -40,8 +40,8 @@ async function uploadToLocalPublic(file, { onProgress } = {}) {
     size: data.size ?? file.size,
     type: data.type ?? file.type,
     name: data.name ?? file.name,
-    storagePath: null,
-    source: 'local',
+    storagePath: data.storagePath ?? null,
+    source: data.source || (import.meta.env.DEV ? 'local' : 'storage'),
   }
 }
 
@@ -59,11 +59,13 @@ export async function uploadMediaFile(file, { onProgress, accept = 'any' } = {})
 
   let uploaded = null
 
-  if (import.meta.env.DEV) {
-    try {
-      uploaded = await uploadToLocalPublic(file, { onProgress })
-    } catch (localErr) {
-      console.warn('[upload] Local public upload failed:', localErr.message)
+  try {
+    uploaded = await uploadViaServerApi(file, { onProgress })
+  } catch (apiErr) {
+    if (import.meta.env.DEV) {
+      console.warn('[upload] Server upload API failed:', apiErr.message)
+    } else {
+      console.warn('[upload] /api/admin/upload failed:', apiErr.message)
     }
   }
 

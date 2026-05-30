@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://localhost:5173", "http://localhost:4173", "https://ats-uk.vercel.app", "https://*.vercel.app"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Authorization", "Content-Length", "x-goog-resumable", "x-goog-meta-*"],
+    "maxAgeSeconds": 3600
+  }
+]

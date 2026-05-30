@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCmsPage } from '../../hooks/useCmsPage';
-
 const defaultPages = [
   {
     title: 'Project Management',

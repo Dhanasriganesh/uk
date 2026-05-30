@@ -2,6 +2,7 @@ import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebas
 import { storage, auth, isStorageConfigured } from './config'
 import { waitForAuthReady } from './authHelpers'
 import { validateMediaFile } from '../cms/mediaLimits'
+import { isBrokenFirebaseStorageUrl, isFirebaseStorageDownloadUrl } from './resolveStorageMediaUrl'
 
 async function ensureUploadAuth() {
   if (!auth) throw new Error('Firebase Auth is not configured.')
@@ -71,6 +72,11 @@ export async function uploadFileToStorage(file, { onProgress } = {}) {
   })
 
   const downloadUrl = await getDownloadURL(storageRef)
+  if (isBrokenFirebaseStorageUrl(downloadUrl) || !isFirebaseStorageDownloadUrl(downloadUrl)) {
+    throw new Error(
+      'Upload succeeded but the download URL is invalid. Configure Storage CORS (see FIREBASE_SETUP.md) and try again.'
+    )
+  }
   return { downloadUrl, storagePath, size: file.size, type: file.type }
 }
 
