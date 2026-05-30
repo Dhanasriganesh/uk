@@ -23,7 +23,23 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^[A-Z_]' },
+      ],
+      'react-refresh/only-export-components': [
+        'error',
+        {
+          allowConstantExport: true,
+          allowExportNames: ['useAuth', 'useSiteSettings', 'useMouseEnter'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['vite.config.js', 'server/**/*.mjs'],
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ])

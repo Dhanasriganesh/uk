@@ -1,14 +1,4 @@
-/** Max bytes saved per image record in the CMS database */
-export const STORAGE_RECORD_MAX_BYTES = 1_048_576
-
-/** Bytes reserved for filename, type, and other fields beside the image data */
-export const MEDIA_METADATA_BYTES = 2048
-
-/**
- * Max raw file size before encoding.
- * Saved images are embedded as text (~33% larger than the file on disk).
- */
-export const MAX_IMAGE_FILE_BYTES = 680 * 1024
+import { isEmbedVideoUrl } from '../utils/videoEmbed'
 
 export const ACCEPTED_IMAGE_MIME = [
   'image/jpeg',
@@ -18,27 +8,39 @@ export const ACCEPTED_IMAGE_MIME = [
   'image/svg+xml',
 ]
 
+export const ACCEPTED_VIDEO_MIME = ['video/mp4', 'video/webm', 'video/quicktime']
+
+export const ACCEPTED_PDF_MIME = ['application/pdf']
+
 export const ACCEPTED_IMAGE_INPUT = ACCEPTED_IMAGE_MIME.join(',')
+export const ACCEPTED_VIDEO_INPUT = ACCEPTED_VIDEO_MIME.join(',')
+export const ACCEPTED_PDF_INPUT = 'application/pdf,.pdf'
+export const ACCEPTED_MEDIA_INPUT = [
+  ...ACCEPTED_IMAGE_MIME,
+  ...ACCEPTED_VIDEO_MIME,
+  ...ACCEPTED_PDF_MIME,
+].join(',')
+
+export const MAX_IMAGE_BYTES = 12 * 1024 * 1024
+export const MAX_VIDEO_BYTES = 150 * 1024 * 1024
+export const MAX_PDF_BYTES = 25 * 1024 * 1024
 
 export const MEDIA_LIMITS_COPY = {
-  headline: 'Before you upload',
-  whyTitle: 'Why is there a size limit?',
+  headline: 'Media library',
+  whyTitle: 'How uploads work',
   whyBody:
-    'Images are stored directly in the website’s content library (not as separate hosted files). Each image must stay under 1 MB when saved. Encoding usually makes the stored size about one-third larger than the file on your computer.',
-  maxFile: `Maximum file size: ${formatBytes(MAX_IMAGE_FILE_BYTES)}`,
-  maxSaved: `Maximum saved size: ${formatBytes(STORAGE_RECORD_MAX_BYTES)}`,
-  formats: 'JPEG, PNG, WebP, GIF, SVG',
-  heic: 'HEIC/HEIF (iPhone photos) are not supported — export as JPG or PNG first.',
-  videoNote: 'Videos cannot be uploaded here. Paste a hosted URL (YouTube, CDN, or /videos/… on this site).',
+    'Upload images or videos here. Files are stored on the site (dev: `public/media` and `public/videos`) or in Firebase Storage when deployed. Only the URL is saved in the `media` collection — not file bytes.',
+  maxFile: `Images up to ${MAX_IMAGE_BYTES / (1024 * 1024)} MB, videos up to ${MAX_VIDEO_BYTES / (1024 * 1024)} MB.`,
+  maxSaved: 'Only the URL string is saved in Firestore.',
+  formats: 'JPEG, PNG, WebP, GIF, SVG, MP4, WebM — or paste an existing URL.',
+  heic: 'HEIC/HEIF (iPhone photos) are not supported — export as JPG or WebP first.',
+  videoNote: 'Use MP4 files under `/videos/`, or paste a YouTube/Vimeo link (embedded player).',
   tips: [
-    'Screenshots and PNGs are often too large — try JPG or WebP.',
-    'Resize to about 1200–1600 px wide before uploading.',
-    'Use TinyPNG, Squoosh, or your editor’s “Export for web” to compress.',
+    'Use “Upload file” for new assets, or paste a URL if the file is already hosted.',
+    'Copy a URL from the library into any image or video field in the page editor.',
+    'Run “Seed local media” to register default paths from the codebase.',
   ],
 }
-
-const HEIC_TYPES = ['image/heic', 'image/heif']
-const HEIC_EXT = /\.(heic|heif)$/i
 
 export function formatBytes(bytes) {
   if (bytes == null || Number.isNaN(bytes)) return '0 B'
@@ -47,82 +49,119 @@ export function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
 }
 
-export function estimateSavedBytes(fileBytes) {
-  const encoded = Math.ceil((fileBytes * 4) / 3) + 80
-  return encoded + MEDIA_METADATA_BYTES
+function acceptAllowsMime(accept, mime) {
+  if (accept === 'video') return mime.startsWith('video/')
+  if (accept === 'image') return mime.startsWith('image/')
+  if (accept === 'pdf' || accept === 'brochure') {
+    return mime === 'application/pdf' || (mime === '' && accept === 'pdf')
+  }
+  return mime.startsWith('image/') || mime.startsWith('video/') || mime === 'application/pdf'
 }
 
-/**
- * @returns {{ ok: boolean, error?: string, hint?: string, fileBytes: number, estimatedSavedBytes: number }}
- */
-export function validateImageFile(file) {
-  if (!file) {
-    return { ok: false, error: 'No file selected.', fileBytes: 0, estimatedSavedBytes: 0 }
+export function validateMediaFile(file, { accept = 'any' } = {}) {
+  if (!file || typeof file.size !== 'number') {
+    return { ok: false, error: 'No file selected.' }
   }
 
-  const fileBytes = file.size
-  const estimatedSavedBytes = estimateSavedBytes(fileBytes)
-  const type = (file.type || '').toLowerCase()
+  const mime = (file.type || '').toLowerCase()
+  const isVideo = mime.startsWith('video/')
+  const isImage = mime.startsWith('image/')
 
-  if (HEIC_TYPES.includes(type) || HEIC_EXT.test(file.name)) {
+  const isPdf = mime === 'application/pdf' || (!mime && accept === 'pdf')
+
+  if (!acceptAllowsMime(accept, mime || (isPdf ? 'application/pdf' : ''))) {
+    const errorByAccept = {
+      video: 'Please choose a video file.',
+      image: 'Please choose an image file.',
+      pdf: 'Please choose a PDF file.',
+      brochure: 'Please choose a PDF brochure.',
+    }
     return {
       ok: false,
-      error: 'HEIC/HEIF is not supported.',
-      hint: MEDIA_LIMITS_COPY.heic,
-      fileBytes,
-      estimatedSavedBytes,
+      error: errorByAccept[accept] || 'File type not allowed.',
+      hint: MEDIA_LIMITS_COPY.formats,
     }
   }
 
-  const isImage =
-    type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(file.name)
-  if (!isImage) {
+  if (isPdf || accept === 'pdf' || accept === 'brochure') {
+    const pdfMime = mime || 'application/pdf'
+    if (pdfMime !== 'application/pdf' && !file.name?.toLowerCase().endsWith('.pdf')) {
+      return { ok: false, error: 'Brochure must be a PDF file.', hint: 'Use .pdf format only.' }
+    }
+    if (file.size > MAX_PDF_BYTES) {
+      return {
+        ok: false,
+        error: `PDF is too large (max ${MAX_PDF_BYTES / (1024 * 1024)} MB).`,
+        hint: 'Compress the PDF or split into smaller files.',
+        fileBytes: file.size,
+      }
+    }
+    return { ok: true, fileBytes: file.size }
+  }
+
+  if (isImage && !ACCEPTED_IMAGE_MIME.includes(mime)) {
     return {
       ok: false,
-      error: 'Only image files can be added to the media library.',
-      hint: MEDIA_LIMITS_COPY.videoNote,
-      fileBytes,
-      estimatedSavedBytes,
+      error: 'Unsupported image type.',
+      hint: 'Use JPEG, PNG, WebP, GIF, or SVG.',
     }
   }
 
-  if (fileBytes > MAX_IMAGE_FILE_BYTES) {
+  if (isVideo && !ACCEPTED_VIDEO_MIME.includes(mime)) {
     return {
       ok: false,
-      error: `This image is too large (${formatBytes(fileBytes)}). Maximum file size is ${formatBytes(MAX_IMAGE_FILE_BYTES)}.`,
-      hint: 'Compress or resize the image, then choose it again.',
-      fileBytes,
-      estimatedSavedBytes,
+      error: 'Unsupported video type.',
+      hint: 'Use MP4 or WebM (convert MOV to MP4 if needed).',
     }
   }
 
-  if (estimatedSavedBytes > STORAGE_RECORD_MAX_BYTES) {
+  if (!isImage && !isVideo) {
+    return { ok: false, error: 'Only images and videos can be uploaded.' }
+  }
+
+  const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+  if (file.size > maxBytes) {
     return {
       ok: false,
-      error: `This image cannot be saved — it would exceed the ${formatBytes(STORAGE_RECORD_MAX_BYTES)} limit after processing.`,
-      hint: 'Use a smaller or more compressed file.',
-      fileBytes,
-      estimatedSavedBytes,
+      error: isVideo
+        ? `Video is too large (max ${MAX_VIDEO_BYTES / (1024 * 1024)} MB).`
+        : `Image is too large (max ${MAX_IMAGE_BYTES / (1024 * 1024)} MB).`,
+      hint: isVideo ? 'Compress the video or use a shorter clip.' : 'Resize the image or save as WebP.',
+      fileBytes: file.size,
     }
   }
 
-  return { ok: true, fileBytes, estimatedSavedBytes }
+  return { ok: true, fileBytes: file.size }
+}
+
+/** @deprecated */
+export function validateImageFile(file, options) {
+  return validateMediaFile(file, { accept: 'image', ...options })
 }
 
 export function isStorageSizeError(error) {
   const msg = (error?.message || '').toLowerCase()
   return (
-    msg.includes('exceeds the maximum allowed size') ||
-    msg.includes('maximum allowed size') ||
     msg.includes('payload too large') ||
-    (msg.includes('over the') && msg.includes('limit')) ||
-    error?.code === 'invalid-argument'
+    msg.includes('too large') ||
+    error?.code === 'invalid-argument' ||
+    error?.code === 'storage/quota-exceeded'
   )
 }
 
 export function storageLimitExceededMessage() {
-  return `This image is too large to save. Use a file under ${formatBytes(MAX_IMAGE_FILE_BYTES)}, or host it elsewhere and paste the URL in the field.`
+  return 'Upload failed — file may be too large, or Storage rules may need publishing. See FIREBASE_SETUP.md.'
 }
 
-/** @deprecated Use STORAGE_RECORD_MAX_BYTES — kept for older import paths */
-export const FIRESTORE_DOC_MAX_BYTES = STORAGE_RECORD_MAX_BYTES
+export function isVideoUrl(url) {
+  if (!url || typeof url !== 'string') return false
+  if (isEmbedVideoUrl(url)) return true
+  const path = url.split('?')[0].toLowerCase()
+  return path.endsWith('.mp4') || path.endsWith('.webm') || path.endsWith('.mov') || path.includes('/videos/')
+}
+
+export function isDirectVideoFile(url) {
+  if (!url || isEmbedVideoUrl(url)) return false
+  const path = url.split('?')[0].toLowerCase()
+  return path.endsWith('.mp4') || path.endsWith('.webm') || path.endsWith('.mov') || path.includes('/videos/')
+}

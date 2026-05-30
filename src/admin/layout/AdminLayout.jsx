@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { LuMenu } from 'react-icons/lu'
 import { useAuth } from '../../context/AuthContext'
-import AdminSidebar, { ADMIN_NAV } from '../components/AdminSidebar'
+import AdminSidebar from '../components/AdminSidebar'
+import { ADMIN_NAV } from '../adminNav'
 import { useIsDesktop } from '../hooks/useMediaQuery'
 
 function getPageTitle(pathname) {

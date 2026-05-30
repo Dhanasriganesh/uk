@@ -1,11 +1,20 @@
 import React from 'react'
-import { LuPlus, LuTrash2, LuExternalLink } from 'react-icons/lu'
-import MediaUploader from './MediaUploader'
+import { LuPlus, LuTrash2 } from 'react-icons/lu'
+import MediaUrlField from './MediaUrlField'
+import IconPickerField from './IconPickerField'
+import BrochureUrlField from './BrochureUrlField'
 
 const URL_KEY_PATTERN = /(url|image|video|logo|src|background|brochure|embed)/i
 
 function isUrlField(key) {
   return URL_KEY_PATTERN.test(key)
+}
+
+/** Image/video fields always get upload UI (even when URL is long, e.g. Unsplash). */
+function isMediaUrlField(key) {
+  if (/embed|brochure|link/i.test(key)) return false
+  if (/imageUrl|videoUrl|logoUrl|photoUrl|thumbnailUrl|backgroundUrl/i.test(key)) return true
+  return isUrlField(key) && /image|video|logo|photo|background|thumbnail/i.test(key)
 }
 
 function formatLabel(key) {
@@ -34,47 +43,34 @@ function StringField({ path, value, onChange }) {
     key === 'summary' ||
     key === 'intro' ||
     key === 'description'
-  const isUrl = isUrlField(key)
+  if (key.toLowerCase() === 'icon') {
+    return <IconPickerField path={path} value={value} onChange={onChange} />
+  }
+
+  if (/^brochureUrl$/i.test(key)) {
+    return <BrochureUrlField path={path} value={value} onChange={onChange} />
+  }
+
+  if (isMediaUrlField(key)) {
+    return <MediaUrlField path={path} value={value} onChange={onChange} />
+  }
 
   return (
     <div className="mb-5">
       <FieldLabel label={key} />
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-        {isLong ? (
-          <textarea
-            className={`${inputClass} min-h-[120px] flex-1 resize-y`}
-            value={value ?? ''}
-            onChange={(e) => onChange(path, e.target.value)}
-          />
-        ) : (
-          <input
-            type="text"
-            className={`${inputClass} flex-1`}
-            value={value ?? ''}
-            onChange={(e) => onChange(path, e.target.value)}
-          />
-        )}
-        {isUrl && !/video/i.test(key) && (
-          <div className="shrink-0 sm:pt-0">
-            <MediaUploader onUploaded={(url) => onChange(path, url)} />
-          </div>
-        )}
-      </div>
-      {/video/i.test(key) && (
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
-          Videos: paste a hosted URL (YouTube, CDN, or /public path). Images use the media library (max 680 KB).
-        </p>
-      )}
-      {isUrl && value && (
-        <a
-          href={value}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
-        >
-          Preview link
-          <LuExternalLink className="h-3 w-3" aria-hidden />
-        </a>
+      {isLong ? (
+        <textarea
+          className={`${inputClass} min-h-[120px] flex-1 resize-y`}
+          value={value ?? ''}
+          onChange={(e) => onChange(path, e.target.value)}
+        />
+      ) : (
+        <input
+          type="text"
+          className={`${inputClass} flex-1`}
+          value={value ?? ''}
+          onChange={(e) => onChange(path, e.target.value)}
+        />
       )}
     </div>
   )

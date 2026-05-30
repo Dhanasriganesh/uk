@@ -1,11 +1,9 @@
 import { HERO_VIDEO_URL } from './mediaPaths'
 import { DEFAULT_SUPPORTED_CUSTOMERS, DEFAULT_TRUSTED_PARTNERS } from './partnerFallbacks'
-import logo from '../assets/logo.png'
-
 /** Global site settings */
 export const defaultSettings = {
   siteName: 'ATS Packaging',
-  logoUrl: logo,
+  logoUrl: '/media/logo.png',
   footer: {
     companyDescription:
       'Advanced Tooling Systems UK Ltd. Over 35 years of experience in advanced packaging machinery for a wide range of industries.',
@@ -246,9 +244,9 @@ export function defaultProductPage(title) {
     sections: [],
     videos: [],
     cta: {
-      brochureUrl: '',
+      brochureUrl: '/media/pdf_1718978495.pdf',
       brochureLabel: 'Download Brochure',
-      enquireLabel: 'Enquire Now',
+      enquireLabel: 'Enquire about this Product',
       enquireLink: '/contact',
     },
   }

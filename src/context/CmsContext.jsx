@@ -12,7 +12,9 @@ export function CmsProvider({ children }) {
   useEffect(() => {
     const unsub = subscribeSiteSettings((data) => {
       if (data) {
-        const { updatedAt, updatedBy, ...rest } = data
+        const rest = { ...data }
+        delete rest.updatedAt
+        delete rest.updatedBy
         setSettings(deepMerge(defaultSettings, rest))
       } else {
         setSettings(defaultSettings)

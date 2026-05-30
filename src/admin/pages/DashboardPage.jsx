@@ -16,7 +16,7 @@ import {
 } from 'react-icons/lu'
 import { PAGE_GROUPS, ALL_PAGE_IDS } from '../../cms/pageRegistry'
 import { PAGE_DEFAULTS } from '../../cms/defaultContent'
-import { savePageContent, saveSiteSettings } from '../../firebase/cmsService'
+import { savePageContent, saveSiteSettings, seedMediaLibrary } from '../../firebase/cmsService'
 import { useAuth } from '../../context/AuthContext'
 import AdminPageShell from '../components/ui/AdminPageShell'
 import PageHeader from '../components/ui/PageHeader'
@@ -84,7 +84,10 @@ export default function DashboardPage() {
           await savePageContent(pageId, structuredClone(content), user?.email)
         }
       }
-      setSeedMessage('Database seeded successfully with default content.')
+      const media = await seedMediaLibrary({ migrateLegacy: true })
+      setSeedMessage(
+        `Database seeded. Media library: ${media.added} new URL(s) added (${media.total} total).`
+      )
     } catch (err) {
       setSeedMessage(`Error: ${err.message}`)
     } finally {

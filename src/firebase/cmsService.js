@@ -10,20 +10,23 @@ import {
 } from 'firebase/firestore'
 import { db, auth, isFirebaseConfigured } from './config'
 import { waitForAuthReady } from './authHelpers'
+import { isStorageSizeError, storageLimitExceededMessage } from '../cms/mediaLimits'
 import {
-  STORAGE_RECORD_MAX_BYTES,
-  validateImageFile,
-  isStorageSizeError,
-  storageLimitExceededMessage,
-} from '../cms/mediaLimits'
+  buildMediaSeedRecords,
+  guessMediaType,
+  isShortMediaUrl,
+  normalizeShortUrl,
+} from '../cms/mediaSeed'
 
 const PAGES_COLLECTION = 'cms_pages'
-const MEDIA_COLLECTION = 'cms_media'
+/** Firestore "media" table — short URL strings only (no base64, no Storage). */
+export const MEDIA_COLLECTION = 'media'
+const LEGACY_MEDIA_COLLECTION = 'cms_media'
 
 export function formatMediaError(error) {
   const code = error?.code || ''
   if (code === 'permission-denied') {
-    return 'Permission denied. Sign in at /admin/login before uploading.'
+    return 'Permission denied. Sign in at /admin/login before saving media.'
   }
   if (isStorageSizeError(error)) {
     return storageLimitExceededMessage()
@@ -31,7 +34,7 @@ export function formatMediaError(error) {
   if (error?.hint) {
     return `${error.message} ${error.hint}`
   }
-  return error?.message || 'Upload failed'
+  return error?.message || 'Save failed'
 }
 
 async function ensureUploadAuth() {
@@ -39,28 +42,26 @@ async function ensureUploadAuth() {
   await waitForAuthReady()
   const user = auth.currentUser
   if (!user) {
-    throw new Error('You must be signed in at /admin/login before uploading.')
+    throw new Error('You must be signed in at /admin/login before saving media.')
   }
   await user.getIdToken(true)
   return user
 }
 
-function assertImageFile(file) {
-  const result = validateImageFile(file)
-  if (!result.ok) {
-    const err = new Error(result.error)
-    if (result.hint) err.hint = result.hint
-    throw err
+function assertMediaUrl(url) {
+  const normalized = normalizeShortUrl(url)
+  if (!normalized || !isShortMediaUrl(normalized)) {
+    throw new Error('Please paste a valid short URL (https://… or /media/… on this site).')
   }
+  return normalized
 }
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = () => reject(new Error('Could not read image file'))
-    reader.readAsDataURL(file)
-  })
+function mediaIdFromUrl(url) {
+  const base = url
+    .replace(/^https?:\/\//, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+  return `url_${base.slice(0, 100)}`
 }
 
 function handleSnapshotError(label, error, callback) {
@@ -152,46 +153,136 @@ export async function saveSiteSettings(settings, userEmail) {
   )
 }
 
-/** Upload image to Firestore as base64 data URL */
-export async function uploadMedia(file) {
-  if (!db) throw new Error('Firestore is not configured')
-  assertImageFile(file)
-  const user = await ensureUploadAuth()
-
-  const dataUrl = await fileToDataUrl(file)
-  const encodedBytes = new Blob([dataUrl]).size
-  if (encodedBytes + 512 > STORAGE_RECORD_MAX_BYTES) {
-    const err = new Error(storageLimitExceededMessage())
-    err.hint = 'Compress the file further or use a smaller resolution.'
-    throw err
+function normalizeMediaDoc(id, data) {
+  const url = normalizeShortUrl(data.url || data.dataUrl || '')
+  if (!url || url.startsWith('data:')) return null
+  return {
+    id,
+    name: data.name || url.split('/').pop() || 'media',
+    url,
+    type: data.type || guessMediaType(url),
+    size: data.size ?? null,
+    source: data.source || '',
+    uploadedBy: data.uploadedBy || '',
+    createdAt: data.createdAt,
   }
+}
 
-  const id = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+/**
+ * Save a media row: short URL + metadata only (no file bytes, no Storage).
+ */
+export async function uploadMedia({ url, name, type, size, source, storagePath } = {}) {
+  if (!db) throw new Error('Firestore is not configured')
+  const user = await ensureUploadAuth()
+  const safeUrl = assertMediaUrl(url)
+  const safeName = (name || safeUrl.split('/').pop() || 'media').toString().slice(0, 140)
+  const id = mediaIdFromUrl(safeUrl)
 
   const record = {
-    name: file.name,
-    url: dataUrl,
-    dataUrl,
-    type: file.type || 'image/png',
-    size: file.size,
+    name: safeName,
+    url: safeUrl,
+    type: type || guessMediaType(safeUrl),
+    size: Number.isFinite(size) ? size : null,
+    source: source || 'manual',
+    storagePath: storagePath || null,
     uploadedBy: user.email || 'admin',
     createdAt: serverTimestamp(),
   }
 
-  await setDoc(doc(db, MEDIA_COLLECTION, id), record)
+  await setDoc(doc(db, MEDIA_COLLECTION, id), record, { merge: true })
 
-  return { id, url: dataUrl, name: file.name }
+  return { id, url: safeUrl, name: safeName }
+}
+
+async function readCollectionMedia(collectionName) {
+  if (!db) return []
+  const snap = await getDocs(collection(db, collectionName))
+  return snap.docs
+    .map((d) => normalizeMediaDoc(d.id, d.data()))
+    .filter(Boolean)
 }
 
 export async function listMedia() {
   if (!isFirebaseConfigured || !db) return []
-  const snap = await getDocs(collection(db, MEDIA_COLLECTION))
-  return snap.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
-    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+  const [current, legacy] = await Promise.all([
+    readCollectionMedia(MEDIA_COLLECTION),
+    readCollectionMedia(LEGACY_MEDIA_COLLECTION),
+  ])
+
+  const byUrl = new Map()
+  for (const item of [...legacy, ...current]) {
+    if (!byUrl.has(item.url)) byUrl.set(item.url, item)
+  }
+
+  return [...byUrl.values()].sort(
+    (a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+  )
 }
 
 export async function deleteMediaItem(mediaId) {
   if (!db || !mediaId) return
-  await deleteDoc(doc(db, MEDIA_COLLECTION, mediaId))
+  await deleteDoc(doc(db, MEDIA_COLLECTION, mediaId)).catch(() => {})
+  await deleteDoc(doc(db, LEGACY_MEDIA_COLLECTION, mediaId)).catch(() => {})
+}
+
+/**
+ * Seed / migrate: local site paths + URLs from default content.
+ * Skips base64 data URLs. Does not use Firebase Storage.
+ */
+export async function seedMediaLibrary({ migrateLegacy = true } = {}) {
+  if (!db) throw new Error('Firestore is not configured')
+  const user = await ensureUploadAuth()
+
+  const existing = await listMedia()
+  const existingUrls = new Set(existing.map((m) => m.url))
+  let added = 0
+  let skipped = 0
+
+  const records = buildMediaSeedRecords()
+  for (const item of records) {
+    if (existingUrls.has(item.url)) {
+      skipped += 1
+      continue
+    }
+    await setDoc(
+      doc(db, MEDIA_COLLECTION, item.id),
+      {
+        name: item.name,
+        url: item.url,
+        type: item.type,
+        source: item.source,
+        uploadedBy: user.email || 'admin',
+        createdAt: serverTimestamp(),
+      },
+      { merge: true }
+    )
+    existingUrls.add(item.url)
+    added += 1
+  }
+
+  if (migrateLegacy) {
+    const legacySnap = await getDocs(collection(db, LEGACY_MEDIA_COLLECTION))
+    for (const d of legacySnap.docs) {
+      const data = d.data()
+      const url = normalizeShortUrl(data.url || data.dataUrl || '')
+      if (!url || url.startsWith('data:') || existingUrls.has(url)) continue
+      await setDoc(
+        doc(db, MEDIA_COLLECTION, mediaIdFromUrl(url)),
+        {
+          name: data.name || url.split('/').pop(),
+          url,
+          type: data.type || guessMediaType(url),
+          size: data.size ?? null,
+          source: 'migrated',
+          uploadedBy: user.email || 'admin',
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      )
+      existingUrls.add(url)
+      added += 1
+    }
+  }
+
+  return { added, skipped, total: existingUrls.size }
 }
