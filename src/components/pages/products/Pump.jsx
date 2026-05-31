@@ -1,157 +1,16 @@
-import React, { useRef, useState, useEffect } from 'react';
-import pump1 from '../../../assets/pump1.png';
-import pump2 from '../../../assets/pump2.png';
-import pump3 from '../../../assets/pump3.png';
-import pump4 from '../../../assets/pump4.png';
-import pump5 from '../../../assets/pump5.png';
-import pump6 from '../../../assets/pump6.png';
-import pump7 from '../../../assets/pump7.png';
-import pump8 from '../../../assets/pump8.png';
-import { useCmsPage } from '../../../hooks/useCmsPage';
-import ProductCta from '../../products/ProductCta';
-
-const images = [pump1, pump2, pump3, pump4, pump5, pump6, pump7, pump8];
-const AUTO_SLIDE_INTERVAL = 3500;
+import ProductDetailPage from '../../products/ProductDetailPage'
+import { PUMP_DEFAULTS, PUMP_GALLERY } from '../../products/pumpDefaults'
 
 function Pump() {
-  const { content } = useCmsPage('pump');
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const autoSlideRef = useRef(null);
-  const thumbContainerRef = useRef(null);
-  const thumbRefs = useRef([]);
-
-  useEffect(() => {
-    if (!paused) {
-      autoSlideRef.current = setInterval(() => {
-        setCurrent((prev) => (prev + 1) % images.length);
-      }, AUTO_SLIDE_INTERVAL);
-    } else {
-      clearInterval(autoSlideRef.current);
-    }
-    return () => clearInterval(autoSlideRef.current);
-  }, [paused]);
-
-  useEffect(() => {
-    if (thumbContainerRef.current && thumbRefs.current[current]) {
-      const container = thumbContainerRef.current;
-      const activeThumb = thumbRefs.current[current];
-      const containerRect = container.getBoundingClientRect();
-      const thumbRect = activeThumb.getBoundingClientRect();
-      const offset = thumbRect.left - containerRect.left - (containerRect.width / 2) + (thumbRect.width / 2);
-      container.scrollTo({ left: container.scrollLeft + offset, behavior: 'smooth' });
-    }
-  }, [current]);
-
-  const handleThumbClick = (idx) => {
-    setCurrent(idx);
-    setPaused(true);
-    setTimeout(() => setPaused(false), 4000);
-  };
-
   return (
-    <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
-      {/* Hero Section */}
-      <section className="site-container py-8 sm:py-12 lg:py-14">
-        <div className="page-hero-grid">
-        {/* Left: Text */}
-        <div className="w-full max-w-xl flex-1 text-center md:text-left">
-          <h1 className="page-hero-title font-bold text-blue-900 mb-3 sm:mb-4 leading-tight">Pump & Trigger Feeding Systems</h1>
-          <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">A range of dispensing pump and trigger feeding systems that carefully sort, feed and deliver pumps at up to 300upm.</p>
-          <p className="text-sm sm:text-lg md:text-xl text-gray-700 mb-4 sm:mb-6">Our cap / dispensing pump / trigger feeding systems have been designed and developed to provide an unrivalled combination of precision, quality and reliability.</p>
-        </div>
-        {/* Right: Carousel */}
-        <div className="flex-1 w-full max-w-xl flex flex-col items-center">
-          <div className="w-full aspect-video rounded-2xl shadow-xl overflow-hidden bg-black mb-3 sm:mb-4">
-            <img
-              src={images[current]}
-              alt={`Pump & Trigger System ${current + 1}`}
-              className="w-full h-full object-cover select-none pointer-events-none"
-              draggable={false}
-            />
-          </div>
-          {/* Thumbnails */}
-          <div
-            ref={thumbContainerRef}
-            className="flex flex-row gap-2 sm:gap-3 mt-1 sm:mt-2 overflow-x-auto w-full max-w-xl px-0.5 sm:px-1 justify-center scrollbar-hide"
-            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
-          >
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                ref={el => thumbRefs.current[idx] = el}
-                onClick={() => handleThumbClick(idx)}
-                className={`h-12 w-12 min-h-12 min-w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 sm:h-[60px] sm:w-[60px] sm:min-h-[60px] sm:min-w-[60px] ${idx === current ? 'border-blue-500 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                tabIndex={0}
-                aria-label={`Show image ${idx + 1}`}
-              >
-                <img
-                  src={img}
-                  alt={`Thumbnail ${idx + 1}`}
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                  draggable={false}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
-
-      {/* System Types Section */}
-      <section className="site-container py-6 flex flex-col md:flex-row gap-6 md:gap-14 items-center">
-        {/* System Types */}
-        <div className="flex-1 bg-blue-50/60 rounded-2xl shadow p-4 sm:p-6 flex flex-col items-center border border-blue-100 max-w-xl w-full">
-          <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m4 4h-1v-4h-1m-4 4h-1v-4h-1m4 4h-1v-4h-1" /></svg>
-            Feeding System Types
-          </h3>
-          <ul className="space-y-2 text-gray-800 w-full text-sm sm:text-base">
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-blue-500 inline-block"></span>Vibratory Bowl Feeding Systems <span className="text-gray-600">– designed for low output speeds up to 80upm.</span></li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-blue-500 inline-block"></span>Single stage Centrifugal Feeding Systems <span className="text-gray-600">– designed for medium to high output speeds up to 300upm for caps and dispensing pumps.</span></li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-blue-500 inline-block"></span>Double stage Centrifugal Feeding Systems <span className="text-gray-600">– designed to for medium to high output speeds for push-on and screw-on spray triggers at up to 300bpm.</span></li>
-          </ul>
-        </div>
-        {/* Closure Types */}
-        <div className="flex-1 bg-purple-50/60 rounded-2xl shadow p-4 sm:p-6 flex flex-col items-center border border-purple-100 max-w-xl w-full">
-          <h3 className="text-base sm:text-xl font-bold text-purple-800 mb-2 sm:mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8M12 8v8" /></svg>
-            Closure Types
-          </h3>
-          <ul className="space-y-2 text-gray-800 w-full text-sm sm:text-base">
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-purple-500 inline-block"></span>Push-On Caps</li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-purple-500 inline-block"></span>Screw-On Caps</li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-purple-500 inline-block"></span>ROPP Shells (caps)</li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-purple-500 inline-block"></span>Dispensing Pumps</li>
-            <li className="flex items-start gap-2"><span className="mt-1 w-2 h-2 rounded-full bg-purple-500 inline-block"></span>Spray Triggers</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
-
-      {/* SMED Info Section */}
-      <section className="site-container py-6 flex flex-col items-center">
-        <div className="bg-white/90 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center border border-blue-100 w-full max-w-2xl">
-          <h3 className="text-base sm:text-xl font-bold text-blue-800 mb-2 sm:mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v8M8 12h8" /></svg>
-            SMED Change-over
-          </h3>
-          <p className="text-xs sm:text-base text-gray-700 text-center">Change-over between formats has been simplified by adopting <span className="font-semibold">SMED (Single Minute Exchange of Die)</span> principles that allow all change-parts to be changed over quickly in under 10-minutes with minimal fuss and instant return to maximum production efficiency.</p>
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className="w-full h-3 bg-blue-50 my-4 sm:my-8" />
-
-      <ProductCta cta={content.cta} />
-    </div>
-  );
+    <ProductDetailPage
+      pageId="pump"
+      breadcrumbLabel="Pump & Trigger Feeding Systems"
+      galleryAltPrefix="Pump and trigger feeding system"
+      fallbackImages={PUMP_GALLERY}
+      defaults={PUMP_DEFAULTS}
+    />
+  )
 }
 
-export default Pump;
-   
+export default Pump

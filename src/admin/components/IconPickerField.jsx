@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react'
 import SectorCardIcon from '../../components/icons/SectorCardIcon'
+import ProductPageIcon from './ProductPageIcon'
 import {
   SECTOR_ICON_OPTIONS,
   EMOJI_ICON_OPTIONS,
+  PRODUCT_ICON_OPTIONS,
   isSectorIcon,
   isEmojiIcon,
+  isProductIcon,
   getDefaultIconTab,
 } from '../../cms/iconOptions'
 
@@ -16,6 +19,9 @@ function formatLabel(key) {
 }
 
 function IconPreview({ value }) {
+  if (isProductIcon(value)) {
+    return <ProductPageIcon type={value} className="h-8 w-8 text-red-600" />
+  }
   if (isSectorIcon(value)) {
     return <SectorCardIcon type={value} className="h-8 w-8 text-red-600" />
   }
@@ -31,7 +37,8 @@ export default function IconPickerField({ path, value, onChange }) {
   const initialTab = useMemo(() => getDefaultIconTab(selected, path), [path, selected])
   const [tab, setTab] = useState(initialTab)
 
-  const options = tab === 'sector' ? SECTOR_ICON_OPTIONS : EMOJI_ICON_OPTIONS
+  const options =
+    tab === 'product' ? PRODUCT_ICON_OPTIONS : tab === 'sector' ? SECTOR_ICON_OPTIONS : EMOJI_ICON_OPTIONS
 
   return (
     <div className="mb-5">
@@ -50,21 +57,30 @@ export default function IconPickerField({ path, value, onChange }) {
       <div className="mb-3 flex gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1">
         <button
           type="button"
+          onClick={() => setTab('product')}
+          className={`flex-1 rounded-md px-2 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+            tab === 'product' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Product
+        </button>
+        <button
+          type="button"
           onClick={() => setTab('sector')}
-          className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+          className={`flex-1 rounded-md px-2 py-2 text-xs font-semibold transition-colors sm:text-sm ${
             tab === 'sector' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Service icons
+          Service
         </button>
         <button
           type="button"
           onClick={() => setTab('emoji')}
-          className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+          className={`flex-1 rounded-md px-2 py-2 text-xs font-semibold transition-colors sm:text-sm ${
             tab === 'emoji' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Emojis
+          Emoji
         </button>
       </div>
 
@@ -89,7 +105,9 @@ export default function IconPickerField({ path, value, onChange }) {
                   : 'border-slate-200 bg-slate-50 hover:border-red-300 hover:bg-red-50/50'
               }`}
             >
-              {tab === 'sector' ? (
+              {tab === 'product' ? (
+                <ProductPageIcon type={opt.id} className="h-6 w-6 text-red-600" />
+              ) : tab === 'sector' ? (
                 <SectorCardIcon type={opt.id} className="h-6 w-6 text-red-600" />
               ) : (
                 <span className="text-xl leading-none sm:text-2xl">{opt.id}</span>
@@ -102,7 +120,7 @@ export default function IconPickerField({ path, value, onChange }) {
         })}
       </div>
 
-      {selected && !isSectorIcon(selected) && !isEmojiIcon(selected) && (
+      {selected && !isProductIcon(selected) && !isSectorIcon(selected) && !isEmojiIcon(selected) && (
         <p className="mt-2 text-xs text-amber-700">
           Current value is custom. Select an option above to replace it.
         </p>

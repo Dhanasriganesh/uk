@@ -1,155 +1,146 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useCmsPage } from '../../hooks/useCmsPage';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { LuCheck } from 'react-icons/lu'
+import { useCmsPage } from '../../hooks/useCmsPage'
+import ProductInfoCta from '../products/ProductInfoCta'
+import {
+  SECTOR_ITEMS,
+  SECTORS_HUB_DEFAULTS,
+} from '../sectors/sectorsHubDefaults'
 
-const defaultSectors = [
-  {
-    name: 'Pharmaceutical & Cosmetic',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#FDE68A"/><ellipse cx="26" cy="14" rx="6" ry="3" fill="#F59E42"/><rect x="10" y="22" width="12" height="6" rx="3" fill="#F59E42"/><rect x="10" y="22" width="12" height="6" rx="3" fill="#fff" fillOpacity=".5"/><path d="M16 25h4" stroke="#F59E42" strokeWidth="1.5" strokeLinecap="round"/></svg>
-    ),
-    solutions: [
-      'Ophthalmic Container & Tube Unscramblers',
-      'Sterile Feeding Systems',
-      'Nasal & Mouth Spray Stopper Assembly Systems',
-      'Lipstick & Mascara Feeding & Assembly Systems',
-      'Syringe Sorting Systems',
-      "Advanced 'Track & Trace' Cap Tightening Systems",
-      '(Produced to FDA, CGMP, CE, UL & Ex standards)',
-    ],
-  },
-  {
-    name: 'Automotive',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#BFDBFE"/><rect x="12" y="22" width="16" height="6" rx="2" fill="#2563EB"/><rect x="14" y="18" width="12" height="6" rx="2" fill="#60A5FA"/><circle cx="16" cy="28" r="2" fill="#1D4ED8"/><circle cx="24" cy="28" r="2" fill="#1D4ED8"/></svg>
-    ),
-    solutions: [
-      'Engine Oil & Brake Fluid Filling Line Solutions',
-      'Adblue Filling Line Solutions',
-      'Car Cleaning Products',
-      'Bottle Unscramblers',
-      'Cap Sorting & Feeding Systems',
-      'Dispensing Pump & Spray Trigger Feeding Systems',
-    ],
-  },
-  {
-    name: 'Food & Beverage',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#BBF7D0"/><path d="M20 10c3 0 5 2 5 5 0 4-2 8-5 8s-5-4-5-8c0-3 2-5 5-5zm0 13v5m-3 2h6" stroke="#059669" strokeWidth="2" strokeLinecap="round"/><ellipse cx="20" cy="15" rx="5" ry="3" fill="#34D399" fillOpacity=".7"/></svg>
-    ),
-    solutions: [
-      'Sauce Filling Line Solutions',
-      'Coffee Capsule Feeding Systems',
-      'Vegetable Oil Filling Lines',
-      'Micro-Brewery Filling Lines',
-      'Dispensing Pump & Cap Feeding Systems',
-      'Container Unscramblers',
-    ],
-  },
-  {
-    name: 'Medical & Veterinary',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#FCA5A5"/><rect x="17" y="12" width="6" height="16" rx="2" fill="#DC2626"/><rect x="12" y="17" width="16" height="6" rx="2" fill="#DC2626"/></svg>
-    ),
-    solutions: [
-      'Hand Sanitiser Filling Lines',
-      'Container Unscramblers',
-      'Sterile Cap Feeding Solutions',
-      'Vial Feeding Systems',
-      'Stopper Feeding & Assembly Systems',
-      "Advanced 'Track & Trace' Cap Tightening Solutions",
-    ],
-  },
-  {
-    name: 'Home Care',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#C7D2FE"/><path d="M12 22l8-8 8 8" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round"/><rect x="16" y="22" width="8" height="6" rx="2" fill="#6366F1"/></svg>
-    ),
-    solutions: [
-      'Bottle Unscramblers',
-      'Capping Machines',
-      'Cap Feeding Systems',
-      'Dispensing Pump & Spray Trigger Feeding Systems',
-      'Turn-key Filling Lines',
-      'Disinfectant & Bleach Filling Line Solutions',
-    ],
-  },
-  {
-    name: 'Personal Care',
-    icon: (
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#FBCFE8"/><circle cx="20" cy="16" r="4" fill="#DB2777"/><rect x="15" y="22" width="10" height="6" rx="3" fill="#DB2777"/></svg>
-    ),
-    solutions: [
-      'Bottle Unscramblers',
-      'Capping Machines',
-      'Cap Feeding Systems',
-      'Dispensing Pump & Spray Trigger Feeding Systems',
-      'Turn-key Filling Lines',
-      'Deodorant & Aerosol Filling Line Solutions',
-    ],
-  },
-];
- 
-const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, type: 'spring' },
-  }),
-};
- 
-export default function Sectors() {
-  const { content } = useCmsPage('sectors');
-  const sectors = content.sectors?.length ? content.sectors : defaultSectors;
+function SectorCardImage({ src, fallback, alt }) {
+  const [failed, setFailed] = useState(false)
+  const url = !failed && src ? src : fallback
+
   return (
-    <div className="site-container section-py flex flex-col items-center bg-[#f9fafb]">
-      <h1 className="page-title mb-2 text-center font-semibold text-gray-900">{content.title || 'Sectors'}</h1>
-      <p className="mb-8 max-w-2xl px-2 text-center text-sm text-gray-600 sm:mb-10 sm:text-base lg:text-lg">
-        {content.intro || 'We provide advanced packaging and automation solutions for a wide range of industries.'}
-      </p>
-      <div className="w-full max-w-3xl flex flex-col gap-4">
-        {sectors.map((sector, i) => (
-          <motion.div
-            key={sector.name}
-            className="sector-card-glow group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-lg sm:gap-4 sm:p-5"
-            custom={i}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={cardVariants}
-          >
-            <motion.div
-              className="flex-shrink-0 flex items-center justify-center w-12 h-12"
-              whileHover={{ scale: 1.18, rotate: 8 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              {defaultSectors[i]?.icon}
-            </motion.div>
-            <div className="flex-1">
-              <h2 className="text-base font-bold text-gray-800 mb-1">{sector.name}</h2>
-              <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
-                {sector.solutions.map((solution, idx) => (
-                  <li key={idx}>{solution}</li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      <style>{`
-        .sector-card-glow::after {
-          content: '';
-          position: absolute;
-          right: 0;
-          top: 0;
-          width: 60%;
-          height: 100%;
-          background: radial-gradient(circle at 90% 60%, rgba(255,0,0,0.08) 0%, rgba(255,0,0,0.04) 60%, rgba(255,0,0,0) 100%);
-          pointer-events: none;
-        }
-      `}</style>
+    <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-44 lg:h-48">
+      {url ? (
+        <img
+          src={url}
+          alt={alt}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" aria-hidden />
     </div>
-  );
+  )
+}
+
+function mergeSectors(cmsSectors) {
+  return SECTOR_ITEMS.map((def, i) => {
+    const sector = cmsSectors?.[i] || {}
+    const cmsImage = sector.imageUrl?.trim()
+    return {
+      name: sector.name || def.name,
+      solutions: sector.solutions?.length ? sector.solutions : def.solutions,
+      imageUrl: cmsImage || def.imageUrl,
+      fallbackImageUrl: def.imageUrl,
+      icon: def.icon,
+    }
+  })
+}
+
+export default function Sectors() {
+  const { content } = useCmsPage('sectors')
+  const hub = { ...SECTORS_HUB_DEFAULTS, ...content }
+  const sectors = mergeSectors(content.sectors)
+  const ctaSection = { ...SECTORS_HUB_DEFAULTS.ctaSection, ...content.ctaSection }
+  const cta = { ...SECTORS_HUB_DEFAULTS.cta, ...content.cta }
+
+  return (
+    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+      <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 right-0 h-[min(18vw,100px)] w-[min(42vw,200px)] sm:h-[min(20vw,140px)] sm:w-[min(38vw,280px)]"
+          style={{
+            clipPath: 'polygon(100% 0, 100% 100%, 8% 100%)',
+            background: 'linear-gradient(160deg, #f87171 0%, #ef4444 45%, #b91c1c 100%)',
+          }}
+          aria-hidden
+        />
+
+        <div className="site-container relative">
+          <nav className="mb-6 text-xs text-[#5f5f5f] sm:text-sm" aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <Link to="/" className="hover:text-[#dc2626]">
+                  Home
+                </Link>
+              </li>
+              <li aria-hidden>&gt;</li>
+              <li className="font-medium text-[#111111]">Sectors</li>
+            </ol>
+          </nav>
+
+          <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
+              {hub.eyebrow}
+            </p>
+            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+              {hub.pageTitle}{' '}
+              <span className="text-[#dc2626]">{hub.pageTitleHighlight}</span>
+            </h1>
+            <div className="mx-auto mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+              {hub.intro}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="site-container pb-12 sm:pb-16 lg:pb-20">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7">
+          {sectors.map((sector) => {
+            const Icon = sector.icon
+            return (
+              <article
+                key={sector.name}
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
+              >
+                <SectorCardImage
+                  src={sector.imageUrl}
+                  fallback={sector.fallbackImageUrl}
+                  alt={sector.name}
+                />
+                <div className="flex flex-1 flex-col p-5 sm:p-6">
+                  <div className="mb-3 flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fef2f2]">
+                      <Icon className="h-5 w-5 text-[#dc2626]" aria-hidden />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-lg font-bold text-[#111111] sm:text-xl">{sector.name}</h2>
+                      <div className="mt-2.5 h-[2px] w-8 rounded-full bg-[#dc2626]" />
+                    </div>
+                  </div>
+                  <ul className="mt-1 space-y-2">
+                    {sector.solutions.map((solution, idx) => (
+                      <li key={idx} className="flex gap-2 text-sm leading-relaxed text-[#5f5f5f]">
+                        <LuCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#dc2626]" aria-hidden />
+                        <span>{solution}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </section>
+
+      <ProductInfoCta
+        title={ctaSection.title}
+        description={ctaSection.description}
+        cta={cta}
+      />
+    </div>
+  )
 }

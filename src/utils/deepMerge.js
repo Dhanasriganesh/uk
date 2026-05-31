@@ -13,6 +13,14 @@ export function deepMerge(target, source) {
       !Array.isArray(target[key])
     ) {
       output[key] = deepMerge(target[key], srcVal)
+    } else if (
+      Array.isArray(srcVal) &&
+      srcVal.length === 0 &&
+      Array.isArray(target?.[key]) &&
+      target[key].length > 0
+    ) {
+      // Keep seeded defaults when Firestore has an empty list (legacy CMS data).
+      output[key] = [...target[key]]
     } else {
       output[key] = srcVal
     }

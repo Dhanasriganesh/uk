@@ -78,24 +78,43 @@ function StringField({ path, value, onChange }) {
 
 function ArrayOfStrings({ path, value, onChange }) {
   const items = Array.isArray(value) ? value : []
+  const key = path[path.length - 1]
+  const useMediaUpload = key === 'gallery' || key === 'galleryImageUrls'
+
   return (
     <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-      <FieldLabel label={`${path[path.length - 1]} (list)`} />
+      <FieldLabel label={`${key} (list)`} />
       <div className="space-y-2">
         {items.map((item, i) => (
           <div key={i} className="flex gap-2">
-            <input
-              className={inputClass}
-              value={item}
-              onChange={(e) => {
-                const next = [...items]
-                next[i] = e.target.value
-                onChange(path, next)
-              }}
-            />
+            {useMediaUpload ? (
+              <div className="min-w-0 flex-1">
+                <MediaUrlField
+                  path={[...path, i]}
+                  value={item}
+                  onChange={(_, url) => {
+                    const next = [...items]
+                    next[i] = url
+                    onChange(path, next)
+                  }}
+                />
+              </div>
+            ) : (
+              <input
+                className={inputClass}
+                value={item}
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = e.target.value
+                  onChange(path, next)
+                }}
+              />
+            )}
             <button
               type="button"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-600 transition-colors hover:bg-red-50"
+              className={`flex shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-600 transition-colors hover:bg-red-50 ${
+                useMediaUpload ? 'h-10 w-10 self-start' : 'h-10 w-10'
+              }`}
               onClick={() => onChange(path, items.filter((_, j) => j !== i))}
               aria-label="Remove item"
             >

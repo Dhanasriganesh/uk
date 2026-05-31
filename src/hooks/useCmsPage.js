@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { subscribePageContent } from '../firebase/cmsService'
 import { getDefaultContent } from '../cms/defaultContent'
-import { deepMerge } from '../utils/deepMerge'
+import { mergePageContent } from '../cms/mergePageContent'
 
 export function useCmsPage(pageId) {
-  const [content, setContent] = useState(() =>
-    deepMerge(getDefaultContent(pageId), {})
-  )
+  const [content, setContent] = useState(() => getDefaultContent(pageId))
   const [loading, setLoading] = useState(true)
   const [fromFirestore, setFromFirestore] = useState(false)
 
@@ -15,7 +13,7 @@ export function useCmsPage(pageId) {
     const defaults = getDefaultContent(pageId)
     const unsub = subscribePageContent(pageId, (remote) => {
       if (remote) {
-        setContent(deepMerge(defaults, remote))
+        setContent(mergePageContent(pageId, defaults, remote))
         setFromFirestore(true)
       } else {
         setContent(defaults)

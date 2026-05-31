@@ -40,8 +40,28 @@ export const EMOJI_ICON_OPTIONS = [
 
 export const EMOJI_ICON_IDS = EMOJI_ICON_OPTIONS.map((o) => o.id)
 
+/** Icons used on product detail pages (feature cards & highlights). */
+export const PRODUCT_ICON_OPTIONS = [
+  { id: 'gears', label: 'Gears' },
+  { id: 'cap', label: 'Cap / closure' },
+  { id: 'wrench', label: 'Wrench' },
+  { id: 'formats', label: 'Formats' },
+  { id: 'conveyor', label: 'Conveyor' },
+  { id: 'bottle', label: 'Bottle' },
+  { id: 'gauge', label: 'Gauge / speed' },
+  { id: 'target', label: 'Target / precision' },
+  { id: 'uk', label: 'UK' },
+  { id: 'puzzle', label: 'Integration' },
+]
+
+export const PRODUCT_ICON_IDS = PRODUCT_ICON_OPTIONS.map((o) => o.id)
+
 export function isSectorIcon(value) {
   return SECTOR_ICON_IDS.includes(value)
+}
+
+export function isProductIcon(value) {
+  return PRODUCT_ICON_IDS.includes(value)
 }
 
 export function isEmojiIcon(value) {
@@ -53,6 +73,9 @@ export function isEmojiIcon(value) {
 /** Pick default tab in admin picker from field context */
 export function getDefaultIconTab(value, path = []) {
   const pathStr = path.join('.').toLowerCase()
+  if (pathStr.includes('featurecards') || pathStr.includes('highlights') || isProductIcon(value)) {
+    return 'product'
+  }
   if (pathStr.includes('cards') || isSectorIcon(value)) return 'sector'
   if (pathStr.includes('promises') || pathStr.includes('contact') || pathStr.includes('social')) {
     return 'emoji'

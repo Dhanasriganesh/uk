@@ -5,6 +5,7 @@ import { getPageMeta } from '../../cms/pageRegistry'
 import { getDefaultContent } from '../../cms/defaultContent'
 import { getPageContent, savePageContent, getSiteSettings, saveSiteSettings } from '../../firebase/cmsService'
 import { deepMerge } from '../../utils/deepMerge'
+import { mergePageContent } from '../../cms/mergePageContent'
 import { useAuth } from '../../context/AuthContext'
 import DynamicForm from '../components/DynamicForm'
 import AdminPageShell from '../components/ui/AdminPageShell'
@@ -37,7 +38,7 @@ export default function PageEditorPage() {
         } else {
           const remote = await getPageContent(pageId)
           const defaults = getDefaultContent(pageId)
-          if (!cancelled) setData(deepMerge(defaults, remote || {}))
+          if (!cancelled) setData(mergePageContent(pageId, defaults, remote))
         }
       } catch (err) {
         if (!cancelled) setMessage(err.message)

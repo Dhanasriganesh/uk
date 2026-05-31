@@ -1,284 +1,339 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useCmsPage } from '../../hooks/useCmsPage'
 import { useSiteSettings } from '../../context/CmsContext'
+import {
+  CONTACT_HUB_DEFAULTS,
+  mergeContactCards,
+  mergeEnquiryTypes,
+  mergeFaq,
+} from '../contact/contactDefaults'
 
-if (typeof document !== 'undefined' && !document.getElementById('playfair-font')) {
-  const link = document.createElement('link');
-  link.id = 'playfair-font';
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap';
-  document.head.appendChild(link);
+const inputClass =
+  'w-full rounded-xl border border-[#e8e8e8] bg-white px-3.5 py-2.5 text-sm text-[#111111] transition-colors placeholder:text-[#9ca3af] focus:border-[#dc2626] focus:outline-none focus:ring-2 focus:ring-[#dc2626]/15 sm:px-4 sm:py-3 sm:text-base'
+
+function SocialIcon({ name }) {
+  if (name === 'LinkedIn') {
+    return (
+      <svg fill="currentColor" viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+        <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm15.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.89v1.36h.04c.4-.75 1.37-1.54 2.82-1.54 3.01 0 3.57 1.98 3.57 4.56v5.62z" />
+      </svg>
+    )
+  }
+  if (name === 'YouTube') {
+    return (
+      <svg fill="currentColor" viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+        <path d="M23.498 6.186a2.994 2.994 0 0 0-2.112-2.112C19.692 3.5 12 3.5 12 3.5s-7.692 0-9.386.574a2.994 2.994 0 0 0-2.112 2.112C0 7.88 0 12 0 12s0 4.12.502 5.814a2.994 2.994 0 0 0 2.112 2.112C4.308 20.5 12 20.5 12 20.5s7.692 0 9.386-.574a2.994 2.994 0 0 0 2.112-2.112C24 16.12 24 12 24 12s0-4.12-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+      </svg>
+    )
+  }
+  return (
+    <span className="text-base font-semibold" aria-hidden>
+      {name?.charAt(0) || '?'}
+    </span>
+  )
 }
 
-function Contact() {
+export default function Contact() {
   const { content } = useCmsPage('contact')
   const { settings } = useSiteSettings()
+  const hub = {
+    ...CONTACT_HUB_DEFAULTS,
+    ...content,
+    pageTitle: content.pageTitle || content.heroTitle || CONTACT_HUB_DEFAULTS.pageTitle,
+    intro: content.intro || content.heroSubtitle || CONTACT_HUB_DEFAULTS.intro,
+  }
+  const contactCards = mergeContactCards(content.contactCards, settings)
+  const enquiryTypes = mergeEnquiryTypes(content.enquiryTypes)
+  const faq = mergeFaq(content.faq)
+  const mapEmbedUrl =
+    content.mapEmbedUrl?.trim() ||
+    settings.contact?.mapEmbedUrl ||
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2486.0!2d0.480!3d51.301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDE4JzAzLjYiTiAwwrAyOCc0OC4wIkU!5e0!3m2!1sen!2suk!4v1'
+
+  const socialLinks = settings.footer?.socialLinks || []
+  const quickLines = [
+    { icon: '📞', text: settings.contact?.phone || settings.footer?.phone },
+    { icon: '✉️', text: settings.contact?.email || settings.footer?.email },
+    { icon: '📍', text: settings.contact?.address || settings.footer?.address },
+  ].filter((line) => line.text)
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     subject: '',
     message: '',
-    enquiryType: 'general',
-  });
+    enquiryType: enquiryTypes[0]?.value || 'general',
+  })
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(content.formSuccessMessage || 'Thank you for contacting ATS! We will get back to you soon.');
+    e.preventDefault()
+    alert(hub.formSuccessMessage)
     setFormData({
       name: '',
       email: '',
       phone: '',
       subject: '',
       message: '',
-      enquiryType: 'general',
-    });
-  };
-
-  const contactInfo = content.contactCards?.length ? content.contactCards : [
-    { icon: '📍', title: 'Head Office', details: settings.contact?.address || settings.footer?.address, description: 'Our main headquarters and manufacturing facility.' },
-    { icon: '📞', title: 'Call Us', details: settings.contact?.phone || settings.footer?.phone, description: 'Speak directly with our team for sales, support, or service.' },
-    { icon: '✉️', title: 'Email Us', details: settings.contact?.email || settings.footer?.email, description: 'Send us your enquiry and our team will respond promptly.' },
-    { icon: '⏰', title: 'Business Hours', details: settings.contact?.businessHours || 'Mon - Fri: 8:30 AM - 5:30 PM', description: "We're available during these hours for consultations and support." },
-  ];
-
-  const socialLinks = [
-    { name: "LinkedIn", icon: "💼", url: "#" },
-    { name: "Twitter", icon: "🐦", url: "#" },
-    { name: "YouTube", icon: "▶️", url: "#" },
-  ];
+      enquiryType: enquiryTypes[0]?.value || 'general',
+    })
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 py-12 text-white sm:py-16 lg:py-20">
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="site-container relative z-10 text-center">
-          <h1 
-            className="page-hero-title mb-4 font-bold sm:mb-6"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            {content.heroTitle || 'Contact ATS'}
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
-            {content.heroSubtitle || 'Have a question about our packaging solutions, machinery, or services? Get in touch with our team.'}
-          </p>
-        </div>
-      </section>
+    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+      <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 right-0 h-[min(18vw,100px)] w-[min(42vw,200px)] sm:h-[min(20vw,140px)] sm:w-[min(38vw,280px)]"
+          style={{
+            clipPath: 'polygon(100% 0, 100% 100%, 8% 100%)',
+            background: 'linear-gradient(160deg, #f87171 0%, #ef4444 45%, #b91c1c 100%)',
+          }}
+          aria-hidden
+        />
 
-      {/* Contact Information Cards */}
-      <section className="py-12 sm:py-16 lg:py-20">
-        <div className="site-container">
-          <h2 
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            How Can We Help You?
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-16">
-            {contactInfo.map((info, index) => (
-              <div key={index} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{info.icon}</div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{info.title}</h3>
-                <p className="text-blue-700 font-semibold mb-2 sm:mb-3 text-sm sm:text-base">{info.details}</p>
-                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{info.description}</p>
-              </div>
-            ))}
+        <div className="site-container relative">
+          <nav className="mb-6 text-xs text-[#5f5f5f] sm:text-sm" aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <Link to="/" className="hover:text-[#dc2626]">
+                  Home
+                </Link>
+              </li>
+              <li aria-hidden>&gt;</li>
+              <li className="font-medium text-[#111111]">Contact</li>
+            </ol>
+          </nav>
+
+          <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
+              {hub.eyebrow}
+            </p>
+            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+              {hub.pageTitle}{' '}
+              <span className="text-[#dc2626]">{hub.pageTitleHighlight}</span>
+            </h1>
+            <div className="mx-auto mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+              {hub.intro}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Contact Form and Map Section */}
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="site-container pb-12 sm:pb-16">
+        <h2 className="mb-8 text-center text-2xl font-bold text-[#111111] sm:mb-10 sm:text-3xl">
+          {hub.cardsSectionTitle}
+        </h2>
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-7">
+          {contactCards.map((card) => (
+            <article
+              key={card.title}
+              className="rounded-2xl border border-[#f1f1f1] bg-white p-6 text-center shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-7"
+            >
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef2f2] text-2xl">
+                {card.icon}
+              </div>
+              <h3 className="text-lg font-bold text-[#111111]">{card.title}</h3>
+              <div className="mx-auto my-2.5 h-[2px] w-8 rounded-full bg-[#dc2626]" />
+              <p className="mb-2 text-sm font-semibold text-[#dc2626] sm:text-base">{card.details}</p>
+              <p className="text-sm leading-relaxed text-[#5f5f5f]">{card.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-[#f1f1f1] bg-[#fafafa] py-12 sm:py-16 lg:py-20">
         <div className="site-container">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12">
-            {/* Contact Form */}
-            <div className="bg-gray-50 p-6 sm:p-8 rounded-2xl shadow-lg">
-              <h3 
-                className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                Send Us an Enquiry
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="rounded-2xl border border-[#f1f1f1] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-8">
+              <h2 className="mb-6 text-2xl font-bold text-[#111111] sm:text-3xl">
+                {hub.formSectionTitle}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
                   <div>
-                    <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Full Name *</label>
+                    <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base"
+                      className={inputClass}
                       placeholder="Your full name"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Email Address *</label>
+                    <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                      Email Address *
+                    </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base"
-                      placeholder="your.email@ats-uk.com"
+                      className={inputClass}
+                      placeholder="your.email@company.com"
                     />
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
                   <div>
-                    <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Phone Number</label>
+                    <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                      Phone Number
+                    </label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base"
-                      placeholder="+44 1234 567890"
+                      className={inputClass}
+                      placeholder="+44 1622 678143"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Enquiry Type</label>
+                    <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                      Enquiry Type
+                    </label>
                     <select
                       name="enquiryType"
                       value={formData.enquiryType}
                       onChange={handleChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base"
+                      className={inputClass}
                     >
-                      <option value="general">General Enquiry</option>
-                      <option value="sales">Sales</option>
-                      <option value="support">Support</option>
-                      <option value="service">Service</option>
-                      <option value="partnership">Partnership</option>
+                      {enquiryTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Subject *</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                    Subject *
+                  </label>
                   <input
                     type="text"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base"
+                    className={inputClass}
                     placeholder="Subject of your enquiry"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Message *</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-[#111111]">
+                    Message *
+                  </label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    rows="5"
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-sm sm:text-base"
+                    rows={5}
+                    className={`${inputClass} resize-none`}
                     placeholder="Please provide details about your enquiry, requirements, or project..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 sm:py-4 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-base sm:text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="w-full rounded-xl bg-[#dc2626] py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(220,38,38,0.25)] transition hover:bg-[#b91c1c] sm:text-base"
                 >
-                  Send Enquiry
+                  {hub.formSubmitLabel}
                 </button>
               </form>
             </div>
 
-            {/* Map and Additional Info */}
-            <div className="space-y-6 sm:space-y-8">
-              {/* Map */}
-              <div className="bg-gray-200 rounded-2xl overflow-hidden shadow-lg h-64 sm:h-80">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2436.504234833635!2d0.13197831580000002!3d52.2042669797577!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d870a6d2e7b1b1%3A0x2e7b1b1d2e7b1b1d!2sATS%20UK%20Ltd!5e0!3m2!1sen!2suk!4v1680000000000!5m2!1sen!2suk"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="ATS UK Ltd Location"
-                />
-              </div>
-
-              {/* Quick Contact */}
-              <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl">
-                <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Quick Contact</h4>
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="flex items-center">
-                    <span className="text-blue-700 mr-2 sm:mr-3 text-lg">📞</span>
-                    <span className="text-gray-700 text-sm sm:text-base">+44 1234 567890</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-blue-700 mr-2 sm:mr-3 text-lg">✉️</span>
-                    <span className="text-gray-700 text-sm sm:text-base">info@ats-uk.com</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-blue-700 mr-2 sm:mr-3 text-lg">📍</span>
-                    <span className="text-gray-700 text-sm sm:text-base">South East England, United Kingdom</span>
-                  </div>
+            <div className="space-y-6 sm:space-y-7">
+              <div className="overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+                <div className="h-64 sm:h-80">
+                  <iframe
+                    src={mapEmbedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="ATS UK Ltd Location"
+                  />
                 </div>
               </div>
 
-              {/* Social Media */}
-              <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl">
-                <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Connect With Us</h4>
-                <div className="flex space-x-3 sm:space-x-4">
-                  {socialLinks.map((social, index) => (
-                    <a
-                      key={index}
-                      href={social.url}
-                      className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-700 hover:bg-blue-800 text-white rounded-full flex items-center justify-center text-lg sm:text-xl transition-colors duration-300 hover:scale-110"
-                      aria-label={social.name}
-                    >
-                      {social.icon}
-                    </a>
-                  ))}
+              {quickLines.length > 0 && (
+                <div className="rounded-2xl border border-[#f1f1f1] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6">
+                  <h3 className="mb-4 text-lg font-bold text-[#111111] sm:text-xl">
+                    {hub.quickContactTitle}
+                  </h3>
+                  <ul className="space-y-3">
+                    {quickLines.map((line) => (
+                      <li key={line.icon} className="flex items-start gap-3 text-sm text-[#5f5f5f] sm:text-base">
+                        <span className="text-lg" aria-hidden>
+                          {line.icon}
+                        </span>
+                        <span>{line.text}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              )}
+
+              {socialLinks.length > 0 && (
+                <div className="rounded-2xl border border-[#f1f1f1] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6">
+                  <h3 className="mb-4 text-lg font-bold text-[#111111] sm:text-xl">
+                    {hub.socialSectionTitle}
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {socialLinks.map((social) => (
+                      <a
+                        key={social.name}
+                        href={social.url}
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-[#dc2626] text-white transition hover:bg-[#b91c1c]"
+                        aria-label={social.name}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <SocialIcon name={social.name} />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-
-
-      {/* FAQ Section */}
-      <section className="bg-gray-100 py-12 sm:py-16 lg:py-20">
-        <div className="site-container">
-          <h2 
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-4 sm:space-y-6">
-            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">What industries does ATS serve?</h3>
-              <p className="text-sm sm:text-base text-gray-700">ATS provides packaging machinery and solutions for a wide range of industries including FMCG, Cosmetics, Pharmaceuticals, Food & Beverage, Chemicals, and Automotive sectors.</p>
-            </div>
-            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">How can I request a quote or consultation?</h3>
-              <p className="text-sm sm:text-base text-gray-700">You can use the contact form above, call us directly, or click the "Request a Quote" button. Our team will respond promptly to discuss your requirements.</p>
-            </div>
-            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">Where are ATS facilities located?</h3>
-              <p className="text-sm sm:text-base text-gray-700">ATS has manufacturing facilities in the South East of England, with additional design, service, and support locations in the North of England and Asia.</p>
-            </div>
-          </div>
+      <section className="site-container py-12 sm:py-16 lg:py-20">
+        <h2 className="mb-8 text-center text-2xl font-bold text-[#111111] sm:mb-10 sm:text-3xl">
+          {hub.faqSectionTitle}
+        </h2>
+        <div className="mx-auto max-w-3xl space-y-4 sm:space-y-5">
+          {faq.map((item) => (
+            <article
+              key={item.question}
+              className="rounded-2xl border border-[#f1f1f1] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"
+            >
+              <h3 className="mb-2 text-base font-bold text-[#111111] sm:text-lg">{item.question}</h3>
+              <p className="text-sm leading-relaxed text-[#5f5f5f] sm:text-base">{item.answer}</p>
+            </article>
+          ))}
         </div>
       </section>
     </div>
   )
 }
-
-export default Contact

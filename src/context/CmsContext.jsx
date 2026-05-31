@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { subscribeSiteSettings } from '../firebase/cmsService'
 import { defaultSettings } from '../cms/defaultContent'
-import { deepMerge } from '../utils/deepMerge'
+import { mergePageContent } from '../cms/mergePageContent'
 
 const CmsContext = createContext(null)
 
@@ -15,7 +15,7 @@ export function CmsProvider({ children }) {
         const rest = { ...data }
         delete rest.updatedAt
         delete rest.updatedBy
-        setSettings(deepMerge(defaultSettings, rest))
+        setSettings(mergePageContent('settings', defaultSettings, rest))
       } else {
         setSettings(defaultSettings)
       }

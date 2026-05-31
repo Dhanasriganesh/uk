@@ -6,7 +6,7 @@ export const PAGE_GROUPS = [
   {
     label: 'Site',
     pages: [
-      { id: 'settings', label: 'Global Settings', description: 'Footer, contact, logo, social links' },
+      { id: 'settings', label: 'Global Settings', description: 'Logo, footer columns, highlights, contact, social & legal links' },
     ],
   },
   {
@@ -23,15 +23,19 @@ export const PAGE_GROUPS = [
     label: 'Main Pages',
     pages: [
       { id: 'about', label: 'About Us', description: '/about page' },
-      { id: 'contact', label: 'Contact', description: '/contact page' },
-      { id: 'products', label: 'Products Hub', description: '/products listing' },
-      { id: 'sectors', label: 'Sectors', description: '/sectors page' },
-      { id: 'consultation', label: 'Consultation Hub', description: '/consultation landing' },
+      { id: 'contact', label: 'Contact', description: '/contact — hero, cards, form, map, FAQ' },
+      { id: 'sectors', label: 'Sectors', description: '/sectors — hero, sector cards, CTA' },
+      { id: 'consultation', label: 'Consultation Hub', description: '/consultation — hero, service cards, CTA' },
     ],
   },
   {
     label: 'Products',
     pages: [
+      {
+        id: 'products',
+        label: 'Products Hub',
+        description: '/products listing — hero, product cards, image strip, CTA',
+      },
       { id: 'capping', label: 'Capping Machines', description: '/capping' },
       { id: 'bottle', label: 'Bottle Unscramblers', description: '/bottle' },
       { id: 'pump', label: 'Pump & Trigger', description: '/pump' },
@@ -43,10 +47,10 @@ export const PAGE_GROUPS = [
   {
     label: 'Consultation Services',
     pages: [
-      { id: 'project-management', label: 'Project Management', description: '/project-management' },
-      { id: 'project-planning', label: 'Project Planning', description: '/project-planning' },
-      { id: 'turnkey-automation', label: 'Turnkey Automation', description: '/turnkey-automation' },
-      { id: 'lifecycle-management', label: 'Lifecycle Management', description: '/lifecycle-management' },
+      { id: 'project-management', label: 'Project Management', description: '/project-management — hero, tasks, highlights, CTA' },
+      { id: 'project-planning', label: 'Project Planning', description: '/project-planning — hero, process steps, highlights, CTA' },
+      { id: 'turnkey-automation', label: 'Turnkey Automation', description: '/turnkey-automation — hero, capabilities, highlights, CTA' },
+      { id: 'lifecycle-management', label: 'Lifecycle Management', description: '/lifecycle-management — hero, solutions, highlights, CTA' },
     ],
   },
   {
