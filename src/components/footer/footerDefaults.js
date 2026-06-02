@@ -43,6 +43,7 @@ export const FOOTER_LINK_COLUMNS = [
       { name: 'Project Planning', url: '/project-planning' },
       { name: 'Lifecycle Management', url: '/lifecycle-management' },
       { name: 'Turnkey Automation', url: '/turnkey-automation' },
+      { name: 'Bespoke Show and Review Models', url: '/bespoke-show-review-models' },
       { name: 'Contact Support', url: '/contact' },
     ],
   },

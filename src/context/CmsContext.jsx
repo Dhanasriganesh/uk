@@ -37,6 +37,12 @@ export function CmsProvider({ children }) {
 
 export function useSiteSettings() {
   const ctx = useContext(CmsContext)
-  if (!ctx) throw new Error('useSiteSettings must be used within CmsProvider')
+  if (!ctx) {
+    return {
+      settings: defaultSettings,
+      settingsLoading: false,
+      refreshSettings: () => {},
+    }
+  }
   return ctx
 }

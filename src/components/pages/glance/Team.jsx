@@ -1,6 +1,7 @@
 import React from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
+import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
 import p1 from '../../../assets/p1.png'
 import p2 from '../../../assets/p2.png'
 import p3 from '../../../assets/p3.png'
@@ -61,15 +62,16 @@ function Team() {
         .filter(Boolean)
     : DEFAULT_INTRO
 
+  const glanceTitle = glanceTitleFromContent(content)
+
   return (
     <section className="site-container section-py bg-white">
       <header className="mx-auto mb-10 max-w-4xl text-center sm:mb-12 lg:mb-14">
-        <h1
-          className="page-title mb-4 font-bold tracking-tight text-black sm:mb-5"
-          style={serif}
-        >
-          {content.title || 'ATS At a Glance'}
-        </h1>
+        <GlancePageTitle
+          line1={glanceTitle.line1}
+          highlight={glanceTitle.highlight}
+          className="mb-6 sm:mb-8"
+        />
         <h2
           className="mb-5 text-xl font-bold text-[#dc2626] sm:mb-6 sm:text-2xl lg:text-3xl"
           style={serif}

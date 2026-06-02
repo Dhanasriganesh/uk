@@ -1,9 +1,17 @@
+export const ATS_HEAD_OFFICE_ADDRESS =
+  'Mfd House, Parkwood Industrial Estate, Coldred Road, Maidstone, Kent, ME15 9XX, UK'
+
+export const ATS_BUSINESS_HOURS = 'Mon - Thu: 8:30 AM - 5:30 PM, Fri: 8:30 AM - 3:00 PM'
+
+export const ATS_MAP_EMBED_URL =
+  'https://maps.google.com/maps?q=Mfd+House,+Coldred+Road,+Parkwood+Industrial+Estate,+Maidstone,+ME15+9XX,+UK&hl=en&z=15&output=embed'
+
 export const CONTACT_CARD_DEFAULTS = [
   {
     icon: '📍',
     title: 'Head Office',
-    details: 'Unit 1, 2-4 Beddow Way, Aylesford, Kent, ME20 7BT, UK',
-    description: 'Our main headquarters and manufacturing facility.',
+    details: ATS_HEAD_OFFICE_ADDRESS,
+    description: 'Our Maidstone headquarters at Parkwood Industrial Estate.',
   },
   {
     icon: '📞',
@@ -20,8 +28,8 @@ export const CONTACT_CARD_DEFAULTS = [
   {
     icon: '⏰',
     title: 'Business Hours',
-    details: 'Mon - Fri: 8:30 AM - 5:30 PM',
-    description: "We're available during these hours for consultations and support.",
+    details: ATS_BUSINESS_HOURS,
+    description: 'Friday closing time is 3:00 PM. We are closed at weekends.',
   },
 ]
 
@@ -46,7 +54,7 @@ export const CONTACT_FAQ_DEFAULTS = [
   {
     question: 'Where are your facilities located?',
     answer:
-      'We have 3 manufacturing facilities in the South East of England with satellite support in the North of England and Asia.',
+      'We have manufacturing facilities in Maidstone and Folkestone, Kent, with satellite design, service, and support in the North of England and Asia.',
   },
 ]
 
@@ -55,23 +63,49 @@ export const CONTACT_HUB_DEFAULTS = {
   pageTitle: 'Contact',
   pageTitleHighlight: 'ATS',
   intro:
-    'Have a question about our packaging solutions, machinery, or services? Get in touch with our team and we will be happy to assist you.',
+    'Have a question about our engineering, tooling, automation, or consultation services? Get in touch with our team and we will be happy to assist you.',
   cardsSectionTitle: 'How Can We Help You?',
   formSectionTitle: 'Send Us an Enquiry',
   formSubmitLabel: 'Send Enquiry',
   formSuccessMessage: 'Thank you for contacting ATS! We will get back to you soon.',
-  mapEmbedUrl: '',
+  mapEmbedUrl: ATS_MAP_EMBED_URL,
   quickContactTitle: 'Quick Contact',
   socialSectionTitle: 'Connect With Us',
   faqSectionTitle: 'Frequently Asked Questions',
 }
 
+const STALE_ADDRESS_MARKERS = ['Beddow Way', 'Aylesford', 'ME20 7BT']
+
+function isStaleAddress(value) {
+  const text = value?.trim() || ''
+  return STALE_ADDRESS_MARKERS.some((marker) => text.includes(marker))
+}
+
+function resolveContactDetail(index, cardDetail, settingDetail, defaultDetail) {
+  const trimmed = cardDetail?.trim()
+  if (index === 0 && trimmed && isStaleAddress(trimmed)) {
+    return settingDetail?.trim() && !isStaleAddress(settingDetail)
+      ? settingDetail.trim()
+      : defaultDetail
+  }
+  if (index === 3 && trimmed && trimmed.includes('Mon - Fri: 8:30 AM - 5:30 PM')) {
+    return settingDetail?.trim() || defaultDetail
+  }
+  return trimmed || settingDetail?.trim() || defaultDetail
+}
+
+export function resolveSiteAddress(settings = {}) {
+  const addr = settings.contact?.address || settings.footer?.address
+  if (addr?.trim() && !isStaleAddress(addr)) return addr.trim()
+  return ATS_HEAD_OFFICE_ADDRESS
+}
+
 export function mergeContactCards(cmsCards, settings = {}) {
   const settingDetails = [
-    settings.contact?.address || settings.footer?.address,
+    resolveSiteAddress(settings),
     settings.contact?.phone || settings.footer?.phone,
     settings.contact?.email || settings.footer?.email,
-    settings.contact?.businessHours || 'Mon - Fri: 8:30 AM - 5:30 PM',
+    settings.contact?.businessHours || ATS_BUSINESS_HOURS,
   ]
 
   return CONTACT_CARD_DEFAULTS.map((def, i) => {
@@ -79,7 +113,7 @@ export function mergeContactCards(cmsCards, settings = {}) {
     return {
       icon: card.icon || def.icon,
       title: card.title || def.title,
-      details: card.details?.trim() || settingDetails[i] || def.details,
+      details: resolveContactDetail(i, card.details, settingDetails[i], def.details),
       description: card.description || def.description,
     }
   })

@@ -6,6 +6,7 @@ const CONSULTATION_SERVICE_IDS = [
   'project-planning',
   'lifecycle-management',
   'turnkey-automation',
+  'bespoke-show-review-models',
 ]
 
 function mergeIndexedObjects(defaultItems, remoteItems) {

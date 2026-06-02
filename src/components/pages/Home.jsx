@@ -65,9 +65,9 @@ function Home() {
             />
           </div>
 
-          <div className="site-container relative z-10">
-            <div className="grid grid-cols-1 items-center gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-10">
-              <div className="w-full min-w-0 text-center lg:text-left">
+          <div className="site-container relative z-10 w-full">
+            <div className="grid grid-cols-1 items-center gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-12">
+              <div className="flex w-full min-w-0 flex-col justify-center self-center text-center lg:text-left">
                 <h1 className="text-[clamp(1.75rem,6vw,4rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-black">
                   <span className="block">
                     {hero.line1 || 'Continuous'}{' '}
@@ -79,19 +79,19 @@ function Home() {
                   </span>
                 </h1>
                 <div className="mx-auto mb-4 mt-4 h-[3px] w-full max-w-[200px] rounded-full bg-[#dc2626] sm:mb-6 sm:mt-6 sm:max-w-[300px] lg:mx-0" />
-                <p className="mx-auto mt-4 max-w-xl text-[clamp(0.95rem,2.5vw,1.25rem)] font-normal leading-[1.75] text-[#5f5f5f] sm:leading-[1.85] lg:mx-0 lg:max-w-[420px]">
+                <p className="mx-auto mt-4 max-w-xl text-[clamp(1.125rem,3vw,1.5rem)] font-normal leading-[1.75] text-[#5f5f5f] sm:leading-[1.85] lg:mx-0 lg:max-w-[480px]">
                   {hero.description ||
                     'Advanced Tooling Systems UK Ltd offers engineering solutions across multiple and varied business sectors enabling shared innovation and experience.'}
                 </p>
               </div>
 
-              <div className="w-full min-w-0">
-                <div className="overflow-hidden rounded-2xl bg-[#111] shadow-[0_16px_48px_rgba(0,0,0,0.12)] sm:rounded-[20px]">
+              <div className="flex w-full min-w-0 lg:h-full lg:min-h-[calc(100svh-var(--header-height)-6rem)]">
+                <div className="flex w-full flex-1 overflow-hidden rounded-2xl bg-[#111] shadow-[0_16px_48px_rgba(0,0,0,0.12)] sm:rounded-[20px] lg:h-full">
                   <CmsVideo
                     ref={videoRef}
                     src={hero.videoUrl}
                     fallback={HERO_VIDEO_URL}
-                    className="aspect-video w-full object-cover sm:min-h-[280px] lg:min-h-[400px] lg:max-h-[460px]"
+                    className="aspect-video w-full min-h-[400px] object-cover sm:min-h-[460px] md:min-h-[500px] lg:aspect-auto lg:h-full lg:min-h-full lg:max-h-none"
                     autoPlay
                     muted
                     loop

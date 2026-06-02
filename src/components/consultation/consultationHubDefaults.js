@@ -4,6 +4,7 @@ import {
   LuCog,
   LuRefreshCw,
   LuCompass,
+  LuPlane,
 } from 'react-icons/lu'
 
 export const CONSULTATION_SERVICES = [
@@ -31,6 +32,12 @@ export const CONSULTATION_SERVICES = [
     path: '/lifecycle-management',
     icon: LuRefreshCw,
   },
+  {
+    title: 'Bespoke Show and Review Models',
+    description: 'Aerospace consultation, show models, and interior review structures.',
+    path: '/bespoke-show-review-models',
+    icon: LuPlane,
+  },
 ]
 
 export const CONSULTATION_HUB_DEFAULTS = {
@@ -38,7 +45,7 @@ export const CONSULTATION_HUB_DEFAULTS = {
   title: 'Consultation & Solutions',
   titleHighlight: 'Hub',
   intro:
-    'Explore our professional consultation services designed to support your packaging and automation projects from concept to completion.',
+    'Explore our professional consultation services — from project management and planning through turnkey automation, lifecycle support, and bespoke aerospace show and review models.',
   ctaSection: {
     title: 'Ready to Start Your Project?',
     description:

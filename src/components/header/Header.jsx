@@ -15,7 +15,7 @@ const navLinks = [
     ],
   },
   {
-    name: 'Products',
+    name: 'Services',
     path: '/products',
     dropdown: [
       { name: 'Capping Machines', path: '/capping' },
@@ -34,6 +34,7 @@ const navLinks = [
       { name: 'Project Planning', path: '/project-planning' },
       { name: 'Lifecycle Management', path: '/lifecycle-management' },
       { name: 'Turn-key Automation', path: '/turnkey-automation' },
+      { name: 'Bespoke Show and Review Models', path: '/bespoke-show-review-models' },
     ],
   },
   { name: 'Sectors', path: '/sectors' },
@@ -117,7 +118,7 @@ function Header() {
           <img
             src={logo}
             alt="ATS"
-            className="h-8 w-auto max-h-[calc(var(--header-height)-0.5rem)] object-contain sm:h-9 lg:h-10"
+            className="h-10 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-11 lg:h-12"
           />
         </Link>
 
@@ -132,7 +133,7 @@ function Header() {
                 >
                   <Link
                     to={link.path}
-                    className={`relative inline-flex items-center gap-1 py-1 text-[13px] font-semibold leading-none transition-colors xl:text-[14px] ${
+                    className={`relative inline-flex items-center gap-1 py-1 text-[15px] font-semibold leading-none transition-colors xl:text-[16px] ${
                       isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
                     }`}
                   >
@@ -175,7 +176,7 @@ function Header() {
         <div className="ml-auto flex shrink-0 items-center justify-end gap-2 sm:gap-3 lg:ml-0">
           <Link
             to="/contact"
-            className="hidden h-9 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
+            className="hidden h-10 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
           >
             Request a Quote
             <svg className="h-4 w-4 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
@@ -220,7 +221,7 @@ function Header() {
                   <div className="flex items-center justify-between gap-2">
                     <Link
                       to={link.path}
-                      className={`text-[15px] font-semibold ${
+                      className={`text-[16px] font-semibold ${
                         isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111]'
                       }`}
                       onClick={(e) => {

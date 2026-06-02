@@ -1,6 +1,7 @@
 import React from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
+import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
 import newsFeatured from '../../../assets/news.png'
 
 const serif = { fontFamily: 'Playfair Display, serif' }
@@ -126,23 +127,18 @@ function News() {
     : DEFAULT_ARTICLES
 
   const showIntro = Boolean(content.intro?.trim())
+  const glanceTitle = glanceTitleFromContent(content)
 
   return (
     <div className="w-full bg-white">
       <section className="site-container section-py">
         <header className="mx-auto mb-10 max-w-3xl text-center sm:mb-12 lg:mb-14">
-          <h1
-            className="page-title font-bold tracking-tight text-black"
-            style={serif}
-          >
-            {content.title || 'News'}
-          </h1>
+          <GlancePageTitle line1={glanceTitle.line1} highlight={glanceTitle.highlight} />
           {showIntro && (
-            <p className="mt-4 text-base leading-relaxed text-[#5f5f5f] sm:mt-5 sm:text-lg">
+            <p className="mt-6 text-base leading-relaxed text-[#5f5f5f] sm:mt-8 sm:text-lg">
               {content.intro}
             </p>
           )}
-          <div className="mx-auto mt-5 h-[3px] w-16 rounded-full bg-[#dc2626] sm:mt-6 sm:w-20" aria-hidden />
         </header>
 
         <div className="mx-auto flex max-w-4xl flex-col gap-10 sm:gap-12">

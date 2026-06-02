@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
-import { resolveCmsImageUrl } from '../../../cms/resolveCmsImageUrl'
+import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
+import { resolvePartnerItems } from '../../../cms/resolvePartnerLogos'
 import {
   DEFAULT_SUPPORTED_CUSTOMERS,
   DEFAULT_TRUSTED_PARTNERS,
@@ -12,19 +13,6 @@ import {
 } from '../../../cms/partnerFallbacks'
 
 const serif = { fontFamily: 'Playfair Display, serif' }
-
-function resolvePartnerItems(items, defaults, fallbacks, logoByName) {
-  const list = items?.length ? items : defaults
-  return list.map((item, i) => {
-    const nameKey = item.name?.toLowerCase()
-    const fallback = logoByName[nameKey] ?? fallbacks[i % fallbacks.length]
-    return {
-      ...item,
-      resolvedLogoUrl: resolveCmsImageUrl(item.logoUrl, fallback),
-      logoFallback: fallback,
-    }
-  })
-}
 
 function LogoMarquee({ items }) {
   const track = [...items, ...items]
@@ -78,10 +66,19 @@ function Partners() {
     )
   }, [content.trustedPartners, content.partners])
 
+  const glanceTitle = glanceTitleFromContent(content)
+
   return (
     <div className="w-full overflow-x-hidden bg-white">
+      <div className="site-container pt-8 sm:pt-10 lg:pt-12">
+        <GlancePageTitle
+          line1={glanceTitle.line1}
+          highlight={glanceTitle.highlight}
+          className="mb-6 sm:mb-8 lg:mb-10"
+        />
+      </div>
       <section className="pb-8 sm:pb-12">
-        <div className="site-container section-py pb-6 sm:pb-8">
+        <div className="site-container pb-6 sm:pb-8">
           <h2 className="section-title text-center font-bold text-black" style={serif}>
             {content.supportedCustomersHeading || 'Supported Customers'}
           </h2>

@@ -73,7 +73,7 @@ export default function Consultation() {
       </section>
 
       <section className="site-container pb-12 sm:pb-16 lg:pb-20">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7">
           {services.map((service) => {
             const Icon = service.icon
             return (

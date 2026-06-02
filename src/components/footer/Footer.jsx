@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { LuMapPin, LuPhone, LuMail } from 'react-icons/lu'
 import { useSiteSettings } from '../../context/CmsContext'
 import logo from '../../assets/logo.png'
+import { resolveSiteAddress } from '../contact/contactDefaults'
 import {
   FOOTER_HIGHLIGHT_ICONS,
   mergeFooterHighlights,
@@ -101,7 +102,7 @@ function Footer() {
   const legalLinks = footer.legalLinks || []
 
   const contactRows = [
-    { Icon: LuMapPin, text: footer.address },
+    { Icon: LuMapPin, text: resolveSiteAddress(settings) },
     { Icon: LuPhone, text: footer.phone },
     { Icon: LuMail, text: footer.email },
   ].filter((row) => row.text)

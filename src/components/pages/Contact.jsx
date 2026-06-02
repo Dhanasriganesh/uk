@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { useCmsPage } from '../../hooks/useCmsPage'
 import { useSiteSettings } from '../../context/CmsContext'
 import {
+  ATS_MAP_EMBED_URL,
   CONTACT_HUB_DEFAULTS,
   mergeContactCards,
   mergeEnquiryTypes,
   mergeFaq,
+  resolveSiteAddress,
 } from '../contact/contactDefaults'
 
 const inputClass =
@@ -46,16 +48,15 @@ export default function Contact() {
   const contactCards = mergeContactCards(content.contactCards, settings)
   const enquiryTypes = mergeEnquiryTypes(content.enquiryTypes)
   const faq = mergeFaq(content.faq)
+  const cmsMap = content.mapEmbedUrl?.trim() || settings.contact?.mapEmbedUrl?.trim() || ''
   const mapEmbedUrl =
-    content.mapEmbedUrl?.trim() ||
-    settings.contact?.mapEmbedUrl ||
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2486.0!2d0.480!3d51.301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDE4JzAzLjYiTiAwwrAyOCc0OC4wIkU!5e0!3m2!1sen!2suk!4v1'
+    cmsMap && !cmsMap.includes('51.301') && !cmsMap.includes('0.480') ? cmsMap : ATS_MAP_EMBED_URL
 
   const socialLinks = settings.footer?.socialLinks || []
   const quickLines = [
     { icon: '📞', text: settings.contact?.phone || settings.footer?.phone },
     { icon: '✉️', text: settings.contact?.email || settings.footer?.email },
-    { icon: '📍', text: settings.contact?.address || settings.footer?.address },
+    { icon: '📍', text: resolveSiteAddress(settings) },
   ].filter((line) => line.text)
 
   const [formData, setFormData] = useState({
@@ -86,9 +87,9 @@ export default function Contact() {
 
   return (
     <div className="w-full overflow-x-hidden bg-white text-[#111111]">
-      <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
+      <section className="relative overflow-hidden bg-[#111111] pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]"
+          className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#1a1a1a]"
           aria-hidden
         />
         <div
@@ -101,28 +102,30 @@ export default function Contact() {
         />
 
         <div className="site-container relative">
-          <nav className="mb-6 text-xs text-[#5f5f5f] sm:text-sm" aria-label="Breadcrumb">
+          <nav className="mb-6 text-xs text-[#d1d5db] sm:text-sm" aria-label="Breadcrumb">
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
-                <Link to="/" className="hover:text-[#dc2626]">
+                <Link to="/" className="hover:text-[#fca5a5]">
                   Home
                 </Link>
               </li>
-              <li aria-hidden>&gt;</li>
-              <li className="font-medium text-[#111111]">Contact</li>
+              <li aria-hidden className="text-[#6b7280]">
+                &gt;
+              </li>
+              <li className="font-medium text-white">Contact</li>
             </ol>
           </nav>
 
           <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#fca5a5] sm:text-sm">
               {hub.eyebrow}
             </p>
-            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-white">
               {hub.pageTitle}{' '}
               <span className="text-[#dc2626]">{hub.pageTitleHighlight}</span>
             </h1>
             <div className="mx-auto mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#d1d5db] sm:text-base lg:text-lg">
               {hub.intro}
             </p>
           </div>

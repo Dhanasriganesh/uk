@@ -15,7 +15,7 @@ export const PAGE_GROUPS = [
       { id: 'home', label: 'Home Hero', description: 'Hero headline, video, intro text' },
       { id: 'home-what-we-do', label: 'What We Do', description: 'Service cards section' },
       { id: 'home-why', label: 'Why Choose ATS', description: 'Features and promises' },
-      { id: 'home-brands', label: 'Brands', description: 'Client logo carousel' },
+      { id: 'home-brands', label: 'Brands', description: 'Section title only; logos match Partners → Supported Customers' },
       { id: 'home-connect', label: 'Connect / Consultation Form', description: 'Home page contact section' },
     ],
   },
@@ -51,6 +51,11 @@ export const PAGE_GROUPS = [
       { id: 'project-planning', label: 'Project Planning', description: '/project-planning — hero, process steps, highlights, CTA' },
       { id: 'turnkey-automation', label: 'Turnkey Automation', description: '/turnkey-automation — hero, capabilities, highlights, CTA' },
       { id: 'lifecycle-management', label: 'Lifecycle Management', description: '/lifecycle-management — hero, solutions, highlights, CTA' },
+      {
+        id: 'bespoke-show-review-models',
+        label: 'Bespoke Show and Review Models',
+        description: '/bespoke-show-review-models — aerospace consultation, delivered examples, CTA',
+      },
     ],
   },
   {

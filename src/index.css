@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --header-height: 4rem; /* compact header (h-16) */
+  --header-height: 5.5rem; /* taller header for logo + nav */
   --site-max-width: 1600px;
   --site-padding-x: 0.75rem;
 }

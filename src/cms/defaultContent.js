@@ -8,7 +8,7 @@ export const defaultSettings = {
     tagline: 'PACKAGING & AUTOMATION',
     companyDescription:
       'Advanced Tooling Systems UK Ltd designs and manufactures innovative packaging and automation solutions for global industries.',
-    address: 'Unit 1, 2-4 Beddow Way, Aylesford, Kent, ME20 7BT, UK',
+    address: 'Mfd House, Parkwood Industrial Estate, Coldred Road, Maidstone, Kent, ME15 9XX, UK',
     phone: '+44 1622 678143',
     email: 'sales@atsuk.com',
     copyrightName: 'Advanced Tooling Systems UK Ltd',
@@ -56,6 +56,7 @@ export const defaultSettings = {
           { name: 'Project Planning', url: '/project-planning' },
           { name: 'Lifecycle Management', url: '/lifecycle-management' },
           { name: 'Turnkey Automation', url: '/turnkey-automation' },
+          { name: 'Bespoke Show and Review Models', url: '/bespoke-show-review-models' },
           { name: 'Contact Support', url: '/contact' },
         ],
       },
@@ -80,13 +81,13 @@ export const defaultSettings = {
   contact: {
     heroTitle: 'Contact ATS',
     heroSubtitle:
-      'Have a question about our packaging solutions, machinery, or services? Get in touch with our team and we\'ll be happy to assist you.',
+      'Have a question about our engineering, tooling, automation, or consultation services? Get in touch with our team and we\'ll be happy to assist you.',
     phone: '+44 1622 678143',
     email: 'sales@atsuk.com',
-    address: 'Unit 1, 2-4 Beddow Way, Aylesford, Kent, ME20 7BT, UK',
-    businessHours: 'Mon - Fri: 8:30 AM - 5:30 PM',
+    address: 'Mfd House, Parkwood Industrial Estate, Coldred Road, Maidstone, Kent, ME15 9XX, UK',
+    businessHours: 'Mon - Thu: 8:30 AM - 5:30 PM, Fri: 8:30 AM - 3:00 PM',
     mapEmbedUrl:
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2486.0!2d0.480!3d51.301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDE4JzAzLjYiTiAwwrAyOCc0OC4wIkU!5e0!3m2!1sen!2suk!4v1',
+      'https://maps.google.com/maps?q=Mfd+House,+Coldred+Road,+Parkwood+Industrial+Estate,+Maidstone,+ME15+9XX,+UK&hl=en&z=15&output=embed',
   },
 }
 
@@ -178,7 +179,8 @@ export const defaultHomeWhatWeDo = {
 }
 
 export const defaultHomeWhy = {
-  title: 'Why Choose ATS Packaging?',
+  titleLine1: 'Why Choose',
+  titleHighlight: 'ATS UK?',
   intro:
     'We combine engineering excellence, innovation, and industry experience to deliver packaging solutions that drive your business forward.',
   features: [
@@ -198,19 +200,7 @@ export const defaultHomeWhy = {
 
 export const defaultHomeBrands = {
   title: 'Brands',
-  brands: [
-    { name: 'Henkel', logoUrl: '' },
-    { name: 'Unilever', logoUrl: '' },
-    { name: 'P&G', logoUrl: '' },
-    { name: 'Nestle', logoUrl: '' },
-    { name: 'Mondelez', logoUrl: '' },
-    { name: 'Bayer', logoUrl: '' },
-    { name: 'Frosch', logoUrl: '' },
-    { name: 'Reckitt Benckiser', logoUrl: '' },
-    { name: 'PepsiCo', logoUrl: '' },
-    { name: 'Coca-Cola', logoUrl: '' },
-    { name: 'Compo', logoUrl: '' },
-  ],
+  /** Logos are sourced from the Partners page “Supported Customers” list. */
 }
 
 export const defaultHomeConnect = {
@@ -223,7 +213,9 @@ export const defaultHomeConnect = {
 }
 
 export const defaultAbout = {
-  pageTitle: 'About Us',
+  pageTitleLine1: 'About',
+  pageTitleHighlight: 'Us',
+  watermarkImageUrl: '',
   companyName: 'Advanced Tooling Systems UK Ltd',
   paragraphs: [
     'Advanced Tooling Systems UK Ltd is a privately owned company originally formed in 1979 with the Advanced Tooling Systems Group created in 2002. Our name is one of pedigree and reliability and we have 3-manufacturing facilities in the South East of England with satellite design, service and support facilities in the North of England and Asia.',
@@ -237,14 +229,14 @@ export const defaultContact = {
   pageTitle: 'Contact',
   pageTitleHighlight: 'ATS',
   intro:
-    'Have a question about our packaging solutions, machinery, or services? Get in touch with our team and we will be happy to assist you.',
+    'Have a question about our engineering, tooling, automation, or consultation services? Get in touch with our team and we will be happy to assist you.',
   cardsSectionTitle: 'How Can We Help You?',
   contactCards: [
     {
       icon: '📍',
       title: 'Head Office',
-      details: 'Unit 1, 2-4 Beddow Way, Aylesford, Kent, ME20 7BT, UK',
-      description: 'Our main headquarters and manufacturing facility.',
+      details: 'Mfd House, Parkwood Industrial Estate, Coldred Road, Maidstone, Kent, ME15 9XX, UK',
+      description: 'Our Maidstone headquarters at Parkwood Industrial Estate.',
     },
     {
       icon: '📞',
@@ -261,14 +253,15 @@ export const defaultContact = {
     {
       icon: '⏰',
       title: 'Business Hours',
-      details: 'Mon - Fri: 8:30 AM - 5:30 PM',
-      description: "We're available during these hours for consultations and support.",
+      details: 'Mon - Thu: 8:30 AM - 5:30 PM, Fri: 8:30 AM - 3:00 PM',
+      description: 'Friday closing time is 3:00 PM. We are closed at weekends.',
     },
   ],
   formSectionTitle: 'Send Us an Enquiry',
   formSubmitLabel: 'Send Enquiry',
   formSuccessMessage: 'Thank you for contacting ATS! We will get back to you soon.',
-  mapEmbedUrl: '',
+  mapEmbedUrl:
+    'https://maps.google.com/maps?q=Mfd+House,+Coldred+Road,+Parkwood+Industrial+Estate,+Maidstone,+ME15+9XX,+UK&hl=en&z=15&output=embed',
   quickContactTitle: 'Quick Contact',
   socialSectionTitle: 'Connect With Us',
   faqSectionTitle: 'Frequently Asked Questions',
@@ -292,7 +285,7 @@ export const defaultContact = {
     {
       question: 'Where are your facilities located?',
       answer:
-        'We have 3 manufacturing facilities in the South East of England with satellite support in the North of England and Asia.',
+        'We have manufacturing facilities in Maidstone and Folkestone, Kent, with satellite design, service, and support in the North of England and Asia.',
     },
   ],
 }
@@ -364,7 +357,7 @@ export const defaultConsultation = {
   title: 'Consultation & Solutions',
   titleHighlight: 'Hub',
   intro:
-    'Explore our professional consultation services designed to support your packaging and automation projects from concept to completion.',
+    'Explore our professional consultation services — from project management and planning through turnkey automation, lifecycle support, and bespoke aerospace show and review models.',
   services: [
     {
       title: 'Project Management',
@@ -385,6 +378,11 @@ export const defaultConsultation = {
       title: 'Lifecycle Management',
       description: 'Proactive maintenance and advanced lifecycle solutions.',
       path: '/lifecycle-management',
+    },
+    {
+      title: 'Bespoke Show and Review Models',
+      description: 'Aerospace consultation, show models, and interior review structures.',
+      path: '/bespoke-show-review-models',
     },
   ],
   ctaSection: {
@@ -1243,6 +1241,65 @@ export const defaultLifecycleManagement = {
   },
 }
 
+export const defaultBespokeShowReviewModels = {
+  eyebrow: 'AEROSPACE CONSULTATION',
+  title: 'Bespoke Show &',
+  titleHighlight: 'Review Models',
+  summary:
+    'Advanced Tooling Systems UK provides specialist consultation and manufacture of aerospace show, review, and spatial models. From early design validation through to show-standard interior monuments and full-scale fuselage structures, we support OEMs, tier suppliers, and cabin integrators with models built to exacting visual and dimensional standards.',
+  heroImageUrl: '',
+  tasksSectionTitle: 'Examples of Delivered Products & Their Uses',
+  tasks: [
+    {
+      title: 'Spatial & Design-Review Models',
+      desc: 'Compact and mid-scale models used to evaluate layout, ergonomics, and stakeholder sign-off before tooling commitment.',
+    },
+    {
+      title: 'Aircraft Interior Mock-Ups',
+      desc: 'Representative cabin sections for customer demonstrations, sales events, and internal design reviews.',
+    },
+    {
+      title: 'Monuments & Galley/Lavatory Units',
+      desc: 'Show-standard monuments produced to match finish, form, and interface requirements for programme reviews.',
+    },
+    {
+      title: 'Full-Scale Fuselage Structures',
+      desc: 'Large-format assemblies for integration trials, exhibition display, and programme communication.',
+    },
+    {
+      title: 'Seat & Interior Component Models',
+      desc: 'Detailed models supporting comfort studies, certification discussions, and supplier selection.',
+    },
+    {
+      title: 'Engineering Change & Retrofit Models',
+      desc: 'Rapid-turn models to assess modifications, retrofits, and product refresh programmes.',
+    },
+  ],
+  highlights: [
+    {
+      title: 'Aerospace-Focused Consultation',
+      desc: 'Dedicated support from concept through delivery, aligned with programme milestones and customer quality requirements.',
+    },
+    {
+      title: 'Cross-Sector Engineering',
+      desc: 'Capabilities drawn from decades of precision tooling across aerospace, automotive, and advanced manufacturing.',
+    },
+    {
+      title: 'UK Manufacturing',
+      desc: 'Models produced at our South East facilities with project management, inspection, and delivery coordination.',
+    },
+  ],
+  ctaSection: {
+    title: 'Discuss Your Aerospace Model Requirements',
+    description:
+      'Speak to our team about show models, review models, and bespoke interior structures for your programme.',
+  },
+  cta: {
+    enquireLabel: 'Connect with Us',
+    enquireLink: '/contact',
+  },
+}
+
 export const defaultTurnkeyAutomation = {
   eyebrow: 'TURNKEY AUTOMATION',
   title: 'A Backbone for',
@@ -1286,7 +1343,8 @@ export const defaultTurnkeyAutomation = {
 }
 
 export const defaultTeam = {
-  title: 'ATS At a Glance',
+  pageTitleLine1: 'ATS At a',
+  pageTitleHighlight: 'Glance',
   sectionHeading: 'Our Senior Management Team',
   intro:
     'Our senior management team brings together extensive experience across engineering, manufacturing, and customer support.\nCommitted to innovation and excellence, they provide strategic leadership across all areas of the business.\nTogether, they ensure Advanced Tooling Systems UK Ltd continues to deliver outstanding results for our clients worldwide.',
@@ -1301,7 +1359,8 @@ export const defaultTeam = {
 }
 
 export const defaultNews = {
-  title: 'News',
+  pageTitleLine1: 'ATS At a',
+  pageTitleHighlight: 'Glance',
   intro: '',
   articles: [
     {
@@ -1318,6 +1377,8 @@ export const defaultNews = {
 }
 
 export const defaultPartners = {
+  pageTitleLine1: 'ATS At a',
+  pageTitleHighlight: 'Glance',
   supportedCustomersHeading: 'Supported Customers',
   trustedPartnersHeading: 'Trusted Partners',
   supportedCustomers: DEFAULT_SUPPORTED_CUSTOMERS,
@@ -1325,7 +1386,8 @@ export const defaultPartners = {
 }
 
 export const defaultAts = {
-  pageTitle: 'ATS At a Glance',
+  pageTitleLine1: 'ATS At a',
+  pageTitleHighlight: 'Glance',
   leftHeading: 'ATS',
   heroTagline: 'A World Leading Engineering Service Provider',
   heroImageUrl:
@@ -1395,6 +1457,7 @@ export const PAGE_DEFAULTS = {
   'project-planning': defaultProjectPlanning,
   'turnkey-automation': defaultTurnkeyAutomation,
   'lifecycle-management': defaultLifecycleManagement,
+  'bespoke-show-review-models': defaultBespokeShowReviewModels,
   ats: defaultAts,
   team: defaultTeam,
   news: defaultNews,

@@ -20,6 +20,7 @@ import Projectmngmt from "../pages/consultation/Projectmngmt"
 import Turnkeymgmt from '../pages/consultation/T-automation'
 import LifecycleManagement from '../pages/consultation/Lifecycle'
 import ProjectPlanning from '../pages/consultation/Projectplan'
+import BespokeShowReview from '../pages/consultation/BespokeShowReview'
 function Routers() {
     return (
         <Routes>
@@ -43,6 +44,7 @@ function Routers() {
             <Route path="/turnkey-automation" element={<Turnkeymgmt/>}/>
             <Route path='/lifecycle-management' element={<LifecycleManagement/>}/>
             <Route path='/project-planning' element={<ProjectPlanning/>}/>
+            <Route path="/bespoke-show-review-models" element={<BespokeShowReview />} />
         </Routes>
     )
 }

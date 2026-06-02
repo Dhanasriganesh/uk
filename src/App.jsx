@@ -5,16 +5,22 @@ import { CmsProvider } from './context/CmsContext'
 import Layout from './components/layout/Layout'
 import AdminApp from './admin/AdminApp'
 
+function PublicSite() {
+  return (
+    <CmsProvider>
+      <Layout />
+    </CmsProvider>
+  )
+}
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <CmsProvider>
-          <Routes>
-            <Route path="/admin/*" element={<AdminApp />} />
-            <Route path="/*" element={<Layout />} />
-          </Routes>
-        </CmsProvider>
+        <Routes>
+          <Route path="/admin/*" element={<AdminApp />} />
+          <Route path="/*" element={<PublicSite />} />
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   )

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
+import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
 
 const serif = { fontFamily: 'Playfair Display, serif' }
 const RED = '#c00000'
@@ -79,7 +80,7 @@ function CenterNav({ companyHistoryLabel, whyAtsLabel }) {
 function Ats() {
   const { content } = useCmsPage('ats')
 
-  const pageTitle = content.pageTitle || 'ATS At a Glance'
+  const glanceTitle = glanceTitleFromContent(content)
   const leftHeading = content.leftHeading || 'ATS'
   const heroTagline = content.heroTagline || 'A World Leading Engineering Service Provider'
   const welcomeHeading = content.welcomeHeading || 'Welcome to Advanced Tooling Systems UK'
@@ -94,11 +95,11 @@ function Ats() {
 
   return (
     <section className="site-container bg-white pb-12 pt-8 sm:pb-16 sm:pt-10 lg:pb-20">
-      <header className="mb-8 text-center lg:mb-10">
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-black sm:text-4xl lg:text-[2.35rem]" style={serif}>
-          {pageTitle}
-        </h1>
-      </header>
+      <GlancePageTitle
+        line1={glanceTitle.line1}
+        highlight={glanceTitle.highlight}
+        className="mb-8 lg:mb-10"
+      />
 
       <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(110px,0.22fr)_minmax(0,1fr)] lg:gap-x-3 xl:gap-x-4">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">

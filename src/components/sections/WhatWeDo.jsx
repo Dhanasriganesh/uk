@@ -128,7 +128,7 @@ export default function WhatWeDo() {
   const cards = mergeCards(content.cards)
 
   return (
-    <section className="section-py relative w-full overflow-x-hidden bg-white">
+    <section className="section-py relative w-full overflow-x-hidden bg-white !pb-6 sm:!pb-8 lg:!pb-10">
       <div
         className="pointer-events-none absolute left-0 top-0 hidden h-full w-[min(320px,40%)] opacity-50 sm:block"
         style={{
