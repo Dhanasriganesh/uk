@@ -1388,7 +1388,7 @@ export const defaultPartners = {
 export const defaultAts = {
   pageTitleLine1: 'ATS At a',
   pageTitleHighlight: 'Glance',
-  leftHeading: 'ATS',
+  leftHeading: '',
   heroTagline: 'A World Leading Engineering Service Provider',
   heroImageUrl:
     'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=960&h=640&q=80',

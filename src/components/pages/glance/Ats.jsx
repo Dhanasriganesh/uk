@@ -81,7 +81,7 @@ function Ats() {
   const { content } = useCmsPage('ats')
 
   const glanceTitle = glanceTitleFromContent(content)
-  const leftHeading = content.leftHeading || 'ATS'
+  const leftHeading = (content.leftHeading ?? '').trim()
   const heroTagline = content.heroTagline || 'A World Leading Engineering Service Provider'
   const welcomeHeading = content.welcomeHeading || 'Welcome to Advanced Tooling Systems UK'
   const rightTagline = content.rightTagline || heroTagline
@@ -103,9 +103,11 @@ function Ats() {
 
       <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(110px,0.22fr)_minmax(0,1fr)] lg:gap-x-3 xl:gap-x-4">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
-          <h2 className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]" style={serif}>
-            {leftHeading}
-          </h2>
+          {leftHeading ? (
+            <h2 className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]" style={serif}>
+              {leftHeading}
+            </h2>
+          ) : null}
           <div className="relative overflow-hidden bg-neutral-200">
             <CmsImage
               src={content.heroImageUrl}
