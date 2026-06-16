@@ -191,7 +191,23 @@ function DynamicFormFields({ data, path = [], onChange }) {
       {Object.entries(data).map(([key, val]) => {
         const fieldPath = [...path, key]
         if (val === null || val === undefined) return null
-        if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+        if (typeof val === 'boolean') {
+          return (
+            <div key={fieldPath.join('.')} className="mb-5">
+              <FieldLabel label={key} />
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                  checked={Boolean(val)}
+                  onChange={(e) => onChange(fieldPath, e.target.checked)}
+                />
+                Enabled
+              </label>
+            </div>
+          )
+        }
+        if (typeof val === 'string' || typeof val === 'number') {
           return (
             <StringField
               key={fieldPath.join('.')}

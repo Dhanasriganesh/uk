@@ -88,6 +88,8 @@ function ProductMedia({ section }) {
 export default function ProductDetailPage({
   pageId,
   breadcrumbLabel,
+  parentLabel = 'Services',
+  parentLink = '/services',
   galleryAltPrefix = 'Product',
   fallbackImages = [],
   defaults = {},
@@ -138,8 +140,8 @@ export default function ProductDetailPage({
               </li>
               <li aria-hidden>&gt;</li>
               <li>
-                <Link to="/products" className="hover:text-[#dc2626]">
-                  Products
+                <Link to={parentLink} className="hover:text-[#dc2626]">
+                  {parentLabel}
                 </Link>
               </li>
               <li aria-hidden>&gt;</li>

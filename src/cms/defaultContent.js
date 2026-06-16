@@ -1,9 +1,16 @@
 import { HERO_VIDEO_URL } from './mediaPaths'
 import { DEFAULT_SUPPORTED_CUSTOMERS, DEFAULT_TRUSTED_PARTNERS } from './partnerFallbacks'
+import { SERVICES } from './servicesRegistry'
+import { SERVICE_PAGE_DEFAULTS } from './serviceDefaultsContent'
+import { SECTORS } from './sectorsRegistry'
+import { buildDefaultNavLinks } from '../components/header/headerDefaults'
 /** Global site settings */
 export const defaultSettings = {
-  siteName: 'ATS Packaging',
+  siteName: 'ATS UK',
   logoUrl: '/media/logo.png',
+  header: {
+    navLinks: buildDefaultNavLinks(),
+  },
   footer: {
     tagline: 'PACKAGING & AUTOMATION',
     companyDescription:
@@ -15,26 +22,16 @@ export const defaultSettings = {
     showMadeInBritain: true,
     linkColumns: [
       {
-        title: 'Products',
+        title: 'Services',
         links: [
-          { name: 'Capping Machines', url: '/capping' },
-          { name: 'Bottle Unscramblers', url: '/bottle' },
-          { name: 'Pump & Trigger Systems', url: '/pump' },
-          { name: 'Turnkey Filling Lines', url: '/turnkey' },
-          { name: 'Bespoke Solutions', url: '/bespoke' },
-          { name: 'Food & Beverage Lines', url: '/foodbeverage' },
-          { name: 'All Products', url: '/products' },
+          ...SERVICES.slice(0, 6).map((s) => ({ name: s.shortTitle, url: s.path })),
+          { name: 'All Services', url: '/services' },
         ],
       },
       {
         title: 'Solutions',
         links: [
-          { name: 'Pharmaceutical', url: '/sectors' },
-          { name: 'Personal Care', url: '/sectors' },
-          { name: 'Home Care', url: '/sectors' },
-          { name: 'Automotive', url: '/sectors' },
-          { name: 'Food & Beverage', url: '/sectors' },
-          { name: 'Medical & Veterinary', url: '/sectors' },
+          ...SECTORS.slice(0, 6).map((s) => ({ name: s.name, url: '/sectors' })),
           { name: 'All Sectors', url: '/sectors' },
         ],
       },
@@ -290,61 +287,23 @@ export const defaultContact = {
   ],
 }
 
-export const defaultProducts = {
-  eyebrow: 'PRODUCT RANGE',
-  pageTitle: 'Packaging Machinery',
-  pageTitleHighlight: 'Solutions',
+export const defaultServices = {
+  eyebrow: 'SERVICES',
+  pageTitle: 'Typical Services to',
+  pageTitleHighlight: 'our Industry',
   intro:
-    'Explore our range of packaging machinery and automation solutions — from capping and unscrambling to complete turnkey filling lines.',
-  slides: [
-    {
-      title: 'Capping Machines',
-      description:
-        'Flexible linear capping and high-speed rotary capping machines for a wide range of applications.',
-      link: '/capping',
-      imageUrl: '',
-    },
-    {
-      title: 'Bottle Unscramblers',
-      description:
-        'Versatile machines for sorting and orienting multiple container formats in a single system.',
-      link: '/bottle',
-      imageUrl: '',
-    },
-    {
-      title: 'Pump & Trigger Feeding Systems',
-      description:
-        'High-speed systems for sorting, feeding, and delivering pumps and triggers with precision and reliability.',
-      link: '/pump',
-      imageUrl: '',
-    },
-    {
-      title: 'Turnkey Filling Lines',
-      description:
-        'Complete filling line solutions from 10ml to 200-litre, including end-to-end automation.',
-      link: '/turnkey',
-      imageUrl: '',
-    },
-    {
-      title: 'Bespoke Packaging Solutions',
-      description:
-        'Custom conveyors, product handling, ultrasonic cap welding, assembly systems, and more.',
-      link: '/bespoke',
-      imageUrl: '',
-    },
-    {
-      title: 'Food & Beverage Lines (FBL)',
-      description:
-        'Comprehensive food and beverage manufacturing machinery for the UK and Ireland.',
-      link: '/foodbeverage',
-      imageUrl: '',
-    },
-  ],
+    'Explore the engineering services ATS UK delivers across automotive, aerospace, packaging, and industrial sectors — from laminating and assembly equipment to inspection fixtures, foundry patterns, and injection moulding.',
+  slides: SERVICES.map((service) => ({
+    title: service.title,
+    description: service.description,
+    link: service.path,
+    imageUrl: '',
+  })),
   galleryImageUrls: [],
   ctaSection: {
-    title: 'Ready to Optimise Your Packaging?',
+    title: 'Ready to Discuss Your Project?',
     description:
-      'Speak to our team about your requirements and discover how ATS can deliver the right solution for your production line.',
+      'Speak to our team about your requirements and discover how ATS UK can deliver the right engineering solution for your application.',
   },
   cta: {
     enquireLabel: 'Connect with Us',
@@ -401,86 +360,17 @@ export const defaultSectors = {
   pageTitle: 'Sectors We',
   pageTitleHighlight: 'Serve',
   intro:
-    'We deliver advanced packaging machinery solutions tailored to diverse industries worldwide — from pharmaceutical and automotive to food, medical, and personal care.',
-  sectors: [
-    {
-      name: 'Pharmaceutical & Cosmetic',
-      imageUrl: '',
-      solutions: [
-        'Ophthalmic Container & Tube Unscramblers',
-        'Sterile Feeding Systems',
-        'Nasal & Mouth Spray Stopper Assembly Systems',
-        'Lipstick & Mascara Feeding & Assembly Systems',
-        'Syringe Sorting Systems',
-        "Advanced 'Track & Trace' Cap Tightening Systems",
-        '(Produced to FDA, CGMP, CE, UL & Ex standards)',
-      ],
-    },
-    {
-      name: 'Automotive',
-      imageUrl: '',
-      solutions: [
-        'Engine Oil & Brake Fluid Filling Line Solutions',
-        'Adblue Filling Line Solutions',
-        'Car Cleaning Products',
-        'Bottle Unscramblers',
-        'Cap Sorting & Feeding Systems',
-        'Dispensing Pump & Spray Trigger Feeding Systems',
-      ],
-    },
-    {
-      name: 'Food & Beverage',
-      imageUrl: '',
-      solutions: [
-        'Sauce Filling Line Solutions',
-        'Coffee Capsule Feeding Systems',
-        'Vegetable Oil Filling Lines',
-        'Micro-Brewery Filling Lines',
-        'Dispensing Pump & Cap Feeding Systems',
-        'Container Unscramblers',
-      ],
-    },
-    {
-      name: 'Medical & Veterinary',
-      imageUrl: '',
-      solutions: [
-        'Hand Sanitiser Filling Lines',
-        'Container Unscramblers',
-        'Sterile Cap Feeding Solutions',
-        'Vial Feeding Systems',
-        'Stopper Feeding & Assembly Systems',
-        "Advanced 'Track & Trace' Cap Tightening Solutions",
-      ],
-    },
-    {
-      name: 'Home Care',
-      imageUrl: '',
-      solutions: [
-        'Bottle Unscramblers',
-        'Capping Machines',
-        'Cap Feeding Systems',
-        'Dispensing Pump & Spray Trigger Feeding Systems',
-        'Turn-key Filling Lines',
-        'Disinfectant & Bleach Filling Line Solutions',
-      ],
-    },
-    {
-      name: 'Personal Care',
-      imageUrl: '',
-      solutions: [
-        'Bottle Unscramblers',
-        'Capping Machines',
-        'Cap Feeding Systems',
-        'Dispensing Pump & Spray Trigger Feeding Systems',
-        'Turn-key Filling Lines',
-        'Deodorant & Aerosol Filling Line Solutions',
-      ],
-    },
-  ],
+    'Advanced Tooling Systems UK Ltd delivers engineering, automation, tooling, and packaging solutions across a wide range of industry sectors — from automotive and aerospace to heritage construction, medical, and motorsport.',
+  sectors: SECTORS.map((sector) => ({
+    name: sector.name,
+    icon: sector.icon,
+    imageUrl: '',
+    solutions: sector.solutions,
+  })),
   ctaSection: {
     title: 'Need a Solution for Your Sector?',
     description:
-      'Speak to our team about your industry requirements and discover how ATS can deliver the right packaging machinery for your production line.',
+      'Speak to our team about your industry requirements and discover how ATS UK can support your project with precision engineering and innovative solutions.',
   },
   cta: {
     enquireLabel: 'Connect with Us',
@@ -1444,9 +1334,10 @@ export const PAGE_DEFAULTS = {
   'home-connect': defaultHomeConnect,
   about: defaultAbout,
   contact: defaultContact,
-  products: defaultProducts,
+  services: defaultServices,
   consultation: defaultConsultation,
   sectors: defaultSectors,
+  ...SERVICE_PAGE_DEFAULTS,
   capping: defaultCapping,
   bottle: defaultBottle,
   pump: defaultPump,

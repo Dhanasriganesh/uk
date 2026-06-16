@@ -4,10 +4,10 @@ import { LuRotateCcw, LuSave } from 'react-icons/lu'
 import { getPageMeta } from '../../cms/pageRegistry'
 import { getDefaultContent } from '../../cms/defaultContent'
 import { getPageContent, savePageContent, getSiteSettings, saveSiteSettings } from '../../firebase/cmsService'
-import { deepMerge } from '../../utils/deepMerge'
 import { mergePageContent } from '../../cms/mergePageContent'
 import { useAuth } from '../../context/AuthContext'
 import DynamicForm from '../components/DynamicForm'
+import SettingsEditor, { stripSettingsMeta } from '../components/SettingsEditor'
 import AdminPageShell from '../components/ui/AdminPageShell'
 import PageHeader from '../components/ui/PageHeader'
 import Alert from '../components/ui/Alert'
@@ -34,7 +34,10 @@ export default function PageEditorPage() {
         if (isSettings) {
           const remote = await getSiteSettings()
           const defaults = getDefaultContent('settings')
-          if (!cancelled) setData(deepMerge(defaults, remote || {}))
+          const rest = remote ? { ...remote } : {}
+          delete rest.updatedAt
+          delete rest.updatedBy
+          if (!cancelled) setData(mergePageContent('settings', defaults, rest))
         } else {
           const remote = await getPageContent(pageId)
           const defaults = getDefaultContent(pageId)
@@ -57,7 +60,7 @@ export default function PageEditorPage() {
     setMessage('')
     try {
       if (isSettings) {
-        await saveSiteSettings(data, user?.email)
+        await saveSiteSettings(stripSettingsMeta(data), user?.email)
       } else {
         await savePageContent(pageId, data, user?.email)
       }
@@ -70,7 +73,12 @@ export default function PageEditorPage() {
     }
   }
 
-  const resetLocal = () => setData(structuredClone(getDefaultContent(pageId)))
+  const resetLocal = () =>
+    setData(
+      isSettings
+        ? mergePageContent('settings', getDefaultContent('settings'), {})
+        : structuredClone(getDefaultContent(pageId))
+    )
 
   if (loading || !data) {
     return (
@@ -118,7 +126,11 @@ export default function PageEditorPage() {
 
       <Card className="mb-0 overflow-hidden">
         <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
-          <DynamicForm data={data} onChange={setData} />
+          {isSettings ? (
+            <SettingsEditor data={data} onChange={setData} />
+          ) : (
+            <DynamicForm data={data} onChange={setData} />
+          )}
         </div>
       </Card>
 

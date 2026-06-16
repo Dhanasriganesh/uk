@@ -1,6 +1,7 @@
 import { deepMerge } from '../utils/deepMerge'
+import { SERVICE_PAGE_IDS } from './servicesRegistry'
 
-const PRODUCT_PAGE_IDS = ['capping', 'bottle', 'pump', 'turnkey', 'bespoke', 'foodbeverage']
+const LEGACY_PRODUCT_PAGE_IDS = ['capping', 'bottle', 'pump', 'turnkey', 'bespoke', 'foodbeverage']
 const CONSULTATION_SERVICE_IDS = [
   'project-management',
   'project-planning',
@@ -26,7 +27,7 @@ function mergeIndexedObjects(defaultItems, remoteItems) {
 export function mergePageContent(pageId, defaults, remote) {
   const merged = deepMerge(defaults, remote || {})
 
-  if (pageId === 'products') {
+  if (pageId === 'services') {
     merged.slides = mergeIndexedObjects(defaults.slides, merged.slides)
     merged.ctaSection = { ...defaults.ctaSection, ...merged.ctaSection }
     merged.cta = { ...defaults.cta, ...merged.cta }
@@ -73,6 +74,27 @@ export function mergePageContent(pageId, defaults, remote) {
     )
   }
 
+  if (pageId === 'settings' && defaults.header?.navLinks?.length) {
+    merged.header = { ...defaults.header, ...merged.header }
+    merged.header.navLinks = defaults.header.navLinks.map((defLink, i) => {
+      const remoteLink = merged.header.navLinks?.[i] || {}
+      return {
+        ...defLink,
+        ...remoteLink,
+        dropdown: mergeIndexedObjects(defLink.dropdown, remoteLink.dropdown),
+      }
+    })
+    if (merged.header.navLinks?.length > defaults.header.navLinks.length) {
+      merged.header.navLinks.push(
+        ...merged.header.navLinks.slice(defaults.header.navLinks.length)
+      )
+    }
+  }
+
+  if (pageId === 'settings' && defaults.contact) {
+    merged.contact = { ...defaults.contact, ...merged.contact }
+  }
+
   if (CONSULTATION_SERVICE_IDS.includes(pageId)) {
     if (defaults.tasks?.length) {
       merged.tasks = mergeIndexedObjects(defaults.tasks, merged.tasks)
@@ -85,7 +107,7 @@ export function mergePageContent(pageId, defaults, remote) {
     merged.cta = { ...defaults.cta, ...merged.cta }
   }
 
-  if (PRODUCT_PAGE_IDS.includes(pageId)) {
+  if (SERVICE_PAGE_IDS.includes(pageId) || LEGACY_PRODUCT_PAGE_IDS.includes(pageId)) {
     merged.hero = { ...defaults.hero, ...merged.hero }
     merged.featureCards = mergeIndexedObjects(defaults.featureCards, merged.featureCards)
     merged.sections = mergeIndexedObjects(defaults.sections, merged.sections)

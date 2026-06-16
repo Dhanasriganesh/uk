@@ -1,45 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../../assets/logo.png'
-
-const navLinks = [
-  { name: 'Home', path: '/' },
-  {
-    name: 'ATS at a Glance',
-    path: '/about',
-    dropdown: [
-      { name: 'ATS', path: '/ats' },
-      { name: 'Team', path: '/team' },
-      { name: 'Partners', path: '/partners' },
-      { name: 'News', path: '/news' },
-    ],
-  },
-  {
-    name: 'Services',
-    path: '/products',
-    dropdown: [
-      { name: 'Capping Machines', path: '/capping' },
-      { name: 'Bottle Unscramblers', path: '/bottle' },
-      { name: 'Pump & Trigger Feeding Systems', path: '/pump' },
-      { name: 'Turnkey Filling Lines', path: '/turnkey' },
-      { name: 'Bespoke Packaging Solutions', path: '/bespoke' },
-      { name: 'Food & Beverage Lines (FBL)', path: '/foodbeverage' },
-    ],
-  },
-  {
-    name: 'Consultation',
-    path: '/consultation',
-    dropdown: [
-      { name: 'Project Management', path: '/project-management' },
-      { name: 'Project Planning', path: '/project-planning' },
-      { name: 'Lifecycle Management', path: '/lifecycle-management' },
-      { name: 'Turn-key Automation', path: '/turnkey-automation' },
-      { name: 'Bespoke Show and Review Models', path: '/bespoke-show-review-models' },
-    ],
-  },
-  { name: 'Sectors', path: '/sectors' },
-  { name: 'Contact', path: '/contact' },
-]
+import { useSiteSettings } from '../../context/CmsContext'
+import { mergeNavLinks } from './headerDefaults'
 
 const SCROLL_THRESHOLD = 8
 
@@ -53,6 +16,9 @@ function ChevronDown() {
 
 function Header() {
   const location = useLocation()
+  const { settings } = useSiteSettings()
+  const navLinks = mergeNavLinks(settings.header?.navLinks)
+  const logoSrc = settings.logoUrl || logo
   const [openDropdown, setOpenDropdown] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileExpanded, setMobileExpanded] = useState(null)
@@ -116,8 +82,8 @@ function Header() {
       <div className="mx-auto flex h-full w-full max-w-[1280px] items-center gap-3 px-4 sm:gap-4 sm:px-6">
         <Link to="/" className="flex h-full shrink-0 items-center py-1" aria-label="ATS home">
           <img
-            src={logo}
-            alt="ATS"
+            src={logoSrc}
+            alt={settings.siteName || 'ATS'}
             className="h-10 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-11 lg:h-12"
           />
         </Link>
@@ -153,7 +119,7 @@ function Header() {
                       role="menu"
                       aria-label={`${link.name} submenu`}
                     >
-                      <div className="rounded-xl border border-[#f1f1f1] bg-white py-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+                      <div className="max-h-[min(70vh,28rem)] overflow-y-auto rounded-xl border border-[#f1f1f1] bg-white py-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
                         {link.dropdown.map((item) => (
                           <Link
                             key={item.name}

@@ -1,3 +1,5 @@
+import { SERVICES } from './servicesRegistry'
+
 /**
  * Registry of all CMS-managed pages for the admin panel.
  * Each page has a default content shape in defaultContent.js
@@ -6,7 +8,7 @@ export const PAGE_GROUPS = [
   {
     label: 'Site',
     pages: [
-      { id: 'settings', label: 'Global Settings', description: 'Logo, footer columns, highlights, contact, social & legal links' },
+      { id: 'settings', label: 'Global Settings', description: 'Header menu, logo, footer columns, contact details, social & legal links' },
     ],
   },
   {
@@ -24,24 +26,34 @@ export const PAGE_GROUPS = [
     pages: [
       { id: 'about', label: 'About Us', description: '/about page' },
       { id: 'contact', label: 'Contact', description: '/contact — hero, cards, form, map, FAQ' },
-      { id: 'sectors', label: 'Sectors', description: '/sectors — hero, sector cards, CTA' },
+      { id: 'sectors', label: 'Sectors', description: '/sectors — hero, 12 industry sector cards, CTA' },
       { id: 'consultation', label: 'Consultation Hub', description: '/consultation — hero, service cards, CTA' },
     ],
   },
   {
-    label: 'Products',
+    label: 'Services',
     pages: [
       {
-        id: 'products',
-        label: 'Products Hub',
-        description: '/products listing — hero, product cards, image strip, CTA',
+        id: 'services',
+        label: 'Services Hub',
+        description: '/services listing — hero, service cards, image strip, CTA',
       },
-      { id: 'capping', label: 'Capping Machines', description: '/capping' },
-      { id: 'bottle', label: 'Bottle Unscramblers', description: '/bottle' },
-      { id: 'pump', label: 'Pump & Trigger', description: '/pump' },
-      { id: 'turnkey', label: 'Turnkey Filling Lines', description: '/turnkey' },
-      { id: 'bespoke', label: 'Bespoke Solutions', description: '/bespoke' },
-      { id: 'foodbeverage', label: 'Food & Beverage Lines', description: '/foodbeverage' },
+      ...SERVICES.map((service) => ({
+        id: service.id,
+        label: service.shortTitle,
+        description: `${service.path} — hero, gallery, case study sections, CTA`,
+      })),
+    ],
+  },
+  {
+    label: 'Packaging Products (Legacy)',
+    pages: [
+      { id: 'capping', label: 'Capping Machines', description: '/capping — legacy packaging product page' },
+      { id: 'bottle', label: 'Bottle Unscramblers', description: '/bottle — legacy packaging product page' },
+      { id: 'pump', label: 'Pump & Trigger', description: '/pump — legacy packaging product page' },
+      { id: 'turnkey', label: 'Turnkey Filling Lines', description: '/turnkey — legacy packaging product page' },
+      { id: 'bespoke', label: 'Bespoke Solutions', description: '/bespoke — legacy packaging product page' },
+      { id: 'foodbeverage', label: 'Food & Beverage Lines', description: '/foodbeverage — legacy packaging product page' },
     ],
   },
   {

@@ -28,6 +28,8 @@ const GROUP_ICONS = {
   Site: LuSettings,
   'Home Page': LuHouse,
   'Main Pages': LuGlobe,
+  Services: LuPackage,
+  'Packaging Products (Legacy)': LuPackage,
   Products: LuPackage,
   'Consultation Services': LuWrench,
   'ATS at a Glance': LuUsers,

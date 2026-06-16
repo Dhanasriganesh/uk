@@ -1,126 +1,178 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import cappingImg from '../../assets/capping.png'
-import bottle from "../../assets/bottle.png"
-import bespoke from "../../assets/bespoke.png"
-import food from "../../assets/food.png"
-import pump from "../../assets/pump.png"
-import turnkey from "../../assets/turnkey.png"
-// Add Google Fonts import for Playfair Display in the document head
-if (typeof document !== 'undefined' && !document.getElementById('playfair-font')) {
-  const link = document.createElement('link');
-  link.id = 'playfair-font';
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap';
-  document.head.appendChild(link);
-}
+import { LuArrowRight } from 'react-icons/lu'
+import { useCmsPage } from '../../hooks/useCmsPage'
+import ProductInfoCta from '../products/ProductInfoCta'
+import {
+  SERVICE_SLIDES,
+  SERVICES_HUB_DEFAULTS,
+} from '../services/serviceDefaults'
+import { PRODUCT_MARQUEE_IMAGES } from '../products/productsHubDefaults'
 
-const services = [
-  {
-    img: cappingImg,
-    title: 'Capping Machines',
-    description: 'Flexible linear capping and high-speed rotary capping machines for a wide range of applications.',
-    path: '/capping',
-  },
-  {
-    img: bottle,
-    title: 'Bottle Unscramblers',
-    description: 'Versatile machines for sorting and orienting multiple container formats in a single system.',
-    path: '/bottle',
-  },
-  {
-    img: pump,
-    title: 'Pump & Trigger Feeding Systems',
-    description: 'High-speed systems for sorting, feeding, and delivering pumps and triggers with precision and reliability.',
-    path: '/pump',
-  },
-  {
-    img: turnkey,
-    title: 'Turnkey Filling Lines',
-    description: 'Complete filling line solutions from 10ml to 200-litre, including end-to-end automation.',
-    path: '/turnkey',
-  },
-  {
-    img: bespoke,
-    title: 'Bespoke Packaging and Automation & Assembly Systems',
-    description: 'Custom conveyors, product handling, ultrasonic cap welding, assembly systems, and more.',
-    path: '/bespoke',
-  },
-  {
-    img: food,
-    title: 'Food & Beverage Lines (FBL)',
-    description: 'Comprehensive food and beverage manufacturing machinery for the UK & Ireland.',
-    path: '/foodbeverage',
-  },
-];
-
-function Services() {
-  const filteredServices = services;
+function ServiceCardImage({ src, fallback, alt }) {
+  const [failed, setFailed] = useState(false)
+  const url = !failed && src ? src : fallback
 
   return (
-    <section className="section-py w-full bg-white">
-      <div className="site-container">
-        {/* Header Section */}
-        <div className="text-center mb-8 sm:mb-12 lg:mb-20">
-          <h2
-            className="section-title mb-3 font-bold tracking-tight text-gray-900 sm:mb-4 md:mb-6"
-            style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '0.04em' }}
+    <div className="relative h-44 w-full shrink-0 overflow-hidden sm:h-48 lg:h-52">
+      {url ? (
+        <img
+          src={url}
+          alt={alt}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden />
+    </div>
+  )
+}
+
+function mergeSlides(cmsSlides) {
+  const remoteByLink = Object.fromEntries(
+    (Array.isArray(cmsSlides) ? cmsSlides : [])
+      .filter((slide) => slide?.link)
+      .map((slide) => [slide.link, slide])
+  )
+
+  return SERVICE_SLIDES.map((def) => {
+    const slide = remoteByLink[def.link] || {}
+    const cmsImage = slide.imageUrl?.trim()
+    return {
+      title: slide.title || def.title,
+      description: slide.description || def.description,
+      link: def.link,
+      imageUrl: cmsImage || def.imageUrl,
+      fallbackImageUrl: def.imageUrl,
+    }
+  })
+}
+
+function ServiceMarquee({ images }) {
+  const urls = images?.length ? images : PRODUCT_MARQUEE_IMAGES
+  const track = [...urls, ...urls]
+
+  return (
+    <div className="relative overflow-x-hidden border-y border-[#f1f1f1] bg-[#f5f5f5] py-4 sm:py-5">
+      <div className="animate-marquee flex w-max items-center gap-3 sm:gap-4">
+        {track.map((src, idx) => (
+          <div
+            key={idx}
+            className="h-14 w-24 shrink-0 overflow-hidden rounded-lg bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] sm:h-16 sm:w-28"
           >
-            Our Services
-          </h2>
-          <p className="text-sm sm:text-base lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Explore our advanced packaging machinery and automation solutions designed to meet the needs of diverse industries.
-          </p>
+            <img
+              src={src}
+              alt=""
+              className="h-full w-full max-w-none object-cover select-none"
+              draggable={false}
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function Services() {
+  const { content } = useCmsPage('services')
+  const hub = {
+    ...SERVICES_HUB_DEFAULTS,
+    eyebrow: content.eyebrow || SERVICES_HUB_DEFAULTS.eyebrow,
+    pageTitle: content.pageTitle || SERVICES_HUB_DEFAULTS.pageTitle,
+    pageTitleHighlight: content.pageTitleHighlight || SERVICES_HUB_DEFAULTS.pageTitleHighlight,
+    intro: content.intro || SERVICES_HUB_DEFAULTS.intro,
+  }
+  const slides = mergeSlides(content.slides)
+  const ctaSection = { ...SERVICES_HUB_DEFAULTS.ctaSection, ...content.ctaSection }
+  const cta = { ...SERVICES_HUB_DEFAULTS.cta, ...content.cta }
+  const marqueeImages = content.galleryImageUrls?.filter(Boolean)?.length
+    ? content.galleryImageUrls.filter(Boolean)
+    : null
+
+  return (
+    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+      <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 right-0 h-[min(18vw,100px)] w-[min(42vw,200px)] sm:h-[min(20vw,140px)] sm:w-[min(38vw,280px)]"
+          style={{
+            clipPath: 'polygon(100% 0, 100% 100%, 8% 100%)',
+            background: 'linear-gradient(160deg, #f87171 0%, #ef4444 45%, #b91c1c 100%)',
+          }}
+          aria-hidden
+        />
+
+        <div className="site-container relative">
+          <nav className="mb-6 text-xs text-[#5f5f5f] sm:text-sm" aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <Link to="/" className="hover:text-[#dc2626]">
+                  Home
+                </Link>
+              </li>
+              <li aria-hidden>&gt;</li>
+              <li className="font-medium text-[#111111]">Services</li>
+            </ol>
+          </nav>
+
+          <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
+              {hub.eyebrow}
+            </p>
+            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+              {hub.pageTitle}{' '}
+              <span className="text-[#dc2626]">{hub.pageTitleHighlight}</span>
+            </h1>
+            <div className="mx-auto mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+              {hub.intro}
+            </p>
+          </div>
         </div>
+      </section>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {filteredServices.map((service, idx) => (
-            <Link to={service.path} key={idx} className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus:outline-none focus:ring-4 focus:ring-blue-200">
-              {/* Image Container */}
-              <div className="relative overflow-hidden h-36 xs:h-40 sm:h-48 lg:h-64">
-                <img
-                  src={service.img}
-                  alt={service.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  draggable="false"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-300"></div>
-              </div>
-
-              {/* Content */}
-              <div className="p-3 sm:p-4 md:p-6">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1 sm:mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  {service.title}
-                </h3>
-                <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed">
-                  {service.description}
-                </p>
+      <section className="site-container pb-12 sm:pb-16 lg:pb-20">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7">
+          {slides.map((slide) => (
+            <Link
+              key={slide.link}
+              to={slide.link}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)]"
+            >
+              <ServiceCardImage
+                src={slide.imageUrl}
+                fallback={slide.fallbackImageUrl}
+                alt={slide.title}
+              />
+              <div className="flex flex-1 flex-col p-5 sm:p-6">
+                <h2 className="text-lg font-bold text-[#111111] sm:text-xl">{slide.title}</h2>
+                <div className="mb-3 mt-2.5 h-[2px] w-8 rounded-full bg-[#dc2626]" />
+                <p className="flex-1 text-sm leading-relaxed text-[#5f5f5f]">{slide.description}</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#dc2626]">
+                  Learn more
+                  <LuArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                </span>
               </div>
             </Link>
           ))}
         </div>
-  {/* Call to Action */}
-  <div className="text-center rounded-2xl p-6 sm:p-10 lg:p-16 shadow-xl mt-8 sm:mt-12 bg-blue-50">
-          <h3
-            className="text-xl sm:text-2xl lg:text-4xl font-bold text-black mb-3 sm:mb-6"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Ready to Optimize Your Packaging?
-          </h3>
-          <p className="text-base sm:text-lg text-black/90 mb-6 sm:mb-10 max-w-2xl mx-auto">
-            Let’s discuss your requirements and see how ATS Packaging can deliver the right solution for your business.
-          </p>
-          <a href="/contact">
-            <button className="px-6 sm:px-10 py-3 sm:py-4 bg-white text-blue-600 font-semibold text-base sm:text-xl rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              Connect with Us
-            </button>
-          </a>
-        </div>
-      </div>
-    </section>
+      </section>
+
+      <ServiceMarquee images={marqueeImages} />
+
+      <ProductInfoCta
+        title={ctaSection.title}
+        description={ctaSection.description}
+        cta={cta}
+      />
+    </div>
   )
 }
-
-export default Services

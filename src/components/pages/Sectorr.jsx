@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { LuCheck } from 'react-icons/lu'
 import { useCmsPage } from '../../hooks/useCmsPage'
 import ProductInfoCta from '../products/ProductInfoCta'
+import SectorCardIcon from '../icons/SectorCardIcon'
 import {
   SECTOR_ITEMS,
   SECTORS_HUB_DEFAULTS,
@@ -32,22 +33,34 @@ function SectorCardImage({ src, fallback, alt }) {
 }
 
 function mergeSectors(cmsSectors) {
-  return SECTOR_ITEMS.map((def, i) => {
-    const sector = cmsSectors?.[i] || {}
+  const remoteByName = Object.fromEntries(
+    (Array.isArray(cmsSectors) ? cmsSectors : [])
+      .filter((sector) => sector?.name)
+      .map((sector) => [sector.name, sector])
+  )
+
+  return SECTOR_ITEMS.map((def) => {
+    const sector = remoteByName[def.name] || {}
     const cmsImage = sector.imageUrl?.trim()
     return {
       name: sector.name || def.name,
       solutions: sector.solutions?.length ? sector.solutions : def.solutions,
       imageUrl: cmsImage || def.imageUrl,
       fallbackImageUrl: def.imageUrl,
-      icon: def.icon,
+      iconId: sector.icon || def.iconId,
     }
   })
 }
 
 export default function Sectors() {
   const { content } = useCmsPage('sectors')
-  const hub = { ...SECTORS_HUB_DEFAULTS, ...content }
+  const hub = {
+    ...SECTORS_HUB_DEFAULTS,
+    eyebrow: content.eyebrow || SECTORS_HUB_DEFAULTS.eyebrow,
+    pageTitle: content.pageTitle || SECTORS_HUB_DEFAULTS.pageTitle,
+    pageTitleHighlight: content.pageTitleHighlight || SECTORS_HUB_DEFAULTS.pageTitleHighlight,
+    intro: content.intro || SECTORS_HUB_DEFAULTS.intro,
+  }
   const sectors = mergeSectors(content.sectors)
   const ctaSection = { ...SECTORS_HUB_DEFAULTS.ctaSection, ...content.ctaSection }
   const cta = { ...SECTORS_HUB_DEFAULTS.cta, ...content.cta }
@@ -99,9 +112,7 @@ export default function Sectors() {
 
       <section className="site-container pb-12 sm:pb-16 lg:pb-20">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7">
-          {sectors.map((sector) => {
-            const Icon = sector.icon
-            return (
+          {sectors.map((sector) => (
               <article
                 key={sector.name}
                 className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
@@ -114,7 +125,7 @@ export default function Sectors() {
                 <div className="flex flex-1 flex-col p-5 sm:p-6">
                   <div className="mb-3 flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fef2f2]">
-                      <Icon className="h-5 w-5 text-[#dc2626]" aria-hidden />
+                      <SectorCardIcon type={sector.iconId} className="h-5 w-5 text-[#dc2626]" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h2 className="text-lg font-bold text-[#111111] sm:text-xl">{sector.name}</h2>
@@ -131,8 +142,7 @@ export default function Sectors() {
                   </ul>
                 </div>
               </article>
-            )
-          })}
+            ))}
         </div>
       </section>
 

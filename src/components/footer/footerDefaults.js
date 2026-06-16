@@ -1,27 +1,23 @@
 import { LuCog, LuGlobe, LuPuzzle, LuFlag } from 'react-icons/lu'
+import { SERVICES } from '../../cms/servicesRegistry'
 
 export const FOOTER_LINK_COLUMNS = [
   {
-    title: 'Products',
+    title: 'Services',
     links: [
-      { name: 'Capping Machines', url: '/capping' },
-      { name: 'Bottle Unscramblers', url: '/bottle' },
-      { name: 'Pump & Trigger Systems', url: '/pump' },
-      { name: 'Turnkey Filling Lines', url: '/turnkey' },
-      { name: 'Bespoke Solutions', url: '/bespoke' },
-      { name: 'Food & Beverage Lines', url: '/foodbeverage' },
-      { name: 'All Products', url: '/products' },
+      ...SERVICES.slice(0, 6).map((s) => ({ name: s.shortTitle, url: s.path })),
+      { name: 'All Services', url: '/services' },
     ],
   },
   {
     title: 'Solutions',
     links: [
-      { name: 'Pharmaceutical', url: '/sectors' },
-      { name: 'Personal Care', url: '/sectors' },
-      { name: 'Home Care', url: '/sectors' },
       { name: 'Automotive', url: '/sectors' },
-      { name: 'Food & Beverage', url: '/sectors' },
-      { name: 'Medical & Veterinary', url: '/sectors' },
+      { name: 'Aerospace', url: '/sectors' },
+      { name: 'Defence', url: '/sectors' },
+      { name: 'Heritage Construction', url: '/sectors' },
+      { name: 'Medical', url: '/sectors' },
+      { name: 'Motorsport', url: '/sectors' },
       { name: 'All Sectors', url: '/sectors' },
     ],
   },
@@ -66,15 +62,12 @@ export const FOOTER_HIGHLIGHT_ICONS = {
 export function mergeLinkColumns(cmsColumns) {
   return FOOTER_LINK_COLUMNS.map((defCol, i) => {
     const col = cmsColumns?.[i] || {}
-    const cmsLinks = col.links?.length ? col.links : null
     return {
       title: col.title || defCol.title,
-      links: cmsLinks
-        ? cmsLinks.map((link, j) => ({
-            name: link.name || defCol.links[j]?.name || '',
-            url: link.url || defCol.links[j]?.url || '#',
-          }))
-        : defCol.links,
+      links: (col.links?.length ? col.links : defCol.links).map((link, j) => ({
+        name: link.name || defCol.links[j]?.name || '',
+        url: link.url || defCol.links[j]?.url || '#',
+      })),
     }
   })
 }

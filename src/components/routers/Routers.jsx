@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Home from '../pages/Home'
 import Contact from '../pages/Contact'
 import About from '../pages/About'
@@ -14,19 +14,29 @@ import Team from '../pages/glance/Team'
 import News from '../pages/glance/News'
 import Partners from '../pages/glance/Partners'
 import Sectorr from "../pages/Sectorr"
-import Products from '../pages/Products'
+import Services from '../pages/Services'
 import Consultation from "../pages/Consultation"
 import Projectmngmt from "../pages/consultation/Projectmngmt"
 import Turnkeymgmt from '../pages/consultation/T-automation'
 import LifecycleManagement from '../pages/consultation/Lifecycle'
 import ProjectPlanning from '../pages/consultation/Projectplan'
 import BespokeShowReview from '../pages/consultation/BespokeShowReview'
+import ServiceDetail from '../pages/services/ServiceDetail'
+import { SERVICES } from '../../cms/servicesRegistry'
+
 function Routers() {
     return (
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
+            {SERVICES.map((service) => (
+              <Route
+                key={service.id}
+                path={service.path}
+                element={<ServiceDetail serviceId={service.id} />}
+              />
+            ))}
             <Route path="/capping" element={<Capping/>}/>
             <Route path="/bottle" element={<Bottle/>} />
             <Route path="/pump" element={<Pump/>} />
@@ -38,7 +48,8 @@ function Routers() {
             <Route path='/partners' element={<Partners/>}/>
             <Route path='/news' element={<News/>}/>
             <Route path="/sectors" element={<Sectorr/>}/>
-            <Route path="/products" element={<Products/>}/>
+            <Route path="/services" element={<Services/>}/>
+            <Route path="/products" element={<Navigate to="/services" replace />} />
             <Route path="/consultation" element={<Consultation/>}/>
             <Route path="/project-management" element={<Projectmngmt/>}/>
             <Route path="/turnkey-automation" element={<Turnkeymgmt/>}/>
