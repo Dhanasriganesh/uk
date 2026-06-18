@@ -1,7 +1,8 @@
 import React from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
-import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
+import GlancePageTitle from '../../glance/GlancePageTitle'
+import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
 import newsFeatured from '../../../assets/news.png'
 
 const serif = { fontFamily: 'Playfair Display, serif' }

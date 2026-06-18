@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import { useCmsPage } from '../../../hooks/useCmsPage'
 import { CmsImage } from '../../cms/CmsMedia'
-import GlancePageTitle, { glanceTitleFromContent } from '../../glance/GlancePageTitle'
+import GlancePageTitle from '../../glance/GlancePageTitle'
+import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
 import { resolvePartnerItems } from '../../../cms/resolvePartnerLogos'
 import {
   DEFAULT_SUPPORTED_CUSTOMERS,

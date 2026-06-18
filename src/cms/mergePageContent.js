@@ -1,4 +1,5 @@
 import { deepMerge } from '../utils/deepMerge'
+import { cmsStringOrFallback } from '../utils/cmsString'
 import { SERVICE_PAGE_IDS } from './servicesRegistry'
 
 const LEGACY_PRODUCT_PAGE_IDS = ['capping', 'bottle', 'pump', 'turnkey', 'bespoke', 'foodbeverage']
@@ -21,6 +22,12 @@ function mergeIndexedObjects(defaultItems, remoteItems) {
     merged.push(...remoteList.slice(defaultItems.length))
   }
   return merged
+}
+
+function mergeRemoteList(remote, merged, key, defaults) {
+  if (remote && Array.isArray(remote[key]) && remote[key].length === 0) return []
+  if (!defaults[key]?.length) return merged[key] || []
+  return mergeIndexedObjects(defaults[key], merged[key])
 }
 
 /** Merge Firestore content with defaults so admin always shows the full field set. */
@@ -96,15 +103,34 @@ export function mergePageContent(pageId, defaults, remote) {
   }
 
   if (CONSULTATION_SERVICE_IDS.includes(pageId)) {
+    merged.eyebrow = cmsStringOrFallback(merged.eyebrow, defaults.eyebrow)
+    merged.title = cmsStringOrFallback(merged.title, defaults.title)
+    merged.titleHighlight = cmsStringOrFallback(merged.titleHighlight, defaults.titleHighlight)
+    merged.summary = cmsStringOrFallback(merged.summary ?? merged.intro, defaults.summary)
+    merged.tasksSectionTitle = cmsStringOrFallback(
+      merged.tasksSectionTitle ?? merged.stepsSectionTitle,
+      defaults.tasksSectionTitle ?? defaults.stepsSectionTitle
+    )
     if (defaults.tasks?.length) {
-      merged.tasks = mergeIndexedObjects(defaults.tasks, merged.tasks)
+      merged.tasks = mergeRemoteList(remote, merged, 'tasks', defaults)
     }
     if (defaults.steps?.length) {
-      merged.steps = mergeIndexedObjects(defaults.steps, merged.steps)
+      merged.steps = mergeRemoteList(remote, merged, 'steps', defaults)
     }
-    merged.highlights = mergeIndexedObjects(defaults.highlights, merged.highlights)
-    merged.ctaSection = { ...defaults.ctaSection, ...merged.ctaSection }
-    merged.cta = { ...defaults.cta, ...merged.cta }
+    merged.highlights = mergeRemoteList(remote, merged, 'highlights', defaults)
+    merged.ctaSection = {
+      title: cmsStringOrFallback(merged.ctaSection?.title, defaults.ctaSection?.title),
+      description: cmsStringOrFallback(
+        merged.ctaSection?.description,
+        defaults.ctaSection?.description
+      ),
+    }
+    merged.cta = {
+      enquireLabel: cmsStringOrFallback(merged.cta?.enquireLabel, defaults.cta?.enquireLabel),
+      enquireLink: cmsStringOrFallback(merged.cta?.enquireLink, defaults.cta?.enquireLink),
+      brochureUrl: cmsStringOrFallback(merged.cta?.brochureUrl, defaults.cta?.brochureUrl),
+      brochureLabel: cmsStringOrFallback(merged.cta?.brochureLabel, defaults.cta?.brochureLabel),
+    }
   }
 
   if (SERVICE_PAGE_IDS.includes(pageId) || LEGACY_PRODUCT_PAGE_IDS.includes(pageId)) {

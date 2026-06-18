@@ -475,12 +475,3 @@ export default function SettingsEditor({ data, onChange }) {
     </div>
   )
 }
-
-function stripSettingsMeta(settings) {
-  const next = structuredClone(settings)
-  delete next.updatedAt
-  delete next.updatedBy
-  return next
-}
-
-export { stripSettingsMeta }
