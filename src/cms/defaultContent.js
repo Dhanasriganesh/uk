@@ -362,10 +362,11 @@ export const defaultSectors = {
   intro:
     'Advanced Tooling Systems UK Ltd delivers engineering, automation, tooling, and packaging solutions across a wide range of industry sectors — from automotive and aerospace to heritage construction, medical, and motorsport.',
   sectors: SECTORS.map((sector) => ({
+    id: sector.id,
     name: sector.name,
     icon: sector.icon,
     imageUrl: '',
-    solutions: sector.solutions,
+    solutions: [...sector.solutions],
   })),
   ctaSection: {
     title: 'Need a Solution for Your Sector?',

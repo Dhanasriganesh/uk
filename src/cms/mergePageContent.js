@@ -24,6 +24,23 @@ function mergeIndexedObjects(defaultItems, remoteItems) {
   return merged
 }
 
+function mergeIndexedStrings(defaultItems = [], remoteItems) {
+  if (!Array.isArray(remoteItems)) {
+    return Array.isArray(defaultItems) ? [...defaultItems] : []
+  }
+  if (remoteItems.length === 0) return []
+  const maxLen = Math.max(defaultItems.length, remoteItems.length)
+  return Array.from({ length: maxLen }, (_, i) => {
+    if (i < remoteItems.length) {
+      const value = remoteItems[i]
+      if (typeof value === 'string') return value
+      if (value === undefined || value === null) return defaultItems[i] ?? ''
+      return String(value)
+    }
+    return defaultItems[i] ?? ''
+  })
+}
+
 function mergeRemoteList(remote, merged, key, defaults) {
   if (remote && Array.isArray(remote[key]) && remote[key].length === 0) return []
   if (!defaults[key]?.length) return merged[key] || []
@@ -47,9 +64,39 @@ export function mergePageContent(pageId, defaults, remote) {
   }
 
   if (pageId === 'sectors') {
-    merged.sectors = mergeIndexedObjects(defaults.sectors, merged.sectors)
-    merged.ctaSection = { ...defaults.ctaSection, ...merged.ctaSection }
-    merged.cta = { ...defaults.cta, ...merged.cta }
+    merged.sectors = defaults.sectors.map((def, i) => {
+      const remoteSector = remote?.sectors?.[i]
+      const mergedSector = {
+        ...def,
+        ...(merged.sectors?.[i] || {}),
+      }
+      if (remoteSector && Array.isArray(remoteSector.solutions)) {
+        mergedSector.solutions = mergeIndexedStrings(def.solutions, remoteSector.solutions)
+      } else if (Array.isArray(mergedSector.solutions)) {
+        mergedSector.solutions = mergeIndexedStrings(def.solutions, mergedSector.solutions)
+      } else {
+        mergedSector.solutions = [...def.solutions]
+      }
+      return mergedSector
+    })
+    merged.eyebrow = cmsStringOrFallback(merged.eyebrow, defaults.eyebrow)
+    merged.pageTitle = cmsStringOrFallback(merged.pageTitle, defaults.pageTitle)
+    merged.pageTitleHighlight = cmsStringOrFallback(
+      merged.pageTitleHighlight,
+      defaults.pageTitleHighlight
+    )
+    merged.intro = cmsStringOrFallback(merged.intro, defaults.intro)
+    merged.ctaSection = {
+      title: cmsStringOrFallback(merged.ctaSection?.title, defaults.ctaSection?.title),
+      description: cmsStringOrFallback(
+        merged.ctaSection?.description,
+        defaults.ctaSection?.description
+      ),
+    }
+    merged.cta = {
+      enquireLabel: cmsStringOrFallback(merged.cta?.enquireLabel, defaults.cta?.enquireLabel),
+      enquireLink: cmsStringOrFallback(merged.cta?.enquireLink, defaults.cta?.enquireLink),
+    }
   }
 
   if (pageId === 'contact') {

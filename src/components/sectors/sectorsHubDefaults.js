@@ -5,6 +5,7 @@ import medImg from '../../assets/med.png'
 import homeImg from '../../assets/home.png'
 import persImg from '../../assets/pers.png'
 import { SECTORS } from '../../cms/sectorsRegistry'
+import { cmsStringOrFallback } from '../../utils/cmsString'
 
 const LEGACY_IMAGES = {
   automotive: autoImg,
@@ -42,4 +43,36 @@ export const SECTORS_HUB_DEFAULTS = {
 
 export function getSectorLocalDefaults(sectorId) {
   return SECTOR_ITEMS.find((s) => s.id === sectorId) || null
+}
+
+/** Merge CMS sector rows by index (and id fallback) so admin edits always apply. */
+export function mergeSectorsForDisplay(cmsSectors) {
+  const cmsList = Array.isArray(cmsSectors) ? cmsSectors : []
+  const cmsById = Object.fromEntries(
+    cmsList.filter((sector) => sector?.id).map((sector) => [sector.id, sector])
+  )
+
+  return SECTOR_ITEMS.map((def, i) => {
+    const sector =
+      (cmsList[i]?.id === def.id ? cmsList[i] : null) ||
+      cmsById[def.id] ||
+      cmsList[i] ||
+      {}
+
+    const cmsImage = cmsStringOrFallback(sector.imageUrl, '')
+    const solutions = Array.isArray(sector.solutions)
+      ? sector.solutions
+          .map((item, j) => cmsStringOrFallback(item, def.solutions?.[j] ?? ''))
+          .filter(Boolean)
+      : [...def.solutions]
+
+    return {
+      id: def.id,
+      name: cmsStringOrFallback(sector.name, def.name),
+      iconId: cmsStringOrFallback(sector.icon, def.iconId),
+      imageUrl: cmsImage || def.imageUrl,
+      fallbackImageUrl: def.imageUrl,
+      solutions,
+    }
+  })
 }

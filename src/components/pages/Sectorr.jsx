@@ -5,9 +5,10 @@ import { useCmsPage } from '../../hooks/useCmsPage'
 import ProductInfoCta from '../products/ProductInfoCta'
 import SectorCardIcon from '../icons/SectorCardIcon'
 import {
-  SECTOR_ITEMS,
   SECTORS_HUB_DEFAULTS,
+  mergeSectorsForDisplay,
 } from '../sectors/sectorsHubDefaults'
+import { cmsStringOrFallback, mergeCmsObjectStrings } from '../../utils/cmsString'
 
 function SectorCardImage({ src, fallback, alt }) {
   const [failed, setFailed] = useState(false)
@@ -33,37 +34,29 @@ function SectorCardImage({ src, fallback, alt }) {
 }
 
 function mergeSectors(cmsSectors) {
-  const remoteByName = Object.fromEntries(
-    (Array.isArray(cmsSectors) ? cmsSectors : [])
-      .filter((sector) => sector?.name)
-      .map((sector) => [sector.name, sector])
-  )
-
-  return SECTOR_ITEMS.map((def) => {
-    const sector = remoteByName[def.name] || {}
-    const cmsImage = sector.imageUrl?.trim()
-    return {
-      name: sector.name || def.name,
-      solutions: sector.solutions?.length ? sector.solutions : def.solutions,
-      imageUrl: cmsImage || def.imageUrl,
-      fallbackImageUrl: def.imageUrl,
-      iconId: sector.icon || def.iconId,
-    }
-  })
+  return mergeSectorsForDisplay(cmsSectors)
 }
 
 export default function Sectors() {
   const { content } = useCmsPage('sectors')
   const hub = {
-    ...SECTORS_HUB_DEFAULTS,
-    eyebrow: content.eyebrow || SECTORS_HUB_DEFAULTS.eyebrow,
-    pageTitle: content.pageTitle || SECTORS_HUB_DEFAULTS.pageTitle,
-    pageTitleHighlight: content.pageTitleHighlight || SECTORS_HUB_DEFAULTS.pageTitleHighlight,
-    intro: content.intro || SECTORS_HUB_DEFAULTS.intro,
+    eyebrow: cmsStringOrFallback(content.eyebrow, SECTORS_HUB_DEFAULTS.eyebrow),
+    pageTitle: cmsStringOrFallback(content.pageTitle, SECTORS_HUB_DEFAULTS.pageTitle),
+    pageTitleHighlight: cmsStringOrFallback(
+      content.pageTitleHighlight,
+      SECTORS_HUB_DEFAULTS.pageTitleHighlight
+    ),
+    intro: cmsStringOrFallback(content.intro, SECTORS_HUB_DEFAULTS.intro),
   }
   const sectors = mergeSectors(content.sectors)
-  const ctaSection = { ...SECTORS_HUB_DEFAULTS.ctaSection, ...content.ctaSection }
-  const cta = { ...SECTORS_HUB_DEFAULTS.cta, ...content.cta }
+  const ctaSection = mergeCmsObjectStrings(content.ctaSection, SECTORS_HUB_DEFAULTS.ctaSection, [
+    'title',
+    'description',
+  ])
+  const cta = mergeCmsObjectStrings(content.cta, SECTORS_HUB_DEFAULTS.cta, [
+    'enquireLabel',
+    'enquireLink',
+  ])
 
   return (
     <div className="w-full overflow-x-hidden bg-white text-[#111111]">
@@ -114,7 +107,7 @@ export default function Sectors() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7">
           {sectors.map((sector) => (
               <article
-                key={sector.name}
+                key={sector.id}
                 className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
               >
                 <SectorCardImage
