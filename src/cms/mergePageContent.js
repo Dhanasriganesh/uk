@@ -41,10 +41,70 @@ function mergeIndexedStrings(defaultItems = [], remoteItems) {
   })
 }
 
-function mergeRemoteList(remote, merged, key, defaults) {
-  if (remote && Array.isArray(remote[key]) && remote[key].length === 0) return []
-  if (!defaults[key]?.length) return merged[key] || []
-  return mergeIndexedObjects(defaults[key], merged[key])
+function mergeProductFeatureCard(def = {}, remote = {}) {
+  return {
+    title: cmsStringOrFallback(remote.title, def.title),
+    linkLabel: cmsStringOrFallback(remote.linkLabel, def.linkLabel),
+    icon: cmsStringOrFallback(remote.icon, def.icon),
+    items: Array.isArray(remote.items)
+      ? mergeIndexedStrings(def.items, remote.items)
+      : Array.isArray(def.items)
+        ? [...def.items]
+        : [],
+  }
+}
+
+function mergeProductSection(def = {}, remote = {}) {
+  return {
+    eyebrow: cmsStringOrFallback(remote.eyebrow, def.eyebrow),
+    title: cmsStringOrFallback(remote.title, def.title),
+    body: cmsStringOrFallback(remote.body, def.body),
+    footer: cmsStringOrFallback(remote.footer, def.footer),
+    exploreLabel: cmsStringOrFallback(remote.exploreLabel, def.exploreLabel),
+    imageUrl: cmsStringOrFallback(remote.imageUrl, def.imageUrl),
+    videoUrl: cmsStringOrFallback(remote.videoUrl, def.videoUrl),
+    bullets: Array.isArray(remote.bullets)
+      ? mergeIndexedStrings(def.bullets, remote.bullets)
+      : Array.isArray(def.bullets)
+        ? [...def.bullets]
+        : [],
+  }
+}
+
+function mergeProductHighlight(def = {}, remote = {}) {
+  return {
+    label: cmsStringOrFallback(remote.label, def.label),
+    icon: cmsStringOrFallback(remote.icon, def.icon),
+  }
+}
+
+function mergeConsultationTaskItem(def = {}, remote = {}) {
+  return {
+    number: cmsStringOrFallback(remote.number, def.number),
+    title: cmsStringOrFallback(remote.title, def.title),
+    desc: cmsStringOrFallback(remote.desc ?? remote.description, def.desc),
+  }
+}
+
+function mergeConsultationHighlight(def = {}, remote = {}) {
+  return {
+    title: cmsStringOrFallback(remote.title, def.title),
+    desc: cmsStringOrFallback(remote.desc ?? remote.text, def.desc),
+  }
+}
+
+function mergeConsultationTaskList(defaultItems = [], remoteList, mergedList) {
+  if (remoteList && Array.isArray(remoteList) && remoteList.length === 0) return []
+  return defaultItems.map((def, i) =>
+    mergeConsultationTaskItem(def, mergedList?.[i] ?? remoteList?.[i] ?? {})
+  )
+}
+
+function mergeConsultationHighlightList(defaultItems = [], remoteList, mergedList) {
+  if (remoteList && Array.isArray(remoteList) && remoteList.length === 0) return []
+  return defaultItems.map((def, i) =>
+    mergeConsultationHighlight(def, mergedList?.[i] ?? remoteList?.[i] ?? {})
+  )
 }
 
 /** Merge Firestore content with defaults so admin always shows the full field set. */
@@ -154,17 +214,32 @@ export function mergePageContent(pageId, defaults, remote) {
     merged.title = cmsStringOrFallback(merged.title, defaults.title)
     merged.titleHighlight = cmsStringOrFallback(merged.titleHighlight, defaults.titleHighlight)
     merged.summary = cmsStringOrFallback(merged.summary ?? merged.intro, defaults.summary)
-    merged.tasksSectionTitle = cmsStringOrFallback(
+    merged.heroImageUrl = cmsStringOrFallback(merged.heroImageUrl, defaults.heroImageUrl)
+    const sectionTitle = cmsStringOrFallback(
       merged.tasksSectionTitle ?? merged.stepsSectionTitle,
       defaults.tasksSectionTitle ?? defaults.stepsSectionTitle
     )
+    merged.tasksSectionTitle = sectionTitle
+    merged.stepsSectionTitle = sectionTitle
     if (defaults.tasks?.length) {
-      merged.tasks = mergeRemoteList(remote, merged, 'tasks', defaults)
+      merged.tasks = mergeConsultationTaskList(
+        defaults.tasks,
+        remote?.tasks,
+        merged.tasks
+      )
     }
     if (defaults.steps?.length) {
-      merged.steps = mergeRemoteList(remote, merged, 'steps', defaults)
+      merged.steps = mergeConsultationTaskList(
+        defaults.steps,
+        remote?.steps,
+        merged.steps
+      )
     }
-    merged.highlights = mergeRemoteList(remote, merged, 'highlights', defaults)
+    merged.highlights = mergeConsultationHighlightList(
+      defaults.highlights || [],
+      remote?.highlights,
+      merged.highlights
+    )
     merged.ctaSection = {
       title: cmsStringOrFallback(merged.ctaSection?.title, defaults.ctaSection?.title),
       description: cmsStringOrFallback(
@@ -181,12 +256,40 @@ export function mergePageContent(pageId, defaults, remote) {
   }
 
   if (SERVICE_PAGE_IDS.includes(pageId) || LEGACY_PRODUCT_PAGE_IDS.includes(pageId)) {
-    merged.hero = { ...defaults.hero, ...merged.hero }
-    merged.featureCards = mergeIndexedObjects(defaults.featureCards, merged.featureCards)
-    merged.sections = mergeIndexedObjects(defaults.sections, merged.sections)
-    merged.highlights = mergeIndexedObjects(defaults.highlights, merged.highlights)
-    merged.ctaSection = { ...defaults.ctaSection, ...merged.ctaSection }
-    merged.cta = { ...defaults.cta, ...merged.cta }
+    const remoteHero = remote?.hero || {}
+    merged.hero = {
+      eyebrow: cmsStringOrFallback(merged.hero?.eyebrow, defaults.hero?.eyebrow),
+      title: cmsStringOrFallback(merged.hero?.title, defaults.hero?.title),
+      titleHighlight: cmsStringOrFallback(merged.hero?.titleHighlight, defaults.hero?.titleHighlight),
+      intro: cmsStringOrFallback(merged.hero?.intro, defaults.hero?.intro),
+      bullets: Array.isArray(remoteHero.bullets)
+        ? mergeIndexedStrings(defaults.hero?.bullets, remoteHero.bullets)
+        : Array.isArray(merged.hero?.bullets)
+          ? mergeIndexedStrings(defaults.hero?.bullets, merged.hero.bullets)
+          : [...(defaults.hero?.bullets || [])],
+    }
+    merged.featureCards = (defaults.featureCards || []).map((def, i) =>
+      mergeProductFeatureCard(def, merged.featureCards?.[i] || remote?.featureCards?.[i] || {})
+    )
+    merged.sections = (defaults.sections || []).map((def, i) =>
+      mergeProductSection(def, merged.sections?.[i] || remote?.sections?.[i] || {})
+    )
+    merged.highlights = (defaults.highlights || []).map((def, i) =>
+      mergeProductHighlight(def, merged.highlights?.[i] || remote?.highlights?.[i] || {})
+    )
+    merged.ctaSection = {
+      title: cmsStringOrFallback(merged.ctaSection?.title, defaults.ctaSection?.title),
+      description: cmsStringOrFallback(
+        merged.ctaSection?.description,
+        defaults.ctaSection?.description
+      ),
+    }
+    merged.cta = {
+      brochureUrl: cmsStringOrFallback(merged.cta?.brochureUrl, defaults.cta?.brochureUrl),
+      brochureLabel: cmsStringOrFallback(merged.cta?.brochureLabel, defaults.cta?.brochureLabel),
+      enquireLabel: cmsStringOrFallback(merged.cta?.enquireLabel, defaults.cta?.enquireLabel),
+      enquireLink: cmsStringOrFallback(merged.cta?.enquireLink, defaults.cta?.enquireLink),
+    }
   }
 
   return merged

@@ -51,3 +51,26 @@ export function mergeCmsObjectStrings(contentObj = {}, defaultObj = {}, keys) {
   }
   return merged
 }
+
+/** Merge a list of CMS strings by index; empty saved list stays empty. */
+export function mergeCmsStringList(items, defaultItems = []) {
+  if (!Array.isArray(items)) return Array.isArray(defaultItems) ? [...defaultItems] : []
+  if (items.length === 0) return []
+  return items
+    .map((item, i) => cmsStringOrFallback(item, defaultItems[i] ?? ''))
+    .filter(Boolean)
+}
+
+export function mergeCmsLabelHighlights(items, defaultItems = []) {
+  if (!Array.isArray(items) || items.length === 0) return []
+
+  return items
+    .map((item, i) => {
+      const def = defaultItems[i] || {}
+      const label = cmsStringOrFallback(item.label, def.label)
+      const icon = cmsStringOrFallback(item.icon, def.icon)
+      if (!label) return null
+      return { label, icon }
+    })
+    .filter(Boolean)
+}

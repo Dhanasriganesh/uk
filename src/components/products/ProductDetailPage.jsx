@@ -15,6 +15,13 @@ import {
   LuTruck,
 } from 'react-icons/lu'
 import { useCmsPage } from '../../hooks/useCmsPage'
+import {
+  cmsFirstArray,
+  cmsStringOrFallback,
+  mergeCmsLabelHighlights,
+  mergeCmsObjectStrings,
+  mergeCmsStringList,
+} from '../../utils/cmsString'
 import { CmsVideo } from '../cms/CmsMedia'
 import ProductInfoCta from './ProductInfoCta'
 
@@ -85,6 +92,47 @@ function ProductMedia({ section }) {
   return null
 }
 
+function mergeFeatureCard(card, def = {}) {
+  return {
+    title: cmsStringOrFallback(card?.title, def.title),
+    linkLabel: cmsStringOrFallback(card?.linkLabel, def.linkLabel),
+    icon: cmsStringOrFallback(card?.icon, def.icon) || 'gears',
+    items: Array.isArray(card?.items)
+      ? mergeCmsStringList(card.items, def.items)
+      : [...(def.items || [])],
+  }
+}
+
+function mergeContentSection(section, def = {}) {
+  const cmsImage = cmsStringOrFallback(section?.imageUrl, '')
+  const cmsVideo = cmsStringOrFallback(section?.videoUrl, '')
+  return {
+    eyebrow: cmsStringOrFallback(section?.eyebrow, def.eyebrow),
+    title: cmsStringOrFallback(section?.title, def.title),
+    body: cmsStringOrFallback(section?.body, def.body),
+    footer: cmsStringOrFallback(section?.footer, def.footer),
+    exploreLabel: cmsStringOrFallback(section?.exploreLabel, def.exploreLabel),
+    imageUrl: cmsImage || def.imageUrl || '',
+    videoUrl: cmsVideo || def.videoUrl || '',
+    bullets: Array.isArray(section?.bullets)
+      ? mergeCmsStringList(section.bullets, def.bullets)
+      : [...(def.bullets || [])],
+  }
+}
+
+function sectionHasContent(section) {
+  return Boolean(
+    section.eyebrow ||
+      section.title ||
+      section.body ||
+      section.footer ||
+      section.exploreLabel ||
+      section.imageUrl ||
+      section.videoUrl ||
+      section.bullets?.length
+  )
+}
+
 export default function ProductDetailPage({
   pageId,
   breadcrumbLabel,
@@ -95,13 +143,37 @@ export default function ProductDetailPage({
   defaults = {},
 }) {
   const { content } = useCmsPage(pageId)
-  const hero = { ...defaults.hero, ...content.hero }
-  const featureCards = content.featureCards?.length ? content.featureCards : defaults.featureCards || []
-  const sections = content.sections?.length ? content.sections : defaults.sections || []
-  const highlights = content.highlights?.length ? content.highlights : defaults.highlights || []
-  const cta = { ...defaults.cta, ...content.cta }
-  const ctaSection = { ...defaults.ctaSection, ...content.ctaSection }
-  const brochureUrl = (cta.brochureUrl || '').trim() || defaults.defaultBrochureUrl || '/media/pdf_1718978495.pdf'
+  const hero = {
+    eyebrow: cmsStringOrFallback(content.hero?.eyebrow, defaults.hero?.eyebrow),
+    title: cmsStringOrFallback(content.hero?.title, defaults.hero?.title),
+    titleHighlight: cmsStringOrFallback(content.hero?.titleHighlight, defaults.hero?.titleHighlight),
+    intro: cmsStringOrFallback(content.hero?.intro, defaults.hero?.intro),
+    bullets: Array.isArray(content.hero?.bullets)
+      ? mergeCmsStringList(content.hero.bullets, defaults.hero?.bullets)
+      : [...(defaults.hero?.bullets || [])],
+  }
+  const featureCards = cmsFirstArray(content, ['featureCards'], defaults.featureCards || []).map(
+    (card, idx) => mergeFeatureCard(card, defaults.featureCards?.[idx])
+  )
+  const sections = cmsFirstArray(content, ['sections'], defaults.sections || [])
+    .map((section, idx) => mergeContentSection(section, defaults.sections?.[idx]))
+    .filter(sectionHasContent)
+  const highlights = mergeCmsLabelHighlights(
+    cmsFirstArray(content, ['highlights'], defaults.highlights || []),
+    defaults.highlights || []
+  )
+  const cta = mergeCmsObjectStrings(content.cta, defaults.cta, [
+    'brochureUrl',
+    'brochureLabel',
+    'enquireLabel',
+    'enquireLink',
+  ])
+  const ctaSection = mergeCmsObjectStrings(content.ctaSection, defaults.ctaSection, [
+    'title',
+    'description',
+  ])
+  const brochureUrl =
+    cta.brochureUrl || defaults.defaultBrochureUrl || '/media/pdf_1718978495.pdf'
 
   const galleryUrls = content.gallery?.filter(Boolean)?.length
     ? content.gallery.filter(Boolean)
@@ -151,24 +223,35 @@ export default function ProductDetailPage({
 
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="min-w-0">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
-                {hero.eyebrow}
-              </p>
-              <h1 className="text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
-                {hero.title}{' '}
-                {hero.titleHighlight ? (
-                  <span className="text-[#dc2626]">{hero.titleHighlight}</span>
-                ) : null}
-              </h1>
-              <div className="mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
-              <p className="mb-6 max-w-xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
-                {hero.intro}
-              </p>
-              <ul className="mb-8 space-y-3">
-                {(hero.bullets || []).map((b) => (
-                  <CheckItem key={b}>{b}</CheckItem>
-                ))}
-              </ul>
+              {hero.eyebrow ? (
+                <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
+                  {hero.eyebrow}
+                </p>
+              ) : null}
+              {hero.title || hero.titleHighlight ? (
+                <h1 className="text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+                  {hero.title}
+                  {hero.title && hero.titleHighlight ? ' ' : null}
+                  {hero.titleHighlight ? (
+                    <span className="text-[#dc2626]">{hero.titleHighlight}</span>
+                  ) : null}
+                </h1>
+              ) : null}
+              {hero.title || hero.titleHighlight ? (
+                <div className="mb-5 mt-4 h-[3px] w-full max-w-[120px] rounded-full bg-[#dc2626] sm:max-w-[160px]" />
+              ) : null}
+              {hero.intro ? (
+                <p className="mb-6 max-w-xl text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+                  {hero.intro}
+                </p>
+              ) : null}
+              {hero.bullets.length > 0 ? (
+                <ul className="mb-8 space-y-3">
+                  {hero.bullets.map((b) => (
+                    <CheckItem key={b}>{b}</CheckItem>
+                  ))}
+                </ul>
+              ) : null}
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
                   to="/contact"
@@ -251,29 +334,34 @@ export default function ProductDetailPage({
         <section className="site-container pb-12 sm:pb-16 lg:pb-20">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
             {featureCards.map((card, idx) => {
-              const def = defaults.featureCards?.[idx] || {}
-              const title = card.title || def.title
-              const items = card.items?.length ? card.items : def.items || []
-              const linkLabel = card.linkLabel || def.linkLabel || 'Learn more'
-              const icon = card.icon || def.icon || 'gears'
+              const title = card.title
+              const items = card.items
+              const linkLabel = card.linkLabel
+              const icon = card.icon
+              const showCard = title || items.length > 0 || linkLabel
+              if (!showCard) return null
               return (
                 <article
-                  key={title}
+                  key={`${title || 'card'}-${idx}`}
                   className="flex flex-col rounded-2xl border border-[#f1f1f1] bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                 >
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef2f2]">
                     <FeatureCardIcon type={icon} />
                   </div>
-                  <h3 className="mb-3 text-lg font-bold text-[#111111]">{title}</h3>
-                  <ul className="mb-4 flex-1 space-y-2">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-[#5f5f5f]">
-                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#dc2626]" aria-hidden />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <span className="text-sm font-semibold text-[#dc2626]">{linkLabel} →</span>
+                  {title ? <h3 className="mb-3 text-lg font-bold text-[#111111]">{title}</h3> : null}
+                  {items.length > 0 ? (
+                    <ul className="mb-4 flex-1 space-y-2">
+                      {items.map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-[#5f5f5f]">
+                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#dc2626]" aria-hidden />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {linkLabel ? (
+                    <span className="text-sm font-semibold text-[#dc2626]">{linkLabel} →</span>
+                  ) : null}
                 </article>
               )
             })}
@@ -282,39 +370,45 @@ export default function ProductDetailPage({
       )}
 
       {sections.map((section, idx) => {
-        const def = defaults.sections?.[idx] || {}
-        const merged = { ...def, ...section }
         const reversed = idx % 2 === 1
         const textBlock = (
           <div className="min-w-0">
-            {merged.eyebrow ? (
+            {section.eyebrow ? (
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-[#dc2626]">
-                {merged.eyebrow}
+                {section.eyebrow}
               </p>
             ) : null}
-            <h2 className="mb-4 text-2xl font-bold text-[#111111] sm:text-3xl lg:text-4xl">{merged.title}</h2>
-            <p className="mb-4 text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">{merged.body}</p>
-            {merged.bullets?.length > 0 && (
+            {section.title ? (
+              <h2 className="mb-4 text-2xl font-bold text-[#111111] sm:text-3xl lg:text-4xl">
+                {section.title}
+              </h2>
+            ) : null}
+            {section.body ? (
+              <p className="mb-4 text-sm leading-relaxed text-[#5f5f5f] sm:text-base lg:text-lg">
+                {section.body}
+              </p>
+            ) : null}
+            {section.bullets?.length > 0 && (
               <ul className="mb-4 space-y-2.5">
-                {merged.bullets.map((b) => (
+                {section.bullets.map((b) => (
                   <CheckItem key={b}>{b}</CheckItem>
                 ))}
               </ul>
             )}
-            {merged.footer ? (
-              <p className="mb-4 text-sm leading-relaxed text-[#5f5f5f] sm:text-base">{merged.footer}</p>
+            {section.footer ? (
+              <p className="mb-4 text-sm leading-relaxed text-[#5f5f5f] sm:text-base">{section.footer}</p>
             ) : null}
-            {merged.exploreLabel ? (
+            {section.exploreLabel ? (
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#dc2626]">
-                {merged.exploreLabel} <LuArrowRight className="h-4 w-4" />
+                {section.exploreLabel} <LuArrowRight className="h-4 w-4" />
               </span>
             ) : null}
           </div>
         )
-        const mediaBlock = <ProductMedia section={merged} />
+        const mediaBlock = <ProductMedia section={section} />
         return (
           <section
-            key={merged.title}
+            key={`${section.title || 'section'}-${idx}`}
             className={`site-container py-10 sm:py-12 lg:py-14 ${idx > 0 ? 'border-t border-[#f1f1f1]' : ''}`}
           >
             <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
@@ -338,27 +432,22 @@ export default function ProductDetailPage({
         <section className="border-y border-[#f1f1f1] bg-[#f5f5f5] py-8 sm:py-10">
           <div className="site-container">
             <div className="grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-8">
-              {highlights.map((item, idx) => {
-                const def = defaults.highlights?.[idx] || {}
-                const label = item.label || def.label
-                const icon = item.icon || def.icon
-                return (
-                  <div key={label} className="flex flex-col items-center text-center">
-                    <HighlightIcon type={icon} />
-                    <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#111111] sm:text-sm">
-                      {label}
-                    </p>
-                  </div>
-                )
-              })}
+              {highlights.map((item, idx) => (
+                <div key={`${item.label}-${idx}`} className="flex flex-col items-center text-center">
+                  <HighlightIcon type={item.icon} />
+                  <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#111111] sm:text-sm">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
       )}
 
       <ProductInfoCta
-        title={ctaSection.title || 'Need More Information?'}
-        description={ctaSection.description || ''}
+        title={ctaSection.title}
+        description={ctaSection.description}
         cta={{ ...cta, brochureUrl }}
       />
     </div>

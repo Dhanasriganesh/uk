@@ -37,18 +37,6 @@ function HeroImage({ src, alt }) {
   )
 }
 
-function resolveRawTasks(content) {
-  if (Array.isArray(content.tasks)) return content.tasks
-  if (Array.isArray(content.steps)) return content.steps
-  if (Array.isArray(content.competencies)) {
-    return content.competencies.map((item) =>
-      typeof item === 'string' ? { title: item, desc: '' } : item
-    )
-  }
-  if (Array.isArray(content.cards)) return content.cards
-  return null
-}
-
 export default function ConsultationDetailPage({
   pageId,
   breadcrumbLabel,
@@ -56,45 +44,62 @@ export default function ConsultationDetailPage({
   parentLink = '/consultation',
   defaults = {},
 }) {
-  const { content } = useCmsPage(pageId)
+  const { content, fromFirestore } = useCmsPage(pageId)
 
-  const eyebrow = cmsStringOrFallback(content.eyebrow, defaults.eyebrow)
-  const title = cmsStringOrFallback(content.title, defaults.title)
-  const titleHighlight = cmsStringOrFallback(content.titleHighlight, defaults.titleHighlight)
-  const summary = cmsStringOrFallback(content.summary ?? content.intro, defaults.summary)
+  const eyebrow = cmsStringOrFallback(
+    content.eyebrow,
+    fromFirestore ? '' : defaults.eyebrow
+  )
+  const title = cmsStringOrFallback(content.title, fromFirestore ? '' : defaults.title)
+  const titleHighlight = cmsStringOrFallback(
+    content.titleHighlight,
+    fromFirestore ? '' : defaults.titleHighlight
+  )
+  const summary = cmsStringOrFallback(
+    content.summary ?? content.intro,
+    fromFirestore ? '' : defaults.summary
+  )
 
   const cmsHeroImage = typeof content.heroImageUrl === 'string' ? content.heroImageUrl.trim() : ''
-  const heroImageUrl = cmsHeroImage || (defaults.heroImageUrl ?? '')
+  const heroImageUrl = fromFirestore
+    ? cmsHeroImage
+    : cmsHeroImage || (defaults.heroImageUrl ?? '')
 
   const tasksSectionTitle = cmsStringOrFallback(
     content.tasksSectionTitle ?? content.stepsSectionTitle,
-    defaults.tasksSectionTitle ?? defaults.stepsSectionTitle
+    fromFirestore ? '' : (defaults.tasksSectionTitle ?? defaults.stepsSectionTitle)
   )
 
   const defaultTaskItems =
     defaults.tasks ?? defaults.steps ?? defaults.cards ?? defaults.competencies ?? []
-  const rawTasks = resolveRawTasks(content)
+  const taskSourceKey = Array.isArray(content.tasks)
+    ? 'tasks'
+    : Array.isArray(content.steps)
+      ? 'steps'
+      : Array.isArray(content.cards)
+        ? 'cards'
+        : null
   const tasks = mergeCmsTaskItems(
-    rawTasks ?? cmsFirstArray(content, ['tasks', 'steps', 'cards'], defaultTaskItems),
-    defaultTaskItems
+    taskSourceKey ? content[taskSourceKey] : cmsFirstArray(content, ['tasks', 'steps', 'cards'], []),
+    taskSourceKey ? [] : defaultTaskItems
   )
 
   const defaultHighlights = defaults.highlights ?? []
   const highlights = mergeCmsHighlightItems(
-    cmsFirstArray(content, ['highlights'], defaultHighlights),
-    defaultHighlights
+    cmsFirstArray(content, ['highlights'], []),
+    fromFirestore ? [] : defaultHighlights
   )
 
-  const ctaSection = mergeCmsObjectStrings(content.ctaSection, defaults.ctaSection, [
-    'title',
-    'description',
-  ])
-  const cta = mergeCmsObjectStrings(content.cta, defaults.cta, [
-    'enquireLabel',
-    'enquireLink',
-    'brochureUrl',
-    'brochureLabel',
-  ])
+  const ctaSection = mergeCmsObjectStrings(
+    content.ctaSection,
+    fromFirestore ? {} : defaults.ctaSection,
+    ['title', 'description']
+  )
+  const cta = mergeCmsObjectStrings(
+    content.cta,
+    fromFirestore ? {} : defaults.cta,
+    ['enquireLabel', 'enquireLink', 'brochureUrl', 'brochureLabel']
+  )
 
   const showHeroText = eyebrow || title || titleHighlight || summary
   const showHeroImage = Boolean(heroImageUrl)
@@ -229,7 +234,9 @@ export default function ConsultationDetailPage({
                 highlights.length >= 4 ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'
               }`}
             >
-              {highlights.map((item, idx) => (
+              {highlights.map((item, idx) => {
+                if (!item.title && !item.desc) return null
+                return (
                 <article
                   key={item.title || idx}
                   className="flex flex-col items-center rounded-2xl border border-[#f1f1f1] bg-white p-6 text-center shadow-sm"
@@ -247,7 +254,8 @@ export default function ConsultationDetailPage({
                     <p className="text-sm leading-relaxed text-[#5f5f5f]">{item.desc}</p>
                   ) : null}
                 </article>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
