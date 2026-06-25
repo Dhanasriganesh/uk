@@ -101,7 +101,16 @@ function Ats() {
         highlight={glanceTitle.highlight}
         className="mb-8 lg:mb-10"
       />
-
+  <div className="mb-2 flex justify-end">
+            <a
+              href={`mailto:${contactEmail}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
+              style={{ backgroundColor: RED }}
+            >
+              <MailIcon />
+              {contactEmail}
+            </a>
+          </div>
       <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(110px,0.22fr)_minmax(0,1fr)] lg:gap-x-3 xl:gap-x-4">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           {leftHeading ? (
@@ -116,31 +125,14 @@ function Ats() {
               alt="Commercial aircraft in flight"
               className="block aspect-[16/11] w-full object-cover sm:aspect-[16/10]"
             />
-            <div className="absolute bottom-3 left-3 max-w-[200px] bg-white/95 px-3 py-2.5 sm:bottom-4 sm:left-4 sm:max-w-[230px] sm:px-3.5 sm:py-3">
-              <p className="text-[11px] font-bold leading-snug text-[#c00000] sm:text-xs">{heroTagline}</p>
-            </div>
           </div>
         </div>
 
-        <div className="flex items-end justify-center lg:col-start-2 lg:row-start-1 lg:self-end">
-          <CenterNav
-            companyHistoryLabel={content.navCompanyHistory || 'Company History'}
-            whyAtsLabel={content.navWhyAts || 'Why ATS UK?'}
-          />
-        </div>
+      
 
         <div className="min-w-0 lg:col-start-3 lg:row-start-1">
-          <div className="mb-2 flex justify-end">
-            <a
-              href={`mailto:${contactEmail}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
-              style={{ backgroundColor: RED }}
-            >
-              <MailIcon />
-              {contactEmail}
-            </a>
-          </div>
-          <p className="mb-2 text-[11px] italic text-[#888888] sm:mb-2.5 sm:text-xs">{rightTagline}</p>
+        
+          
           <div className="overflow-hidden bg-neutral-200">
             <CmsImage
               src={content.rightHeroImageUrl}
