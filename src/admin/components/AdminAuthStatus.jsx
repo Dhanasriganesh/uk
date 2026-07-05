@@ -34,7 +34,7 @@ export default function AdminAuthStatus() {
       <div className="leading-relaxed">
         {status.email ? (
           <p>
-            Signed in as <strong>{status.email}</strong> — you can upload images and videos from page fields or Media Library.
+            Signed in as <strong>{status.email}</strong> — you can upload images and videos from page editor fields.
           </p>
         ) : (
           <p>

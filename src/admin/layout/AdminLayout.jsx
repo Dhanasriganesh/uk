@@ -7,7 +7,6 @@ import { ADMIN_NAV } from '../adminNav'
 import { useIsDesktop } from '../hooks/useMediaQuery'
 
 function getPageTitle(pathname) {
-  if (pathname.startsWith('/admin/media')) return 'Media Library'
   if (pathname.startsWith('/admin/pages/')) return 'Page Editor'
   if (pathname === '/admin' || pathname === '/admin/') return 'Dashboard'
   return 'Admin'

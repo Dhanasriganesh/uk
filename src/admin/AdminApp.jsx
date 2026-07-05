@@ -5,7 +5,6 @@ import AdminLayout from './layout/AdminLayout'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import PageEditorPage from './pages/PageEditorPage'
-import MediaPage from './pages/MediaPage'
 
 export default function AdminApp() {
   return (
@@ -21,7 +20,6 @@ export default function AdminApp() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="pages/:pageId" element={<PageEditorPage />} />
-        <Route path="media" element={<MediaPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>

@@ -16,7 +16,7 @@ import {
 } from 'react-icons/lu'
 import { PAGE_GROUPS, ALL_PAGE_IDS } from '../../cms/pageRegistry'
 import { PAGE_DEFAULTS } from '../../cms/defaultContent'
-import { savePageContent, saveSiteSettings, seedMediaLibrary } from '../../firebase/cmsService'
+import { savePageContent, saveSiteSettings } from '../../firebase/cmsService'
 import { useAuth } from '../../context/AuthContext'
 import AdminPageShell from '../components/ui/AdminPageShell'
 import PageHeader from '../components/ui/PageHeader'
@@ -86,10 +86,7 @@ export default function DashboardPage() {
           await savePageContent(pageId, structuredClone(content), user?.email)
         }
       }
-      const media = await seedMediaLibrary({ migrateLegacy: true })
-      setSeedMessage(
-        `Database seeded. Media library: ${media.added} new URL(s) added (${media.total} total).`
-      )
+      setSeedMessage('Database seeded with default page content.')
     } catch (err) {
       setSeedMessage(`Error: ${err.message}`)
     } finally {
@@ -131,7 +128,7 @@ export default function DashboardPage() {
         <Card className="sm:col-span-2 lg:col-span-1">
           <p className="text-sm font-medium text-slate-500">Quick tip</p>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Upload images in <Link to="/admin/media" className="font-semibold text-red-600 hover:underline">Media Library</Link>, then paste URLs into page fields.
+            Upload images directly in each page editor field, or paste an existing image URL.
           </p>
         </Card>
       </div>
