@@ -1,6 +1,5 @@
 import { auth, isStorageConfigured } from './config'
 import { waitForAuthReady } from './authHelpers'
-import { uploadMedia } from './cmsService'
 import { normalizeShortUrl } from '../cms/mediaSeed'
 import { resolveReplaceTarget } from '../cms/resolveReplacePath'
 import { validateMediaFile } from '../cms/mediaLimits'
@@ -59,25 +58,17 @@ async function uploadViaServerApi(file, { onProgress, replaceUrl } = {}) {
   }
 }
 
-async function saveMediaRecord(uploaded, file) {
+async function finalizeUpload(uploaded, file) {
   const shortUrl =
     typeof uploaded.url === 'string' && uploaded.url.startsWith('http')
       ? uploaded.url
       : normalizeShortUrl(uploaded.url)
   const displayName = (file.name || shortUrl.split('/').pop() || 'media').slice(0, 140)
 
-  const record = await uploadMedia({
+  return {
+    id: null,
     url: shortUrl,
     name: displayName,
-    type: uploaded.type,
-    size: uploaded.size,
-    source: uploaded.source || 'upload',
-    storagePath: uploaded.storagePath || null,
-  })
-
-  return {
-    ...record,
-    url: shortUrl,
     isStorageUrl: isFirebaseStorageUrl(shortUrl) || uploaded.source === 'blob',
     storagePath: uploaded.storagePath || null,
     replaced: uploaded.replaced,
@@ -97,7 +88,7 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
 
   try {
     const uploaded = await uploadViaServerApi(file, { onProgress, replaceUrl })
-    return saveMediaRecord(uploaded, file)
+    return finalizeUpload(uploaded, file)
   } catch (err) {
     failures.push(err)
     console.warn('[upload] Server image upload failed:', err.message)
@@ -110,7 +101,7 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
         target: 'storage',
         storagePath: reuse.path,
       })
-      return saveMediaRecord(
+      return finalizeUpload(
         {
           url: storageResult.downloadUrl,
           storagePath: storageResult.storagePath,
@@ -201,5 +192,5 @@ export async function uploadMediaFile(file, { onProgress, accept = 'any', replac
     throw err
   }
 
-  return saveMediaRecord(uploaded, file)
+  return finalizeUpload(uploaded, file)
 }

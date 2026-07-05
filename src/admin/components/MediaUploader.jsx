@@ -82,7 +82,8 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
       )
       onUploaded?.(result.url, result)
     } catch (err) {
-      setError(formatMediaError(err) || err.message || 'Upload failed')
+      const detail = [err.message, err.hint].filter(Boolean).join(' ')
+      setError(formatMediaError(err) || detail || 'Upload failed')
     } finally {
       setUploading(false)
       setProgress(0)

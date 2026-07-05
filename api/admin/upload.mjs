@@ -2,7 +2,7 @@ import { put } from '@vercel/blob'
 import admin from 'firebase-admin'
 import Busboy from 'busboy'
 import { randomUUID } from 'crypto'
-import { buildUploadPath } from '../../src/cms/resolveReplacePath.js'
+import { buildUploadPath } from '../lib/uploadPath.mjs'
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const MAX_VIDEO_BYTES = 150 * 1024 * 1024
@@ -122,7 +122,6 @@ function parseMultipart(req) {
   })
 }
 
-/** Free on Vercel Hobby — live admin uploads without Firebase Storage. */
 async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
   const token = process.env.BLOB_READ_WRITE_TOKEN
   if (!token) return null
@@ -133,6 +132,7 @@ async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
     contentType: mimeType,
     token,
     addRandomSuffix: false,
+    allowOverwrite: Boolean(replaceUrl),
   })
 
   return {
@@ -172,6 +172,14 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY
+  if (!apiKey) {
+    res.status(500).json({
+      error: 'Server missing Firebase API key.',
+      hint: 'Add VITE_FIREBASE_API_KEY to Vercel environment variables, then redeploy.',
+    })
+    return
+  }
+
   const authHeader = req.headers.authorization || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
   const user = await verifyIdToken(token, apiKey)
@@ -201,26 +209,45 @@ export default async function handler(req, res) {
     return
   }
 
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+
   try {
     let result = null
+    let blobError = null
 
-    if (isImageMime(mimeType) || isPdfMime(mimeType, fileName)) {
-      result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
+    if (isImageMime(mimeType) || isPdfMime(mimeType, fileName) || isVideoMime(mimeType)) {
+      if (!blobToken) {
+        res.status(503).json({
+          error: 'Vercel Blob is not configured for this project.',
+          hint:
+            'Vercel dashboard → your project → Storage → Create Blob Store → Connect to project → Redeploy.',
+        })
+        return
+      }
+
+      try {
+        result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
+      } catch (err) {
+        blobError = err
+        console.error('[api/admin/upload] Blob upload failed:', err)
+      }
     }
 
     if (!result && process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-      result = await uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl)
-    }
-
-    if (!result && isVideoMime(mimeType)) {
-      result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
+      try {
+        result = await uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl)
+      } catch (err) {
+        console.error('[api/admin/upload] Firebase Storage fallback failed:', err)
+        if (!blobError) blobError = err
+      }
     }
 
     if (!result) {
       res.status(500).json({
-        error: 'Live upload storage is not configured.',
-        hint:
-          'In Vercel: Storage → Create Blob store (free on Hobby). Vercel adds BLOB_READ_WRITE_TOKEN automatically. Redeploy after creating the store.',
+        error: blobError?.message || 'Upload failed.',
+        hint: blobToken
+          ? 'Check Vercel Blob store is linked to this project and redeploy after creating it.'
+          : 'Create a Vercel Blob store (free on Hobby), connect it to this project, then redeploy.',
       })
       return
     }
@@ -237,10 +264,7 @@ export default async function handler(req, res) {
     console.error('[api/admin/upload]', err)
     res.status(500).json({
       error: err.message || 'Upload failed',
-      hint:
-        process.env.BLOB_READ_WRITE_TOKEN
-          ? 'Upload failed — try a smaller file or check Vercel Blob limits.'
-          : 'Create a Vercel Blob store in your project (free on Hobby), then redeploy.',
+      hint: 'Check Vercel function logs and confirm BLOB_READ_WRITE_TOKEN is set.',
     })
   }
 }
