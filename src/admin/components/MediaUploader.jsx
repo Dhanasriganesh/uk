@@ -20,7 +20,7 @@ function acceptToInput(accept) {
   return ACCEPTED_MEDIA_INPUT
 }
 
-export default function MediaUploader({ onUploaded, variant = 'compact', accept = 'any' }) {
+export default function MediaUploader({ onUploaded, variant = 'compact', accept = 'any', replaceUrl }) {
   const fileInputRef = useRef(null)
   const [url, setUrl] = useState('')
   const [name, setName] = useState('')
@@ -71,10 +71,15 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
       const result = await uploadMediaFile(file, {
         accept,
         onProgress: setProgress,
+        replaceUrl,
       })
       const urlLabel =
         result.url?.startsWith('data:') ? 'image saved in Firestore' : result.url
-      setSuccess(`Uploaded “${result.name}” → ${urlLabel}`)
+      setSuccess(
+        result.replaced
+          ? `Replaced file → ${urlLabel}`
+          : `Uploaded “${result.name}” → ${urlLabel}`
+      )
       onUploaded?.(result.url, result)
     } catch (err) {
       setError(formatMediaError(err) || err.message || 'Upload failed')
@@ -94,7 +99,7 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
         {accept === 'video'
           ? 'Videos: dev public folder or paste YouTube/Vimeo on live site'
           : accept === 'image'
-            ? 'Images: saved in Firestore as base64 (max ~700 KB)'
+            ? 'Up to 5 MB — live site uses Vercel Blob (free); local dev uses /media/…'
             : 'Images in Firestore; videos via URL or dev upload'}
       </p>
       <input

@@ -38,14 +38,14 @@ export function isFirebaseStorageUrl(url) {
 /**
  * Upload file to Firebase Storage, return public download URL.
  */
-export async function uploadFileToStorage(file, { onProgress } = {}) {
+export async function uploadFileToStorage(file, { onProgress, target = 'storage', storagePath } = {}) {
   if (!isStorageConfigured || !storage) {
     throw new Error(
       'Firebase Storage is not configured. Add VITE_FIREBASE_STORAGE_BUCKET to .env and enable Storage in Firebase Console.'
     )
   }
 
-  const validation = validateMediaFile(file)
+  const validation = validateMediaFile(file, { target })
   if (!validation.ok) {
     const err = new Error(validation.error)
     if (validation.hint) err.hint = validation.hint
@@ -54,8 +54,8 @@ export async function uploadFileToStorage(file, { onProgress } = {}) {
 
   await ensureUploadAuth()
 
-  const storagePath = buildCmsStoragePath(file.name)
-  const storageRef = ref(storage, storagePath)
+  const resolvedPath = storagePath || buildCmsStoragePath(file.name)
+  const storageRef = ref(storage, resolvedPath)
 
   await new Promise((resolve, reject) => {
     const task = uploadBytesResumable(storageRef, file, { contentType: file.type })
@@ -77,7 +77,7 @@ export async function uploadFileToStorage(file, { onProgress } = {}) {
       'Upload succeeded but the download URL is invalid. Configure Storage CORS (see FIREBASE_SETUP.md) and try again.'
     )
   }
-  return { downloadUrl, storagePath, size: file.size, type: file.type }
+  return { downloadUrl, storagePath: resolvedPath, size: file.size, type: file.type }
 }
 
 export async function deleteStorageObject(storagePath) {

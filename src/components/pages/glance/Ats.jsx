@@ -83,9 +83,9 @@ function Ats() {
 
   const glanceTitle = glanceTitleFromContent(content)
   const leftHeading = (content.leftHeading ?? '').trim()
-  const heroTagline = content.heroTagline || 'A World Leading Engineering Service Provider'
+  const rightTagline =
+    content.rightTagline || content.heroTagline || 'A World Leading Engineering Service Provider'
   const welcomeHeading = content.welcomeHeading || 'Welcome to Advanced Tooling Systems UK'
-  const rightTagline = content.rightTagline || heroTagline
   const contactEmail = content.contactEmail || 'info@atsuk.com'
 
   const welcomeParagraphs =
@@ -131,8 +131,14 @@ function Ats() {
       
 
         <div className="min-w-0 lg:col-start-3 lg:row-start-1">
-        
-          
+          {rightTagline ? (
+            <h2
+              className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]"
+              style={serif}
+            >
+              {rightTagline}
+            </h2>
+          ) : null}
           <div className="overflow-hidden bg-neutral-200">
             <CmsImage
               src={content.rightHeroImageUrl}

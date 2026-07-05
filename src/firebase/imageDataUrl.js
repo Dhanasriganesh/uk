@@ -1,5 +1,7 @@
+import { MAX_IMAGE_FIRESTORE_BYTES } from '../cms/mediaLimits'
+
 /** Firestore document limit is ~1 MiB; base64 adds ~33% overhead. */
-export const MAX_IMAGE_RAW_BYTES = 700 * 1024
+export const MAX_IMAGE_RAW_BYTES = MAX_IMAGE_FIRESTORE_BYTES
 export const MAX_DATA_URL_CHARS = 980_000
 
 export function readFileAsDataUrl(file) {

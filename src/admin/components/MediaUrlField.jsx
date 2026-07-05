@@ -3,6 +3,8 @@ import { LuExternalLink, LuPencil, LuX } from 'react-icons/lu'
 import MediaUploader from './MediaUploader'
 import { isVideoUrl } from '../../cms/mediaLimits'
 import VideoEmbed from '../../components/cms/VideoEmbed'
+import { CmsImage } from '../../components/cms/CmsMedia'
+import { isFirebaseStoragePath } from '../../cms/mediaSeed'
 
 function formatLabel(key) {
   return key
@@ -18,8 +20,17 @@ export default function MediaUrlField({ path, value, onChange }) {
   const key = path[path.length - 1]
   const accept = /video/i.test(key) ? 'video' : /image|logo|photo|background/i.test(key) ? 'image' : 'any'
   const [editingUrl, setEditingUrl] = useState(false)
+  const [previewVersion, setPreviewVersion] = useState(0)
   const trimmed = (value || '').trim()
   const isVideo = isVideoUrl(trimmed) || /video/i.test(key)
+  const previewSrc =
+    trimmed && previewVersion > 0
+      ? `${trimmed}${trimmed.includes('?') ? '&' : '?'}v=${previewVersion}`
+      : trimmed
+  const canOpenDirectly =
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    (trimmed.startsWith('/') && !isFirebaseStoragePath(trimmed))
   return (
     <div className="mb-5">
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -39,22 +50,24 @@ export default function MediaUrlField({ path, value, onChange }) {
                 title="Preview"
               />
             ) : (
-              <img src={trimmed} alt="" className="h-full w-full object-contain p-2" />
+              <CmsImage src={previewSrc} alt="" className="h-full w-full object-contain p-2" />
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-3 py-2">
             <p className="min-w-0 flex-1 truncate text-xs text-slate-600" title={trimmed}>
               {trimmed}
             </p>
-            <a
-              href={trimmed}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
-            >
-              Open
-              <LuExternalLink className="h-3 w-3" aria-hidden />
-            </a>
+            {canOpenDirectly ? (
+              <a
+                href={trimmed}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
+              >
+                Open
+                <LuExternalLink className="h-3 w-3" aria-hidden />
+              </a>
+            ) : null}
             <button
               type="button"
               className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900"
@@ -76,13 +89,15 @@ export default function MediaUrlField({ path, value, onChange }) {
         <MediaUploader
           variant="inline"
           accept={accept}
+          replaceUrl={trimmed || undefined}
           onUploaded={(url) => {
             onChange(path, url)
+            setPreviewVersion((v) => v + 1)
             setEditingUrl(false)
           }}
         />
         <p className="mt-2 text-[11px] text-slate-500">
-          Images are stored in Firestore (max ~700 KB each). Save the page after uploading.
+          Replacing overwrites the same file URL. Works on live admin after you create a Vercel Blob store (free).
         </p>
       </div>
 

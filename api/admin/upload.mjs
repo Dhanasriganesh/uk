@@ -1,8 +1,10 @@
+import { put } from '@vercel/blob'
 import admin from 'firebase-admin'
 import Busboy from 'busboy'
 import { randomUUID } from 'crypto'
+import { buildUploadPath } from '../../src/cms/resolveReplacePath.js'
 
-const MAX_IMAGE_BYTES = 12 * 1024 * 1024
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const MAX_VIDEO_BYTES = 150 * 1024 * 1024
 const MAX_PDF_BYTES = 25 * 1024 * 1024
 
@@ -68,11 +70,16 @@ function buildDownloadUrl(bucketName, storagePath, token) {
 
 function parseMultipart(req) {
   return new Promise((resolve, reject) => {
+    let replaceUrl = ''
     const bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: MAX_VIDEO_BYTES } })
     let fileBuffer = null
     let fileName = ''
     let mimeType = 'application/octet-stream'
     let fileError = null
+
+    bb.on('field', (name, value) => {
+      if (name === 'replaceUrl') replaceUrl = value
+    })
 
     bb.on('file', (fieldname, stream, info) => {
       if (fieldname !== 'file') {
@@ -108,11 +115,54 @@ function parseMultipart(req) {
     bb.on('error', reject)
     bb.on('finish', () => {
       if (fileError) reject(fileError)
-      else resolve({ fileBuffer, fileName, mimeType })
+      else resolve({ fileBuffer, fileName, mimeType, replaceUrl })
     })
 
     req.pipe(bb)
   })
+}
+
+/** Free on Vercel Hobby — live admin uploads without Firebase Storage. */
+async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
+  const token = process.env.BLOB_READ_WRITE_TOKEN
+  if (!token) return null
+
+  const pathname = buildUploadPath(fileName, replaceUrl)
+  const blob = await put(pathname, fileBuffer, {
+    access: 'public',
+    contentType: mimeType,
+    token,
+    addRandomSuffix: false,
+  })
+
+  return {
+    url: blob.url,
+    storagePath: pathname,
+    source: 'blob',
+  }
+}
+
+async function uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl) {
+  getAdminApp()
+  const bucket = admin.storage().bucket()
+  const storagePath = buildUploadPath(fileName, replaceUrl)
+  const downloadToken = randomUUID()
+  const file = bucket.file(storagePath)
+
+  await file.save(fileBuffer, {
+    metadata: {
+      contentType: mimeType,
+      metadata: {
+        firebaseStorageDownloadTokens: downloadToken,
+      },
+    },
+  })
+
+  return {
+    url: buildDownloadUrl(bucket.name, storagePath, downloadToken),
+    storagePath,
+    source: 'storage',
+  }
 }
 
 export default async function handler(req, res) {
@@ -133,8 +183,9 @@ export default async function handler(req, res) {
   let fileBuffer
   let fileName
   let mimeType
+  let replaceUrl
   try {
-    ;({ fileBuffer, fileName, mimeType } = await parseMultipart(req))
+    ;({ fileBuffer, fileName, mimeType, replaceUrl } = await parseMultipart(req))
   } catch (err) {
     res.status(400).json({ error: err.message || 'Could not read upload.' })
     return
@@ -151,36 +202,45 @@ export default async function handler(req, res) {
   }
 
   try {
-    getAdminApp()
-    const bucket = admin.storage().bucket()
-    const storagePath = `cms/${Date.now()}_${sanitizeFileName(fileName)}`
-    const downloadToken = randomUUID()
-    const file = bucket.file(storagePath)
+    let result = null
 
-    await file.save(fileBuffer, {
-      metadata: {
-        contentType: mimeType,
-        metadata: {
-          firebaseStorageDownloadTokens: downloadToken,
-        },
-      },
-    })
+    if (isImageMime(mimeType) || isPdfMime(mimeType, fileName)) {
+      result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
+    }
 
-    const downloadUrl = buildDownloadUrl(bucket.name, storagePath, downloadToken)
+    if (!result && process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      result = await uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl)
+    }
+
+    if (!result && isVideoMime(mimeType)) {
+      result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
+    }
+
+    if (!result) {
+      res.status(500).json({
+        error: 'Live upload storage is not configured.',
+        hint:
+          'In Vercel: Storage → Create Blob store (free on Hobby). Vercel adds BLOB_READ_WRITE_TOKEN automatically. Redeploy after creating the store.',
+      })
+      return
+    }
 
     res.status(200).json({
-      url: downloadUrl,
-      storagePath,
+      url: result.url,
+      storagePath: result.storagePath,
       size: fileBuffer.length,
       type: mimeType,
       name: fileName,
-      source: 'storage',
+      source: result.source,
     })
   } catch (err) {
     console.error('[api/admin/upload]', err)
     res.status(500).json({
       error: err.message || 'Upload failed',
-      hint: 'Set FIREBASE_SERVICE_ACCOUNT_JSON in Vercel (Project Settings → Environment Variables).',
+      hint:
+        process.env.BLOB_READ_WRITE_TOKEN
+          ? 'Upload failed — try a smaller file or check Vercel Blob limits.'
+          : 'Create a Vercel Blob store in your project (free on Hobby), then redeploy.',
     })
   }
 }

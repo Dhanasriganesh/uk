@@ -19,7 +19,7 @@ import {
 } from '../cms/mediaSeed'
 
 const PAGES_COLLECTION = 'cms_pages'
-/** Firestore "media" table — https/ paths or base64 image data URLs. */
+/** Firestore "media" table — short paths (cms/…, /media/…) or https URLs only. */
 export const MEDIA_COLLECTION = 'media'
 const LEGACY_MEDIA_COLLECTION = 'cms_media'
 
@@ -51,11 +51,16 @@ async function ensureUploadAuth() {
 function assertMediaUrl(url) {
   const trimmed = (url || '').trim()
   if (trimmed.startsWith('data:image/')) {
-    return trimmed
+    throw new Error(
+      'Base64 images are not supported. Upload the file to Firebase Storage instead (short cms/… URL).'
+    )
   }
+  if (trimmed.startsWith('cms/')) return trimmed
   const normalized = normalizeShortUrl(url)
   if (!normalized || !isShortMediaUrl(normalized)) {
-    throw new Error('Please paste a valid image URL (https://…, /media/…, or upload an image file).')
+    throw new Error(
+      'Please paste a valid media URL (https://…, /media/…, cms/…) or upload an image file.'
+    )
   }
   return normalized
 }
@@ -185,7 +190,7 @@ function normalizeMediaDoc(id, data) {
 }
 
 /**
- * Save a media row: https/ path or base64 image data URL in Firestore.
+ * Save a media row: short Storage path (cms/…), site path, or https URL in Firestore.
  */
 export async function uploadMedia({ url, name, type, size, source, storagePath } = {}) {
   if (!db) throw new Error('Firestore is not configured')

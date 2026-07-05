@@ -3,6 +3,7 @@ import { LuCopy, LuImageOff, LuTrash2 } from 'react-icons/lu'
 import { listMedia, deleteMediaItem, seedMediaLibrary } from '../../firebase/cmsService'
 import { formatBytes, isVideoUrl } from '../../cms/mediaLimits'
 import VideoEmbed from '../../components/cms/VideoEmbed'
+import { CmsImage } from '../../components/cms/CmsMedia'
 import { getVideoPlayback } from '../../utils/videoEmbed'
 import MediaUploader from '../components/MediaUploader'
 import AdminAuthStatus from '../components/AdminAuthStatus'
@@ -140,7 +141,7 @@ export default function MediaPage() {
                     />
                   )
                 ) : (
-                  <img
+                  <CmsImage
                     src={item.url}
                     alt={item.name}
                     className="h-full w-full object-contain p-2 sm:p-3"

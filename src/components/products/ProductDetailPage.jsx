@@ -22,7 +22,7 @@ import {
   mergeCmsObjectStrings,
   mergeCmsStringList,
 } from '../../utils/cmsString'
-import { CmsVideo } from '../cms/CmsMedia'
+import { CmsImage, CmsVideo } from '../cms/CmsMedia'
 import ProductInfoCta from './ProductInfoCta'
 
 const AUTO_SLIDE_MS = 4000
@@ -81,7 +81,7 @@ function ProductMedia({ section }) {
   if (section.imageUrl) {
     return (
       <div className="overflow-hidden rounded-2xl bg-[#f5f5f5] shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
-        <img
+        <CmsImage
           src={section.imageUrl}
           alt={section.title || ''}
           className="aspect-[4/3] w-full object-contain p-4"
@@ -278,7 +278,7 @@ export default function ProductDetailPage({
               <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
                 <div className="relative aspect-[4/3] bg-[#f5f5f5]">
                   {galleryUrls[current] ? (
-                    <img
+                    <CmsImage
                       src={galleryUrls[current]}
                       alt={`${galleryAltPrefix} ${current + 1}`}
                       className="h-full w-full object-contain p-4"

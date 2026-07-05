@@ -21,8 +21,15 @@ export const ACCEPTED_MEDIA_INPUT = [
   ...ACCEPTED_PDF_MIME,
 ].join(',')
 
-/** Raw file size before base64 (Firestore ~1 MB field limit). */
-export const MAX_IMAGE_BYTES = 700 * 1024
+/** Base64 in Firestore (~1 MiB doc limit; encoding adds ~33%). */
+export const MAX_IMAGE_FIRESTORE_BYTES = 700 * 1024
+
+/** Site folder uploads (public/media — free, no Firebase Storage). */
+export const MAX_IMAGE_STORAGE_BYTES = 5 * 1024 * 1024
+
+/** @deprecated Use MAX_IMAGE_STORAGE_BYTES or MAX_IMAGE_FIRESTORE_BYTES */
+export const MAX_IMAGE_BYTES = MAX_IMAGE_STORAGE_BYTES
+
 export const MAX_VIDEO_BYTES = 150 * 1024 * 1024
 export const MAX_PDF_BYTES = 25 * 1024 * 1024
 
@@ -30,16 +37,16 @@ export const MEDIA_LIMITS_COPY = {
   headline: 'Media library',
   whyTitle: 'How uploads work',
   whyBody:
-    'Images are saved in Firestore as base64 (no Storage bucket needed). Keep each image under ~700 KB. Videos on the live site: paste YouTube/Vimeo or use /videos/… after deploying the file in your repo.',
-  maxFile: `Images up to ${Math.round(MAX_IMAGE_BYTES / 1024)} KB (Firestore), videos up to ${MAX_VIDEO_BYTES / (1024 * 1024)} MB (dev only).`,
-  maxSaved: 'Image data is stored in Firestore; videos use URLs only.',
+    'Live admin uploads go to Vercel Blob (free on Hobby) and Firestore stores the short https URL — not base64. Local dev saves to public/media/ as /media/… paths.',
+  maxFile: `Images up to ${MAX_IMAGE_STORAGE_BYTES / (1024 * 1024)} MB. Live site uses Vercel Blob (free); local dev uses public/media/.`,
+  maxSaved: 'Firestore stores short URLs only (https://… or /media/…). Files live in Vercel Blob or your project folder.',
   formats: 'JPEG, PNG, WebP, GIF, SVG, MP4, WebM — or paste an existing URL.',
   heic: 'HEIC/HEIF (iPhone photos) are not supported — export as JPG or WebP first.',
   videoNote: 'Use MP4 files under `/videos/`, or paste a YouTube/Vimeo link (embedded player).',
   tips: [
-    'Use “Upload file” for new assets, or paste a URL if the file is already hosted.',
-    'Copy a URL from the library into any image or video field in the page editor.',
-    'Run “Seed local media” to register default paths from the codebase.',
+    'Live site: Vercel dashboard → Storage → Create Blob Store (free), then redeploy.',
+    'Local dev: npm run dev uploads to public/media/ — commit those files if you also want them on static hosting.',
+    'Copy a URL from the media library into any image field, then save the page.',
   ],
 }
 
@@ -59,7 +66,7 @@ function acceptAllowsMime(accept, mime) {
   return mime.startsWith('image/') || mime.startsWith('video/') || mime === 'application/pdf'
 }
 
-export function validateMediaFile(file, { accept = 'any' } = {}) {
+export function validateMediaFile(file, { accept = 'any', target = 'storage' } = {}) {
   if (!file || typeof file.size !== 'number') {
     return { ok: false, error: 'No file selected.' }
   }
@@ -120,14 +127,21 @@ export function validateMediaFile(file, { accept = 'any' } = {}) {
     return { ok: false, error: 'Only images and videos can be uploaded.' }
   }
 
-  const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+  const maxImageBytes = target === 'firestore' ? MAX_IMAGE_FIRESTORE_BYTES : MAX_IMAGE_STORAGE_BYTES
+  const maxBytes = isVideo ? MAX_VIDEO_BYTES : maxImageBytes
   if (file.size > maxBytes) {
     return {
       ok: false,
       error: isVideo
         ? `Video is too large (max ${MAX_VIDEO_BYTES / (1024 * 1024)} MB).`
-        : `Image is too large (max ${Math.round(MAX_IMAGE_BYTES / 1024)} KB for Firestore).`,
-      hint: isVideo ? 'Compress the video or use a shorter clip.' : 'Resize the image or save as WebP.',
+        : target === 'firestore'
+          ? `Image is too large for Firestore (max ${Math.round(MAX_IMAGE_FIRESTORE_BYTES / 1024)} KB).`
+          : `Image is too large (max ${MAX_IMAGE_STORAGE_BYTES / (1024 * 1024)} MB).`,
+      hint: isVideo
+        ? 'Compress the video or use a shorter clip.'
+        : target === 'firestore'
+          ? 'Resize the image, save as WebP, or enable Firebase Storage for larger files.'
+          : 'Resize the image or save as WebP/JPEG.',
       fileBytes: file.size,
     }
   }
@@ -151,7 +165,7 @@ export function isStorageSizeError(error) {
 }
 
 export function storageLimitExceededMessage() {
-  return 'Upload failed — image may be too large for Firestore (max ~700 KB per image). Resize or compress and try again.'
+  return `Upload failed — image may be too large (max ${MAX_IMAGE_STORAGE_BYTES / (1024 * 1024)} MB). Resize or compress and try again.`
 }
 
 export function isVideoUrl(url) {

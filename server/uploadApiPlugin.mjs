@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import Busboy from 'busboy'
+import { resolveReplaceTarget } from '../src/cms/resolveReplacePath.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -77,7 +78,12 @@ export function uploadApiPlugin({ apiKey } = {}) {
           let fileBuffer = null
           let fileName = ''
           let mimeType = 'application/octet-stream'
+          let replaceUrl = ''
           let fileError = null
+
+          bb.on('field', (name, value) => {
+            if (name === 'replaceUrl') replaceUrl = value
+          })
 
           bb.on('file', (fieldname, stream, info) => {
             if (fieldname !== 'file') {
@@ -133,8 +139,18 @@ export function uploadApiPlugin({ apiKey } = {}) {
               return
             }
 
-            const folder = isVideoMime(mimeType) ? 'videos' : 'media'
-            const safeName = `${Date.now()}_${sanitizeFileName(fileName)}`
+            const replaceTarget = resolveReplaceTarget(replaceUrl)
+            let folder
+            let safeName
+
+            if (replaceTarget?.kind === 'local') {
+              folder = replaceTarget.folder
+              safeName = replaceTarget.fileName
+            } else {
+              folder = isVideoMime(mimeType) ? 'videos' : 'media'
+              safeName = `${Date.now()}_${sanitizeFileName(fileName)}`
+            }
+
             const destDir = path.join(projectRoot, 'public', folder)
             const destPath = path.join(destDir, safeName)
 

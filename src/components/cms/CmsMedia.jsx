@@ -1,9 +1,16 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import { resolveHeroVideoUrl } from '../../cms/mediaPaths'
 import { resolveCmsImageUrl } from '../../cms/resolveCmsImageUrl'
+import { isFirebaseStoragePath } from '../../cms/mediaSeed'
 import { resolveFirebaseStorageMediaUrl } from '../../firebase/resolveStorageMediaUrl'
 import { getVideoPlayback } from '../../utils/videoEmbed'
 import VideoEmbed from './VideoEmbed'
+
+function needsStorageResolve(url) {
+  if (!url || typeof url !== 'string') return false
+  const trimmed = url.trim()
+  return trimmed.includes('firebasestorage') || isFirebaseStoragePath(trimmed)
+}
 
 export function CmsImage({ src, fallback, alt = '', className = '', ...props }) {
   const initial = resolveCmsImageUrl(src, fallback)
@@ -16,7 +23,7 @@ export function CmsImage({ src, fallback, alt = '', className = '', ...props }) 
 
     async function resolveStorage() {
       const trimmed = typeof src === 'string' ? src.trim() : ''
-      if (!trimmed || !trimmed.includes('firebasestorage')) return
+      if (!trimmed || !needsStorageResolve(trimmed)) return
       const resolved = await resolveFirebaseStorageMediaUrl(trimmed)
       if (!cancelled && resolved) setUrl(resolved)
     }
@@ -51,7 +58,7 @@ export const CmsVideo = forwardRef(function CmsVideo(
 
     async function resolveStorage() {
       const trimmed = typeof src === 'string' ? src.trim() : ''
-      if (!trimmed || !trimmed.includes('firebasestorage')) return
+      if (!trimmed || !needsStorageResolve(trimmed)) return
       const resolved = await resolveFirebaseStorageMediaUrl(trimmed)
       if (!cancelled && resolved) setUrl(resolved)
     }

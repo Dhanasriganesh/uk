@@ -1,9 +1,10 @@
 import { auth, isStorageConfigured } from './config'
 import { waitForAuthReady } from './authHelpers'
 import { uploadMedia } from './cmsService'
-import { uploadFileToStorage, isFirebaseStorageUrl } from './mediaStorageService'
+import { normalizeShortUrl } from '../cms/mediaSeed'
+import { resolveReplaceTarget } from '../cms/resolveReplacePath'
 import { validateMediaFile } from '../cms/mediaLimits'
-import { assertImageFitsInFirestore, readFileAsDataUrl } from './imageDataUrl'
+import { uploadFileToStorage, isFirebaseStorageUrl } from './mediaStorageService'
 
 async function getIdToken() {
   await waitForAuthReady()
@@ -14,13 +15,18 @@ async function getIdToken() {
   return user.getIdToken(true)
 }
 
-/** Local dev only: save videos/PDFs to public/ */
-async function uploadToPublicFolder(file, { onProgress } = {}) {
+/**
+ * Dev → public/media (vite plugin).
+ * Live → Vercel Blob (free) or Firebase Storage fallback via /api/admin/upload.
+ * Pass replaceUrl to overwrite the same file path (same URL).
+ */
+async function uploadViaServerApi(file, { onProgress, replaceUrl } = {}) {
   const token = await getIdToken()
   onProgress?.(5)
 
   const body = new FormData()
   body.append('file', file)
+  if (replaceUrl) body.append('replaceUrl', replaceUrl)
 
   const res = await fetch('/api/admin/upload', {
     method: 'POST',
@@ -36,54 +42,105 @@ async function uploadToPublicFolder(file, { onProgress } = {}) {
   }
 
   onProgress?.(100)
+
+  const url =
+    typeof data.url === 'string' && data.url.startsWith('http')
+      ? data.url
+      : normalizeShortUrl(data.url)
+
   return {
-    url: data.url,
+    url,
     size: data.size ?? file.size,
     type: data.type ?? file.type,
     name: data.name ?? file.name,
-    storagePath: null,
-    source: 'local',
+    storagePath: data.storagePath ?? null,
+    source: data.source || (import.meta.env.DEV ? 'local' : 'blob'),
+    replaced: Boolean(replaceUrl),
   }
 }
 
-/** Images → base64 data URL saved in Firestore (works on Vercel without Storage). */
-async function uploadImageToFirestore(file, { onProgress } = {}) {
-  const validation = validateMediaFile(file, { accept: 'image' })
+async function saveMediaRecord(uploaded, file) {
+  const shortUrl =
+    typeof uploaded.url === 'string' && uploaded.url.startsWith('http')
+      ? uploaded.url
+      : normalizeShortUrl(uploaded.url)
+  const displayName = (file.name || shortUrl.split('/').pop() || 'media').slice(0, 140)
+
+  const record = await uploadMedia({
+    url: shortUrl,
+    name: displayName,
+    type: uploaded.type,
+    size: uploaded.size,
+    source: uploaded.source || 'upload',
+    storagePath: uploaded.storagePath || null,
+  })
+
+  return {
+    ...record,
+    url: shortUrl,
+    isStorageUrl: isFirebaseStorageUrl(shortUrl) || uploaded.source === 'blob',
+    storagePath: uploaded.storagePath || null,
+    replaced: uploaded.replaced,
+  }
+}
+
+async function uploadImage(file, { onProgress, replaceUrl } = {}) {
+  const validation = validateMediaFile(file, { accept: 'image', target: 'storage' })
   if (!validation.ok) {
     const err = new Error(validation.error)
     if (validation.hint) err.hint = validation.hint
     throw err
   }
 
-  onProgress?.(15)
-  const dataUrl = await readFileAsDataUrl(file)
-  assertImageFitsInFirestore(file, dataUrl)
-  onProgress?.(85)
+  const reuse = resolveReplaceTarget(replaceUrl)
+  const failures = []
 
-  const displayName = (file.name || 'image').slice(0, 140)
-  const record = await uploadMedia({
-    url: dataUrl,
-    name: displayName,
-    type: file.type || 'image/jpeg',
-    size: file.size,
-    source: 'firestore-base64',
-    storagePath: null,
-  })
-
-  onProgress?.(100)
-  return {
-    ...record,
-    isStorageUrl: false,
-    storagePath: null,
+  try {
+    const uploaded = await uploadViaServerApi(file, { onProgress, replaceUrl })
+    return saveMediaRecord(uploaded, file)
+  } catch (err) {
+    failures.push(err)
+    console.warn('[upload] Server image upload failed:', err.message)
   }
+
+  if (isStorageConfigured && reuse?.kind === 'storage') {
+    try {
+      const storageResult = await uploadFileToStorage(file, {
+        onProgress,
+        target: 'storage',
+        storagePath: reuse.path,
+      })
+      return saveMediaRecord(
+        {
+          url: storageResult.downloadUrl,
+          storagePath: storageResult.storagePath,
+          size: storageResult.size,
+          type: storageResult.type,
+          source: 'storage',
+          replaced: true,
+        },
+        file
+      )
+    } catch (err) {
+      failures.push(err)
+      console.warn('[upload] Client Storage fallback failed:', err.message)
+    }
+  }
+
+  const err = new Error('Image upload failed.')
+  err.hint =
+    failures.find((item) => item.hint)?.hint ||
+    (import.meta.env.PROD
+      ? 'On Vercel: create a Blob store (Storage tab, free on Hobby), redeploy, then try again.'
+      : 'Run npm run dev and sign in at /admin/login before uploading.')
+  throw err
 }
 
 /**
- * Upload → URL stored in Firestore.
- * - Images: base64 in Firestore (dev + production)
- * - Videos: local public/ in dev only; not on Vercel without Storage
+ * Upload → short URL in Firestore (no base64).
+ * Pass replaceUrl to overwrite an existing upload (same path / same URL).
  */
-export async function uploadMediaFile(file, { onProgress, accept = 'any' } = {}) {
+export async function uploadMediaFile(file, { onProgress, accept = 'any', replaceUrl } = {}) {
   const mime = (file.type || '').toLowerCase()
   const isVideo = mime.startsWith('video/') || accept === 'video'
   const isImage =
@@ -92,71 +149,57 @@ export async function uploadMediaFile(file, { onProgress, accept = 'any' } = {})
     (/image|logo|photo|background|thumbnail/i.test(accept) && !isVideo)
 
   if (isImage && !isVideo) {
-    return uploadImageToFirestore(file, { onProgress })
+    return uploadImage(file, { onProgress, replaceUrl })
   }
 
-  const validation = validateMediaFile(file, { accept })
+  const validation = validateMediaFile(file, { accept, target: 'storage' })
   if (!validation.ok) {
     const err = new Error(validation.error)
     if (validation.hint) err.hint = validation.hint
     throw err
   }
 
-  if (isVideo && import.meta.env.PROD) {
-    const err = new Error('Video upload is not available without Firebase Storage (Blaze plan).')
-    err.hint =
-      'Paste a YouTube/Vimeo URL, or add the MP4 under public/videos/ in your repo and deploy, then use /videos/your-file.mp4.'
-    throw err
-  }
-
   let uploaded = null
 
-  if (import.meta.env.DEV) {
-    try {
-      uploaded = await uploadToPublicFolder(file, { onProgress })
-    } catch (err) {
-      console.warn('[upload] Dev public folder upload failed:', err.message)
-    }
+  try {
+    uploaded = await uploadViaServerApi(file, { onProgress, replaceUrl })
+  } catch (err) {
+    console.warn('[upload] Server upload failed:', err.message)
+  }
 
-    if (!uploaded && isStorageConfigured && isVideo) {
-      try {
-        const storageResult = await uploadFileToStorage(file, { onProgress })
-        uploaded = {
-          url: storageResult.downloadUrl,
-          size: storageResult.size,
-          type: storageResult.type,
-          name: file.name,
-          storagePath: storageResult.storagePath,
-          source: 'storage',
-        }
-      } catch (err) {
-        console.warn('[upload] Dev Storage fallback:', err.message)
+  if (!uploaded && isStorageConfigured && isVideo) {
+    const reuse = resolveReplaceTarget(replaceUrl)
+    try {
+      const storageResult = await uploadFileToStorage(file, {
+        onProgress,
+        target: 'storage',
+        storagePath: reuse?.kind === 'storage' ? reuse.path : undefined,
+      })
+      uploaded = {
+        url: storageResult.downloadUrl,
+        size: storageResult.size,
+        type: storageResult.type,
+        name: file.name,
+        storagePath: storageResult.storagePath,
+        source: 'storage',
+        replaced: Boolean(replaceUrl),
       }
+    } catch (err) {
+      console.warn('[upload] Storage fallback failed:', err.message)
     }
   }
 
   if (!uploaded) {
     const err = new Error(
       import.meta.env.DEV
-        ? 'Upload failed. Run npm run dev for videos/PDFs, or use Paste URL.'
-        : 'This file type cannot be uploaded on the live site without Firebase Storage.'
+        ? 'Upload failed. Run npm run dev, or use Paste URL.'
+        : 'Upload failed on the live site.'
     )
+    err.hint = import.meta.env.PROD
+      ? 'Create a Vercel Blob store (free on Hobby) in your Vercel project → Storage, then redeploy.'
+      : 'Sign in at /admin/login and ensure npm run dev is running.'
     throw err
   }
 
-  const displayName = (file.name || uploaded.url.split('/').pop() || 'media').slice(0, 140)
-  const record = await uploadMedia({
-    url: uploaded.url,
-    name: displayName,
-    type: uploaded.type,
-    size: uploaded.size,
-    source: uploaded.source,
-    storagePath: uploaded.storagePath,
-  })
-
-  return {
-    ...record,
-    isStorageUrl: isFirebaseStorageUrl(uploaded.url),
-    storagePath: uploaded.storagePath,
-  }
+  return saveMediaRecord(uploaded, file)
 }

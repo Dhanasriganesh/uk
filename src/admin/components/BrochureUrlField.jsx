@@ -62,6 +62,7 @@ export default function BrochureUrlField({ path, value, onChange }) {
         <MediaUploader
           variant="inline"
           accept="pdf"
+          replaceUrl={trimmed || undefined}
           onUploaded={(url) => {
             onChange(path, url)
             setEditingUrl(false)

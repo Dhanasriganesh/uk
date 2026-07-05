@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import { useSiteSettings } from '../../context/CmsContext'
 import { mergeNavLinks } from './headerDefaults'
+import SiteSearch from './SiteSearch'
 
 const SCROLL_THRESHOLD = 8
 
@@ -18,6 +19,8 @@ function Header() {
   const location = useLocation()
   const { settings } = useSiteSettings()
   const navLinks = mergeNavLinks(settings.header?.navLinks)
+  const contactLink = navLinks.find((link) => link.path === '/contact')
+  const mainNavLinks = navLinks.filter((link) => link.path !== '/contact')
   const logoSrc = settings.logoUrl || logo
   const [openDropdown, setOpenDropdown] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -90,7 +93,7 @@ function Header() {
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center lg:flex" aria-label="Main">
           <ul className="flex items-center gap-6 xl:gap-[42px]">
-            {navLinks.map((link) => (
+            {mainNavLinks.map((link) => (
               <li key={link.name} className="relative flex list-none items-center">
                 <div
                   className="relative"
@@ -140,6 +143,19 @@ function Header() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center justify-end gap-2 sm:gap-3 lg:ml-0">
+          {contactLink && (
+            <Link
+              to={contactLink.path}
+              className={`hidden py-1 text-[15px] font-semibold leading-none transition-colors xl:text-[16px] lg:inline-flex ${
+                isActive(contactLink.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
+              }`}
+            >
+              {contactLink.name}
+            </Link>
+          )}
+
+          <SiteSearch navLinks={navLinks} className="hidden lg:block" onNavigate={closeMobile} />
+
           <Link
             to="/contact"
             className="hidden h-10 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
@@ -182,6 +198,7 @@ function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col p-6" aria-label="Mobile">
+              <SiteSearch navLinks={navLinks} className="mb-4 w-full lg:hidden" onNavigate={closeMobile} />
               {navLinks.map((link) => (
                 <div key={link.name} className="border-b border-[#f1f1f1] py-3 last:border-0">
                   <div className="flex items-center justify-between gap-2">

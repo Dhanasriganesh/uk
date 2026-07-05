@@ -31,14 +31,20 @@ export function isShortMediaUrl(value) {
   if (!trimmed) return false
   if (trimmed.startsWith('data:image/')) return true
   if (trimmed.startsWith('data:')) return false
+  if (trimmed.startsWith('cms/')) return true
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return true
   if (trimmed.startsWith('/')) return true
   return false
 }
 
+export function isFirebaseStoragePath(value) {
+  return typeof value === 'string' && value.trim().startsWith('cms/')
+}
+
 export function normalizeShortUrl(url) {
   const trimmed = (url || '').trim()
   if (!trimmed) return ''
+  if (trimmed.startsWith('cms/')) return trimmed.split('?')[0]
   if (trimmed.startsWith('data:image/')) return trimmed
   if (trimmed.startsWith('data:')) return ''
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {

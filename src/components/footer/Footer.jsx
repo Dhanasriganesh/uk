@@ -113,11 +113,11 @@ function Footer() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-4">
           <div className="lg:col-span-4">
             <Link to="/" className="mb-2 inline-block" aria-label="ATS home">
-              <span className="inline-flex rounded-md bg-white px-2.5 py-1.5 shadow-sm">
+              <span className="inline-flex rounded-md bg-white px-8.5 py-0.5 shadow-sm">
                 <img
                   src={logoSrc}
                   alt={settings.siteName || 'ATS'}
-                  className="h-7 w-auto max-w-[140px] object-contain sm:h-8"
+                  className="h-6 w-90 object-contain sm:h-6"
                 />
               </span>
             </Link>

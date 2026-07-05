@@ -1,16 +1,17 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { uploadApiPlugin } from './server/uploadApiPlugin.mjs'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  return {
-    plugins: [
-      react(),
-      tailwindcss(),
-      uploadApiPlugin({ apiKey: env.VITE_FIREBASE_API_KEY }),
-    ],
+export default defineConfig(async ({ mode, command }) => {
+  const env = loadEnv(mode, process.cwd(), '') || {}
+  const plugins = [react(), tailwindcss()]
+
+  // Dev-only local upload API — skip loading during production build.
+  if (command === 'serve') {
+    const { uploadApiPlugin } = await import('./server/uploadApiPlugin.mjs')
+    plugins.push(uploadApiPlugin({ apiKey: env.VITE_FIREBASE_API_KEY || '' }))
   }
+
+  return { plugins }
 })
