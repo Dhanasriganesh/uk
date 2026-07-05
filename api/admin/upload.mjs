@@ -123,23 +123,41 @@ function parseMultipart(req) {
 }
 
 async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
-  const token = process.env.BLOB_READ_WRITE_TOKEN
-  if (!token) return null
-
   const pathname = buildUploadPath(fileName, replaceUrl)
-  const blob = await put(pathname, fileBuffer, {
+  const options = {
+    // CMS images must be public so <img src="…"> works on the live site.
     access: 'public',
     contentType: mimeType,
-    token,
     addRandomSuffix: false,
     allowOverwrite: Boolean(replaceUrl),
-  })
+  }
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    options.token = process.env.BLOB_READ_WRITE_TOKEN
+  }
+
+  const blob = await put(pathname, fileBuffer, options)
 
   return {
     url: blob.url,
     storagePath: pathname,
     source: 'blob',
   }
+}
+
+function blobSetupHint(err) {
+  const msg = (err?.message || '').toLowerCase()
+  if (msg.includes('private') || msg.includes('access')) {
+    return 'This Blob store is Private. For website images create a Public Blob store (or a new store with Public access), connect it to project "uk", redeploy.'
+  }
+  if (
+    !process.env.BLOB_READ_WRITE_TOKEN &&
+    !process.env.BLOB_STORE_ID &&
+    !process.env.VERCEL_OIDC_TOKEN
+  ) {
+    return 'Open ats-media → Projects tab → Connect to project "uk" (Production + Preview) → Redeploy.'
+  }
+  return 'Open Blob store → Projects → Connect to project "uk", then redeploy. For website images use a Public store.'
 }
 
 async function uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl) {
@@ -209,22 +227,11 @@ export default async function handler(req, res) {
     return
   }
 
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-
   try {
     let result = null
     let blobError = null
 
     if (isImageMime(mimeType) || isPdfMime(mimeType, fileName) || isVideoMime(mimeType)) {
-      if (!blobToken) {
-        res.status(503).json({
-          error: 'Vercel Blob is not configured for this project.',
-          hint:
-            'Vercel dashboard → your project → Storage → Create Blob Store → Connect to project → Redeploy.',
-        })
-        return
-      }
-
       try {
         result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl)
       } catch (err) {
@@ -243,11 +250,9 @@ export default async function handler(req, res) {
     }
 
     if (!result) {
-      res.status(500).json({
-        error: blobError?.message || 'Upload failed.',
-        hint: blobToken
-          ? 'Check Vercel Blob store is linked to this project and redeploy after creating it.'
-          : 'Create a Vercel Blob store (free on Hobby), connect it to this project, then redeploy.',
+      res.status(blobError ? 500 : 503).json({
+        error: blobError?.message || 'Vercel Blob is not connected to this deployment.',
+        hint: blobSetupHint(blobError),
       })
       return
     }
