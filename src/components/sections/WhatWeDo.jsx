@@ -71,71 +71,47 @@ const CARD_DEFAULTS = [
 
 const CARD_IMAGE_ASPECT = 'aspect-[16/10]'
 
-function CardImage({ src, fallback, alt }) {
-  const [displayUrl, setDisplayUrl] = React.useState(null)
-  const [ready, setReady] = React.useState(false)
+function CardImage({ src, fallback, alt, priority = false }) {
+  const [activeUrl, setActiveUrl] = React.useState(src || fallback || '')
+  const [loaded, setLoaded] = React.useState(false)
 
   React.useEffect(() => {
-    let cancelled = false
-
-    const showPlaceholder = () => {
-      if (!cancelled) {
-        setDisplayUrl(null)
-        setReady(false)
-      }
-    }
-
-    const preload = (url, onFail) => {
-      if (!url) {
-        onFail?.()
-        return
-      }
-      const img = new Image()
-      img.onload = () => {
-        if (!cancelled) {
-          setDisplayUrl(url)
-          setReady(true)
-        }
-      }
-      img.onerror = () => onFail?.()
-      img.src = url
-    }
-
-    setReady(false)
-    setDisplayUrl(null)
-
-    if (src) {
-      preload(src, () => preload(fallback, showPlaceholder))
-      return () => {
-        cancelled = true
-      }
-    }
-
-    if (fallback) {
-      preload(fallback, showPlaceholder)
-      return () => {
-        cancelled = true
-      }
-    }
-
-    showPlaceholder()
-    return () => {
-      cancelled = true
-    }
+    setActiveUrl(src || fallback || '')
+    setLoaded(false)
   }, [src, fallback])
+
+  if (!activeUrl) {
+    return (
+      <div
+        className={`w-full shrink-0 rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
+      />
+    )
+  }
 
   return (
     <div
       className={`relative w-full shrink-0 overflow-hidden rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
     >
-      {displayUrl && ready ? (
-        <img
-          src={displayUrl}
-          alt={alt}
-          className="h-full w-full object-cover object-center"
-          decoding="async"
-        />
+      {!loaded ? (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
       ) : null}
+      <img
+        src={activeUrl}
+        alt={alt}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          if (fallback && activeUrl !== fallback) {
+            setActiveUrl(fallback)
+            setLoaded(false)
+          }
+        }}
+        className={`h-full w-full object-cover object-center transition-opacity duration-200 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
     </div>
   )
 }
@@ -159,20 +135,28 @@ function resolveImageUrl(cmsUrl, defaultUrl) {
   return trimmed
 }
 
+function isUploadedImage(url) {
+  return (
+    url.includes('blob.vercel-storage.com') || url.includes('firebasestorage.googleapis.com')
+  )
+}
+
 function mergeCards(cmsCards, { cmsReady = true } = {}) {
   const list = cmsCards?.length ? cmsCards : CARD_DEFAULTS
   return CARD_DEFAULTS.map((def, i) => {
     const card = list[i] || {}
     const cmsImage = card.imageUrl?.trim()
     const hasCmsImage = cmsImage && !BROKEN_IMAGE_URLS.has(cmsImage)
+    const imageUrl =
+      hasCmsImage && isUploadedImage(cmsImage)
+        ? cmsImage
+        : cmsReady
+          ? resolveImageUrl(card.imageUrl, def.imageUrl)
+          : ''
     return {
       title: card.title || def.title,
       description: card.description || def.description,
-      imageUrl: cmsReady
-        ? resolveImageUrl(card.imageUrl, def.imageUrl)
-        : hasCmsImage
-          ? cmsImage
-          : '',
+      imageUrl,
       defaultImageUrl: def.imageUrl,
       icon: card.icon || def.icon,
     }
@@ -215,13 +199,18 @@ export default function WhatWeDo() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 items-stretch gap-6 sm:mt-14 sm:grid-cols-2 sm:gap-7 lg:grid-cols-4 lg:gap-8">
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <article
               key={card.title}
               className="flex h-full flex-col overflow-hidden rounded-[10px] border border-[#ececec] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
             >
               <div className="relative shrink-0">
-                <CardImage src={card.imageUrl} fallback={card.defaultImageUrl} alt={card.title} />
+                <CardImage
+                  src={card.imageUrl}
+                  fallback={card.defaultImageUrl}
+                  alt={card.title}
+                  priority={index < 4}
+                />
                 <div
                   className="absolute bottom-0 left-1/2 z-10 flex h-12 w-12 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-[#fecaca] bg-white shadow-md sm:h-14 sm:w-14"
                   aria-hidden

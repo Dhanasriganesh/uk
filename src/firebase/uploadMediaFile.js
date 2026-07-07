@@ -4,6 +4,7 @@ import { normalizeShortUrl } from '../cms/mediaSeed'
 import { resolveReplaceTarget } from '../cms/resolveReplacePath'
 import { validateMediaFile } from '../cms/mediaLimits'
 import { uploadFileToStorage, isFirebaseStorageUrl } from './mediaStorageService'
+import { compressImageForUpload } from '../utils/compressImage'
 
 async function getIdToken() {
   await waitForAuthReady()
@@ -55,6 +56,7 @@ async function uploadViaServerApi(file, { onProgress, replaceUrl } = {}) {
     storagePath: data.storagePath ?? null,
     source: data.source || (import.meta.env.DEV ? 'local' : 'blob'),
     replaced: Boolean(replaceUrl),
+    warning: data.warning || null,
   }
 }
 
@@ -76,7 +78,20 @@ async function finalizeUpload(uploaded, file) {
 }
 
 async function uploadImage(file, { onProgress, replaceUrl } = {}) {
-  const validation = validateMediaFile(file, { accept: 'image', target: 'storage' })
+  onProgress?.(2)
+
+  let uploadFile = file
+  let compression = null
+  try {
+    compression = await compressImageForUpload(file)
+    uploadFile = compression.file
+  } catch (err) {
+    console.warn('[upload] Image compression skipped:', err.message)
+  }
+
+  onProgress?.(10)
+
+  const validation = validateMediaFile(uploadFile, { accept: 'image', target: 'storage' })
   if (!validation.ok) {
     const err = new Error(validation.error)
     if (validation.hint) err.hint = validation.hint
@@ -87,8 +102,11 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
   const failures = []
 
   try {
-    const uploaded = await uploadViaServerApi(file, { onProgress, replaceUrl })
-    return finalizeUpload(uploaded, file)
+    const uploaded = await uploadViaServerApi(uploadFile, { onProgress, replaceUrl })
+    return {
+      ...(await finalizeUpload(uploaded, uploadFile)),
+      compression,
+    }
   } catch (err) {
     failures.push(err)
     console.warn('[upload] Server image upload failed:', err.message)
@@ -96,22 +114,25 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
 
   if (isStorageConfigured && reuse?.kind === 'storage') {
     try {
-      const storageResult = await uploadFileToStorage(file, {
+      const storageResult = await uploadFileToStorage(uploadFile, {
         onProgress,
         target: 'storage',
         storagePath: reuse.path,
       })
-      return finalizeUpload(
-        {
-          url: storageResult.downloadUrl,
-          storagePath: storageResult.storagePath,
-          size: storageResult.size,
-          type: storageResult.type,
-          source: 'storage',
-          replaced: true,
-        },
-        file
-      )
+      return {
+        ...(await finalizeUpload(
+          {
+            url: storageResult.downloadUrl,
+            storagePath: storageResult.storagePath,
+            size: storageResult.size,
+            type: storageResult.type,
+            source: 'storage',
+            replaced: true,
+          },
+          uploadFile
+        )),
+        compression,
+      }
     } catch (err) {
       failures.push(err)
       console.warn('[upload] Client Storage fallback failed:', err.message)

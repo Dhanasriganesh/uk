@@ -8,6 +8,7 @@ import {
   ACCEPTED_VIDEO_INPUT,
   ACCEPTED_MEDIA_INPUT,
   ACCEPTED_PDF_INPUT,
+  formatBytes,
 } from '../../cms/mediaLimits'
 import MediaLimitsPanel from './MediaLimitsPanel'
 import Button from './ui/Button'
@@ -75,10 +76,18 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
       })
       const urlLabel =
         result.url?.startsWith('data:') ? 'image saved in Firestore' : result.url
+      const compressionNote =
+        result.compression?.didCompress
+          ? ` (compressed ${formatBytes(result.compression.originalBytes)} → ${formatBytes(result.compression.finalBytes)})`
+          : ''
       setSuccess(
         result.replaced
-          ? `Replaced file → ${urlLabel} (saved to page)`
-          : `Uploaded “${result.name}” → ${urlLabel}`
+          ? `Replaced file → ${urlLabel}${compressionNote} (saved to page)`
+          : result.warning
+            ? `Uploaded locally only — ${result.warning}`
+            : result.url?.includes('blob.vercel-storage.com')
+              ? `Uploaded to live storage → ${urlLabel}${compressionNote}`
+              : `Uploaded “${result.name}” → ${urlLabel}${compressionNote}`
       )
       onUploaded?.(result.url, result)
     } catch (err) {
@@ -100,7 +109,7 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
         {accept === 'video'
           ? 'Videos: dev public folder or paste YouTube/Vimeo on live site'
           : accept === 'image'
-            ? 'Up to 5 MB — live site uses Vercel Blob (free); local dev uses /media/…'
+            ? 'Large images are auto-compressed (max 1600px, WebP) before upload — up to 5 MB original'
             : 'Images in Firestore; videos via URL or dev upload'}
       </p>
       <input

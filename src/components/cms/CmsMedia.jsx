@@ -12,7 +12,15 @@ function needsStorageResolve(url) {
   return trimmed.includes('firebasestorage') || isFirebaseStoragePath(trimmed)
 }
 
-export function CmsImage({ src, fallback, alt = '', className = '', ...props }) {
+export function CmsImage({
+  src,
+  fallback,
+  alt = '',
+  className = '',
+  loading = 'lazy',
+  decoding = 'async',
+  ...props
+}) {
   const initial = needsStorageResolve(src) ? '' : resolveCmsImageUrl(src, fallback)
   const [url, setUrl] = useState(initial)
 
@@ -40,7 +48,17 @@ export function CmsImage({ src, fallback, alt = '', className = '', ...props }) 
     if (fallback && url !== fallback) setUrl(fallback)
   }
 
-  return <img src={url} alt={alt} className={className} onError={handleError} {...props} />
+  return (
+    <img
+      src={url}
+      alt={alt}
+      className={className}
+      loading={loading}
+      decoding={decoding}
+      onError={handleError}
+      {...props}
+    />
+  )
 }
 
 export const CmsVideo = forwardRef(function CmsVideo(

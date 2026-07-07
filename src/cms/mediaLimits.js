@@ -45,6 +45,7 @@ export const MEDIA_LIMITS_COPY = {
   videoNote: 'Use MP4 files under `/videos/`, or paste a YouTube/Vimeo link (embedded player).',
   tips: [
     'Live site: Vercel dashboard → Storage → Create Blob Store (free), then redeploy.',
+    'Large images are auto-compressed in the admin (max 1600px, WebP) before upload.',
     'Local dev: npm run dev uploads to public/media/ — commit those files if you also want them on static hosting.',
     'Copy a URL from the media library into any image field, then save the page.',
   ],

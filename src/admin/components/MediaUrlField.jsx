@@ -98,8 +98,15 @@ export default function MediaUrlField({ path, value, onChange }) {
           }}
         />
         <p className="mt-2 text-[11px] text-slate-500">
-          Upload saves to Vercel Blob and auto-saves this page to Firebase.
+          {import.meta.env.DEV
+            ? 'Uses Vercel Blob when BLOB_READ_WRITE_TOKEN is set (run vercel env pull). Large images are auto-compressed before upload.'
+            : 'Upload saves to Vercel Blob and auto-saves this page to Firebase. Large images are auto-compressed.'}
         </p>
+        {import.meta.env.DEV && trimmed.startsWith('/media/') && /\d{10,}_/.test(trimmed) ? (
+          <p className="mt-2 text-[11px] font-medium text-amber-700">
+            This looks like a local-only upload. Re-upload here after vercel env pull so the live site can show it.
+          </p>
+        ) : null}
       </div>
 
       {!editingUrl ? (

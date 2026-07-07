@@ -2,6 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import Busboy from 'busboy'
+import { put } from '@vercel/blob'
+import { buildUploadPath } from '../api/lib/uploadPath.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -76,10 +78,41 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body))
 }
 
+function withVersion(url, shouldVersion) {
+  if (!shouldVersion || !url || typeof url !== 'string') return url
+  try {
+    const u = new URL(url)
+    u.searchParams.set('v', Date.now().toString())
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
+async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl, { blobToken, blobStoreId }) {
+  const pathname = buildUploadPath(fileName, replaceUrl)
+  const options = {
+    access: 'public',
+    contentType: mimeType,
+    addRandomSuffix: false,
+    allowOverwrite: Boolean(replaceUrl),
+    token: blobToken,
+  }
+  if (blobStoreId) options.storeId = blobStoreId
+
+  const blob = await put(pathname, fileBuffer, options)
+  return {
+    url: withVersion(blob.url, Boolean(replaceUrl)),
+    storagePath: pathname,
+    source: 'blob',
+  }
+}
+
 /**
- * Dev-only: save uploads to public/media or public/videos and return site paths.
+ * Dev upload API: prefers Vercel Blob (same as live) when BLOB_READ_WRITE_TOKEN is set.
+ * Falls back to public/media only for offline local work — those URLs do not work on Vercel.
  */
-export function uploadApiPlugin({ apiKey } = {}) {
+export function uploadApiPlugin({ apiKey, blobToken, blobStoreId } = {}) {
   return {
     name: 'ats-upload-api',
     configureServer(server) {
@@ -163,6 +196,30 @@ export function uploadApiPlugin({ apiKey } = {}) {
               return
             }
 
+            const useBlob =
+              blobToken &&
+              (isImageMime(mimeType) || isPdfMime(mimeType, fileName) || isVideoMime(mimeType))
+
+            if (useBlob) {
+              try {
+                const result = await uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl, {
+                  blobToken,
+                  blobStoreId,
+                })
+                sendJson(res, 200, {
+                  url: result.url,
+                  storagePath: result.storagePath,
+                  source: result.source,
+                  size: fileBuffer.length,
+                  type: mimeType,
+                  name: fileName,
+                })
+                return
+              } catch (err) {
+                console.warn('[dev upload] Blob upload failed, using local public/media:', err.message)
+              }
+            }
+
             const replaceTarget = resolveLocalReplaceTarget(replaceUrl)
             let folder
             let safeName
@@ -187,6 +244,9 @@ export function uploadApiPlugin({ apiKey } = {}) {
               size: fileBuffer.length,
               type: mimeType,
               name: fileName,
+              source: 'local',
+              warning:
+                'Saved to local public/media only. Run vercel env pull and restart npm run dev to upload to Blob for the live site.',
             })
           })
 
