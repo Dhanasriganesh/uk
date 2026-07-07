@@ -3,8 +3,9 @@ import { LuExternalLink, LuPencil, LuX } from 'react-icons/lu'
 import MediaUploader from './MediaUploader'
 import { isVideoUrl } from '../../cms/mediaLimits'
 import VideoEmbed from '../../components/cms/VideoEmbed'
-import { CmsImage } from '../../components/cms/CmsMedia'
+import AdminImagePreview from './AdminImagePreview'
 import { isFirebaseStoragePath } from '../../cms/mediaSeed'
+import { withAdminPreviewBust } from '../../utils/adminMediaPreview'
 
 function formatLabel(key) {
   return key
@@ -25,7 +26,7 @@ export default function MediaUrlField({ path, value, onChange }) {
   const isVideo = isVideoUrl(trimmed) || /video/i.test(key)
   const previewSrc =
     trimmed && previewVersion > 0
-      ? `${trimmed}${trimmed.includes('?') ? '&' : '?'}v=${previewVersion}`
+      ? withAdminPreviewBust(trimmed, previewVersion)
       : trimmed
   const canOpenDirectly =
     trimmed.startsWith('http://') ||
@@ -39,18 +40,18 @@ export default function MediaUrlField({ path, value, onChange }) {
 
       {trimmed ? (
         <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-          <div className="relative aspect-video max-h-48 w-full bg-slate-100">
+          <div className="relative aspect-[16/10] max-h-48 w-full bg-slate-100">
             {isVideo ? (
               <VideoEmbed
                 src={trimmed}
-                className="h-full w-full border-0"
+                className="h-full w-full border-0 object-cover"
                 controls
                 playsInline
                 preload="metadata"
                 title="Preview"
               />
             ) : (
-              <CmsImage src={previewSrc} alt="" className="h-full w-full object-contain p-2" />
+              <AdminImagePreview src={previewSrc} alt="" className="h-full w-full object-cover object-center" />
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-3 py-2">
@@ -91,13 +92,13 @@ export default function MediaUrlField({ path, value, onChange }) {
           accept={accept}
           replaceUrl={trimmed || undefined}
           onUploaded={(url) => {
-            onChange(path, url)
+            onChange(path, url, { autoSave: true })
             setPreviewVersion((v) => v + 1)
             setEditingUrl(false)
           }}
         />
         <p className="mt-2 text-[11px] text-slate-500">
-          Replacing overwrites the same file URL. Works on live admin after you create a Vercel Blob store (free).
+          Upload saves to Vercel Blob and auto-saves this page to Firebase.
         </p>
       </div>
 

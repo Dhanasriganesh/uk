@@ -13,7 +13,7 @@ function needsStorageResolve(url) {
 }
 
 export function CmsImage({ src, fallback, alt = '', className = '', ...props }) {
-  const initial = resolveCmsImageUrl(src, fallback)
+  const initial = needsStorageResolve(src) ? '' : resolveCmsImageUrl(src, fallback)
   const [url, setUrl] = useState(initial)
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export const CmsVideo = forwardRef(function CmsVideo(
   ref
 ) {
   const resolvedFallback = fallback || resolveSrc()
-  const syncUrl = resolveSrc(src, resolvedFallback)
+  const syncUrl = needsStorageResolve(src) ? '' : resolveSrc(src, resolvedFallback)
   const [url, setUrl] = useState(syncUrl)
 
   useEffect(() => {

@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { LuRotateCcw, LuSave } from 'react-icons/lu'
 import { getPageMeta } from '../../cms/pageRegistry'
 import { getDefaultContent } from '../../cms/defaultContent'
-import { getPageContent, savePageContent, getSiteSettings, saveSiteSettings } from '../../firebase/cmsService'
+import {
+  savePageContent,
+  saveSiteSettings,
+  subscribePageContent,
+  subscribeSiteSettings,
+} from '../../firebase/cmsService'
 import { mergePageContent } from '../../cms/mergePageContent'
+import { readPageContentCache } from '../../cms/pageContentCache'
 import { useAuth } from '../../context/AuthContext'
 import DynamicForm from '../components/DynamicForm'
 import SettingsEditor from '../components/SettingsEditor'
@@ -24,62 +30,97 @@ export default function PageEditorPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const isDirtyRef = useRef(false)
 
   const isSettings = pageId === 'settings'
 
   useEffect(() => {
-    let cancelled = false
-    async function load() {
-      setLoading(true)
-      try {
-        if (isSettings) {
-          const remote = await getSiteSettings()
-          const defaults = getDefaultContent('settings')
-          const rest = remote ? { ...remote } : {}
-          delete rest.updatedAt
-          delete rest.updatedBy
-          if (!cancelled) setData(mergePageContent('settings', defaults, rest))
-        } else {
-          const remote = await getPageContent(pageId)
-          const defaults = getDefaultContent(pageId)
-          if (!cancelled) setData(mergePageContent(pageId, defaults, remote))
-        }
-      } catch (err) {
-        if (!cancelled) setMessage(err.message)
-      } finally {
-        if (!cancelled) setLoading(false)
+    isDirtyRef.current = false
+    const defaults = getDefaultContent(isSettings ? 'settings' : pageId)
+
+    if (!isSettings) {
+      const cached = readPageContentCache(pageId)
+      if (cached) {
+        setData(mergePageContent(pageId, defaults, cached))
+        setLoading(false)
+      } else {
+        setData(null)
+        setLoading(true)
       }
+    } else {
+      setData(null)
+      setLoading(true)
     }
-    load()
-    return () => {
-      cancelled = true
+
+    const applyRemote = (remote) => {
+      if (isDirtyRef.current) return
+      if (isSettings) {
+        const rest = remote ? { ...remote } : {}
+        delete rest.updatedAt
+        delete rest.updatedBy
+        setData(mergePageContent('settings', defaults, rest))
+      } else {
+        setData(mergePageContent(pageId, defaults, remote))
+      }
+      setLoading(false)
     }
+
+    const unsub = isSettings
+      ? subscribeSiteSettings(applyRemote)
+      : subscribePageContent(pageId, applyRemote)
+
+    return unsub
   }, [pageId, isSettings])
 
-  const handleSave = async () => {
+  const handleDataChange = (next) => {
+    isDirtyRef.current = true
+    setData(next)
+  }
+
+  const handleAutoSave = async (nextData) => {
+    setData(nextData)
+    try {
+      if (isSettings) {
+        await saveSiteSettings(stripSettingsMeta(nextData), user?.email)
+      } else {
+        await savePageContent(pageId, nextData, user?.email)
+      }
+      isDirtyRef.current = false
+      setMessage('Image uploaded and saved to website.')
+      setTimeout(() => setMessage(''), 4000)
+    } catch (err) {
+      setMessage(`Error: Image uploaded but could not save to Firebase — ${err.message}`)
+    }
+  }
+
+  const handleSave = async (payload = data) => {
     setSaving(true)
     setMessage('')
     try {
       if (isSettings) {
-        await saveSiteSettings(stripSettingsMeta(data), user?.email)
+        await saveSiteSettings(stripSettingsMeta(payload), user?.email)
       } else {
-        await savePageContent(pageId, data, user?.email)
+        await savePageContent(pageId, payload, user?.email)
       }
       setMessage('Saved successfully!')
+      isDirtyRef.current = false
       setTimeout(() => setMessage(''), 3000)
     } catch (err) {
       setMessage(`Error: ${err.message}`)
+      throw err
     } finally {
       setSaving(false)
     }
   }
 
-  const resetLocal = () =>
+  const resetLocal = () => {
+    isDirtyRef.current = true
     setData(
       isSettings
         ? mergePageContent('settings', getDefaultContent('settings'), {})
         : structuredClone(getDefaultContent(pageId))
     )
+  }
 
   if (loading || !data) {
     return (
@@ -107,7 +148,7 @@ export default function PageEditorPage() {
               <span className="sm:hidden">Reset</span>
               <span className="hidden sm:inline">Reset locally</span>
             </Button>
-            <Button size="md" icon={LuSave} fullWidth onClick={handleSave} disabled={saving} className="lg:w-auto">
+            <Button size="md" icon={LuSave} fullWidth onClick={() => handleSave()} disabled={saving} className="lg:w-auto">
               {saving ? 'Saving…' : 'Save changes'}
             </Button>
           </>
@@ -128,9 +169,9 @@ export default function PageEditorPage() {
       <Card className="mb-0 overflow-hidden">
         <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
           {isSettings ? (
-            <SettingsEditor data={data} onChange={setData} />
+            <SettingsEditor data={data} onChange={handleDataChange} onAutoSave={handleAutoSave} />
           ) : (
-            <DynamicForm data={data} onChange={setData} />
+            <DynamicForm data={data} onChange={handleDataChange} onAutoSave={handleAutoSave} />
           )}
         </div>
       </Card>
@@ -141,7 +182,7 @@ export default function PageEditorPage() {
           <span className="lg:hidden">Reset defaults</span>
           <span className="hidden lg:inline">Reset to defaults (local)</span>
         </Button>
-        <Button icon={LuSave} fullWidth onClick={handleSave} disabled={saving} className="sm:flex-1 lg:flex-none lg:w-auto">
+        <Button icon={LuSave} fullWidth onClick={() => handleSave()} disabled={saving} className="sm:flex-1 lg:flex-none lg:w-auto">
           {saving ? 'Saving…' : 'Save changes'}
         </Button>
       </div>

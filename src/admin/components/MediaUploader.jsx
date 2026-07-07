@@ -77,7 +77,7 @@ export default function MediaUploader({ onUploaded, variant = 'compact', accept 
         result.url?.startsWith('data:') ? 'image saved in Firestore' : result.url
       setSuccess(
         result.replaced
-          ? `Replaced file → ${urlLabel}`
+          ? `Replaced file → ${urlLabel} (saved to page)`
           : `Uploaded “${result.name}” → ${urlLabel}`
       )
       onUploaded?.(result.url, result)

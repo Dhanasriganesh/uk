@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import Busboy from 'busboy'
-import { resolveReplaceTarget } from '../src/cms/resolveReplacePath.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -29,6 +28,31 @@ function isImageMime(mime) {
 function isPdfMime(mime, fileName) {
   if (mime === 'application/pdf') return true
   return typeof fileName === 'string' && fileName.toLowerCase().endsWith('.pdf')
+}
+
+function safeLocalFileName(name) {
+  if (!name || typeof name !== 'string') return null
+  const base = (name.split('/').pop() || '').split('?')[0].split('#')[0]
+  if (!base || base.includes('..')) return null
+  return base
+}
+
+function resolveLocalReplaceTarget(replaceUrl) {
+  if (!replaceUrl || typeof replaceUrl !== 'string') return null
+  const trimmed = replaceUrl.trim()
+  if (!trimmed) return null
+
+  if (trimmed.startsWith('/media/')) {
+    const fileName = safeLocalFileName(trimmed.slice('/media/'.length))
+    if (fileName) return { folder: 'media', fileName }
+  }
+
+  if (trimmed.startsWith('/videos/')) {
+    const fileName = safeLocalFileName(trimmed.slice('/videos/'.length))
+    if (fileName) return { folder: 'videos', fileName }
+  }
+
+  return null
 }
 
 async function verifyIdToken(idToken, apiKey) {
@@ -139,11 +163,11 @@ export function uploadApiPlugin({ apiKey } = {}) {
               return
             }
 
-            const replaceTarget = resolveReplaceTarget(replaceUrl)
+            const replaceTarget = resolveLocalReplaceTarget(replaceUrl)
             let folder
             let safeName
 
-            if (replaceTarget?.kind === 'local') {
+            if (replaceTarget) {
               folder = replaceTarget.folder
               safeName = replaceTarget.fileName
             } else {

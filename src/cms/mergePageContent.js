@@ -1,5 +1,6 @@
 import { deepMerge } from '../utils/deepMerge'
 import { cmsStringOrFallback } from '../utils/cmsString'
+import { isUploadedMediaUrl } from '../utils/adminMediaPreview'
 import { SERVICE_PAGE_IDS } from './servicesRegistry'
 
 const LEGACY_PRODUCT_PAGE_IDS = ['capping', 'bottle', 'pump', 'turnkey', 'bespoke', 'foodbeverage']
@@ -105,6 +106,14 @@ function mergeConsultationHighlightList(defaultItems = [], remoteList, mergedLis
   return defaultItems.map((def, i) =>
     mergeConsultationHighlight(def, mergedList?.[i] ?? remoteList?.[i] ?? {})
   )
+}
+
+function pickCardImageUrl(savedUrl, defaultUrl) {
+  const saved = typeof savedUrl === 'string' ? savedUrl.trim() : ''
+  const fallback = typeof defaultUrl === 'string' ? defaultUrl.trim() : ''
+  if (isUploadedMediaUrl(saved)) return saved
+  if (saved && saved !== fallback && /^https?:\/\//i.test(saved)) return saved
+  return cmsStringOrFallback(saved, fallback)
 }
 
 /** Merge Firestore content with defaults so admin always shows the full field set. */
@@ -290,6 +299,24 @@ export function mergePageContent(pageId, defaults, remote) {
       enquireLabel: cmsStringOrFallback(merged.cta?.enquireLabel, defaults.cta?.enquireLabel),
       enquireLink: cmsStringOrFallback(merged.cta?.enquireLink, defaults.cta?.enquireLink),
     }
+  }
+
+  if (pageId === 'home-what-we-do' && defaults.cards?.length) {
+    merged.cards = defaults.cards.map((def, i) => {
+      const remoteCard = remote?.cards?.[i] || {}
+      const mergedCard = merged.cards?.[i] || {}
+      return {
+        ...def,
+        ...mergedCard,
+        title: cmsStringOrFallback(mergedCard.title ?? remoteCard.title, def.title),
+        description: cmsStringOrFallback(
+          mergedCard.description ?? remoteCard.description,
+          def.description
+        ),
+        imageUrl: pickCardImageUrl(remoteCard.imageUrl ?? mergedCard.imageUrl, def.imageUrl),
+        icon: cmsStringOrFallback(mergedCard.icon ?? remoteCard.icon, def.icon),
+      }
+    })
   }
 
   return merged

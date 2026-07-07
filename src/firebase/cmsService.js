@@ -17,6 +17,7 @@ import {
   isShortMediaUrl,
   normalizeShortUrl,
 } from '../cms/mediaSeed'
+import { writePageContentCache } from '../cms/pageContentCache'
 
 const PAGES_COLLECTION = 'cms_pages'
 /** Firestore "media" table — short paths (cms/…, /media/…) or https URLs only. */
@@ -123,6 +124,7 @@ export async function savePageContent(pageId, content, userEmail) {
     },
     { merge: true }
   )
+  writePageContentCache(pageId, content)
 }
 
 export async function getAllPagesFromFirestore() {

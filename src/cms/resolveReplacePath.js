@@ -15,7 +15,7 @@ function extractBlobPathname(url) {
 
 function safeLocalFileName(name) {
   if (!name || typeof name !== 'string') return null
-  const base = name.split('/').pop() || ''
+  const base = (name.split('/').pop() || '').split('?')[0].split('#')[0]
   if (!base || base.includes('..')) return null
   return base
 }

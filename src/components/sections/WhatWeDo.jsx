@@ -69,26 +69,73 @@ const CARD_DEFAULTS = [
   },
 ]
 
-const CARD_IMAGE_HEIGHT = 'h-[200px]'
+const CARD_IMAGE_ASPECT = 'aspect-[16/10]'
 
 function CardImage({ src, fallback, alt }) {
-  const [failed, setFailed] = React.useState(false)
-  const url = !failed && src ? src : fallback
+  const [displayUrl, setDisplayUrl] = React.useState(null)
+  const [ready, setReady] = React.useState(false)
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    const showPlaceholder = () => {
+      if (!cancelled) {
+        setDisplayUrl(null)
+        setReady(false)
+      }
+    }
+
+    const preload = (url, onFail) => {
+      if (!url) {
+        onFail?.()
+        return
+      }
+      const img = new Image()
+      img.onload = () => {
+        if (!cancelled) {
+          setDisplayUrl(url)
+          setReady(true)
+        }
+      }
+      img.onerror = () => onFail?.()
+      img.src = url
+    }
+
+    setReady(false)
+    setDisplayUrl(null)
+
+    if (src) {
+      preload(src, () => preload(fallback, showPlaceholder))
+      return () => {
+        cancelled = true
+      }
+    }
+
+    if (fallback) {
+      preload(fallback, showPlaceholder)
+      return () => {
+        cancelled = true
+      }
+    }
+
+    showPlaceholder()
+    return () => {
+      cancelled = true
+    }
+  }, [src, fallback])
 
   return (
-    <div className={`relative w-full shrink-0 overflow-hidden rounded-t-[10px] ${CARD_IMAGE_HEIGHT}`}>
-      {url ? (
+    <div
+      className={`relative w-full shrink-0 overflow-hidden rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
+    >
+      {displayUrl && ready ? (
         <img
-          src={url}
+          src={displayUrl}
           alt={alt}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          loading="lazy"
+          className="h-full w-full object-cover object-center"
           decoding="async"
-          onError={() => setFailed(true)}
         />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
-      )}
+      ) : null}
     </div>
   )
 }
@@ -106,17 +153,26 @@ const BROKEN_IMAGE_URLS = new Set([
 function resolveImageUrl(cmsUrl, defaultUrl) {
   const trimmed = cmsUrl?.trim()
   if (!trimmed || BROKEN_IMAGE_URLS.has(trimmed)) return defaultUrl
+  if (trimmed.includes('blob.vercel-storage.com') || trimmed.includes('firebasestorage.googleapis.com')) {
+    return trimmed
+  }
   return trimmed
 }
 
-function mergeCards(cmsCards) {
+function mergeCards(cmsCards, { cmsReady = true } = {}) {
   const list = cmsCards?.length ? cmsCards : CARD_DEFAULTS
   return CARD_DEFAULTS.map((def, i) => {
     const card = list[i] || {}
+    const cmsImage = card.imageUrl?.trim()
+    const hasCmsImage = cmsImage && !BROKEN_IMAGE_URLS.has(cmsImage)
     return {
       title: card.title || def.title,
       description: card.description || def.description,
-      imageUrl: resolveImageUrl(card.imageUrl, def.imageUrl),
+      imageUrl: cmsReady
+        ? resolveImageUrl(card.imageUrl, def.imageUrl)
+        : hasCmsImage
+          ? cmsImage
+          : '',
       defaultImageUrl: def.imageUrl,
       icon: card.icon || def.icon,
     }
@@ -124,8 +180,8 @@ function mergeCards(cmsCards) {
 }
 
 export default function WhatWeDo() {
-  const { content } = useCmsPage('home-what-we-do')
-  const cards = mergeCards(content.cards)
+  const { content, loading, fromFirestore } = useCmsPage('home-what-we-do')
+  const cards = mergeCards(content.cards, { cmsReady: !loading || fromFirestore })
 
   return (
     <section className="section-py relative w-full overflow-x-hidden bg-white !pb-6 sm:!pb-8 lg:!pb-10">

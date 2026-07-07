@@ -92,10 +92,10 @@ function ArrayOfStrings({ path, value, onChange }) {
                 <MediaUrlField
                   path={[...path, i]}
                   value={item}
-                  onChange={(_, url) => {
+                  onChange={(_, url, options) => {
                     const next = [...items]
                     next[i] = url
-                    onChange(path, next)
+                    onChange(path, next, options)
                   }}
                 />
               </div>
@@ -244,8 +244,8 @@ function DynamicFormFields({ data, path = [], onChange }) {
   )
 }
 
-export default function DynamicForm({ data, onChange }) {
-  const handleChange = (path, newValue) => {
+export default function DynamicForm({ data, onChange, onAutoSave }) {
+  const handleChange = (path, newValue, options = {}) => {
     const next = structuredClone(data)
     let cursor = next
     for (let i = 0; i < path.length - 1; i++) {
@@ -253,6 +253,7 @@ export default function DynamicForm({ data, onChange }) {
     }
     cursor[path[path.length - 1]] = newValue
     onChange(next)
+    if (options.autoSave) onAutoSave?.(next)
   }
 
   return (

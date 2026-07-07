@@ -118,7 +118,7 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
     }
   }
 
-  const err = new Error('Image upload failed.')
+  const err = new Error(failures[0]?.message || 'Image upload failed.')
   err.hint =
     failures.find((item) => item.hint)?.hint ||
     (import.meta.env.PROD

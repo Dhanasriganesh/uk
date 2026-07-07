@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob'
+import { getVercelOidcToken } from '@vercel/oidc'
 import admin from 'firebase-admin'
 import Busboy from 'busboy'
 import { randomUUID } from 'crypto'
@@ -122,22 +123,7 @@ function parseMultipart(req) {
   })
 }
 
-async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
-  const pathname = buildUploadPath(fileName, replaceUrl)
-  const options = {
-    // CMS images must be public so <img src="…"> works on the live site.
-    access: 'public',
-    contentType: mimeType,
-    addRandomSuffix: false,
-    allowOverwrite: Boolean(replaceUrl),
-  }
-
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    options.token = process.env.BLOB_READ_WRITE_TOKEN
-  }
-
-  const blob = await put(pathname, fileBuffer, options)
-
+function blobUploadResult(blob, pathname) {
   return {
     url: blob.url,
     storagePath: pathname,
@@ -145,19 +131,82 @@ async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
   }
 }
 
+function withVersion(url, shouldVersion) {
+  if (!shouldVersion || !url || typeof url !== 'string') return url
+  try {
+    const u = new URL(url)
+    u.searchParams.set('v', Date.now().toString())
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
+async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl) {
+  const pathname = buildUploadPath(fileName, replaceUrl)
+  const baseOptions = {
+    access: 'public',
+    contentType: mimeType,
+    addRandomSuffix: false,
+    allowOverwrite: Boolean(replaceUrl),
+  }
+  const errors = []
+
+  const storeId = process.env.BLOB_STORE_ID?.trim()
+  if (storeId) {
+    try {
+      const oidcToken =
+        process.env.VERCEL_OIDC_TOKEN?.trim() || (await getVercelOidcToken().catch(() => ''))
+      if (oidcToken) {
+        const blob = await put(pathname, fileBuffer, { ...baseOptions, oidcToken, storeId })
+        return blobUploadResult(blob, pathname)
+      }
+    } catch (err) {
+      errors.push(err)
+      console.error('[api/admin/upload] OIDC blob upload failed:', err)
+    }
+  }
+
+  const readWriteToken = process.env.BLOB_READ_WRITE_TOKEN?.trim()
+  if (readWriteToken) {
+    try {
+      const blob = await put(pathname, fileBuffer, { ...baseOptions, token: readWriteToken })
+      return blobUploadResult(blob, pathname)
+    } catch (err) {
+      errors.push(err)
+      console.error('[api/admin/upload] Read-write token blob upload failed:', err)
+    }
+  }
+
+  try {
+    const blob = await put(pathname, fileBuffer, baseOptions)
+    return blobUploadResult(blob, pathname)
+  } catch (err) {
+    errors.push(err)
+    throw errors[errors.length - 1] || err
+  }
+}
+
 function blobSetupHint(err) {
-  const msg = (err?.message || '').toLowerCase()
-  if (msg.includes('private') || msg.includes('access')) {
-    return 'This Blob store is Private. For website images create a Public Blob store (or a new store with Public access), connect it to project "uk", redeploy.'
+  const msg = err?.message || ''
+
+  if (msg.includes('No blob credentials') || msg.includes('No read-write token')) {
+    return 'Connect "ats-medias" to project uk (Projects tab), then redeploy.'
   }
-  if (
-    !process.env.BLOB_READ_WRITE_TOKEN &&
-    !process.env.BLOB_STORE_ID &&
-    !process.env.VERCEL_OIDC_TOKEN
-  ) {
-    return 'Open ats-media → Projects tab → Connect to project "uk" (Production + Preview) → Redeploy.'
+  if (msg.includes('Access denied') || msg.includes('valid token')) {
+    return 'Blob auth failed. Redeploy project uk after connecting ats-medias. If it still fails: Storage → ats-medias → copy Read-Write Token → add BLOB_READ_WRITE_TOKEN to project uk → redeploy.'
   }
-  return 'Open Blob store → Projects → Connect to project "uk", then redeploy. For website images use a Public store.'
+  if (msg.includes('OIDC') && msg.includes('environment')) {
+    return 'Connect ats-medias to both Preview and Production on project uk, then redeploy.'
+  }
+  if (msg.includes('does not exist')) {
+    return 'Blob store not found. Confirm ats-medias is connected to uk and redeploy.'
+  }
+  if (msg.toLowerCase().includes('private store') || msg.includes('access: \'private\'')) {
+    return 'Use public store "ats-medias" (not a Private store).'
+  }
+
+  return 'Connect ats-medias to project uk and redeploy. Add BLOB_READ_WRITE_TOKEN if uploads still fail.'
 }
 
 async function uploadToFirebaseStorage(fileBuffer, fileName, mimeType, replaceUrl) {
@@ -258,7 +307,8 @@ export default async function handler(req, res) {
     }
 
     res.status(200).json({
-      url: result.url,
+      // When replacing an existing file path, append a version query to bypass stale CDN/browser cache.
+      url: withVersion(result.url, Boolean(replaceUrl)),
       storagePath: result.storagePath,
       size: fileBuffer.length,
       type: mimeType,

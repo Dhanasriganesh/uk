@@ -2,18 +2,27 @@ import { useEffect, useState } from 'react'
 import { subscribePageContent } from '../firebase/cmsService'
 import { getDefaultContent } from '../cms/defaultContent'
 import { mergePageContent } from '../cms/mergePageContent'
+import { readPageContentCache, writePageContentCache } from '../cms/pageContentCache'
 
 export function useCmsPage(pageId) {
-  const [content, setContent] = useState(() => getDefaultContent(pageId))
-  const [loading, setLoading] = useState(true)
-  const [fromFirestore, setFromFirestore] = useState(false)
+  const [content, setContent] = useState(() => {
+    const defaults = getDefaultContent(pageId)
+    const cached = readPageContentCache(pageId)
+    return cached ? mergePageContent(pageId, defaults, cached) : defaults
+  })
+  const [loading, setLoading] = useState(() => !readPageContentCache(pageId))
+  const [fromFirestore, setFromFirestore] = useState(() => Boolean(readPageContentCache(pageId)))
 
   useEffect(() => {
-    setLoading(true)
     const defaults = getDefaultContent(pageId)
+    const hadCache = Boolean(readPageContentCache(pageId))
+    if (!hadCache) setLoading(true)
+
     const unsub = subscribePageContent(pageId, (remote) => {
       if (remote) {
-        setContent(mergePageContent(pageId, defaults, remote))
+        const merged = mergePageContent(pageId, defaults, remote)
+        setContent(merged)
+        writePageContentCache(pageId, remote)
         setFromFirestore(true)
       } else {
         setContent(defaults)

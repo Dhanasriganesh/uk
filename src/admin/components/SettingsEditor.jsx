@@ -205,7 +205,7 @@ function HighlightEditor({ item, onChange }) {
   )
 }
 
-export default function SettingsEditor({ data, onChange }) {
+export default function SettingsEditor({ data, onChange, onAutoSave }) {
   const patch = (key, value) => onChange({ ...data, [key]: value })
   const patchFooter = (key, value) => patch('footer', { ...data.footer, [key]: value })
   const patchContact = (key, value) => patch('contact', { ...data.contact, [key]: value })
@@ -236,7 +236,15 @@ export default function SettingsEditor({ data, onChange }) {
           />
         </Field>
         <Field label="Logo image" hint="Upload or paste a URL. Recommended: transparent PNG, roughly 200×60px.">
-          <MediaUrlField path={['logoUrl']} value={data.logoUrl || ''} onChange={(_, val) => patch('logoUrl', val)} />
+          <MediaUrlField
+            path={['logoUrl']}
+            value={data.logoUrl || ''}
+            onChange={(_, val, options) => {
+              const next = { ...data, logoUrl: val }
+              onChange(next)
+              if (options?.autoSave) onAutoSave?.(next)
+            }}
+          />
         </Field>
       </SettingsSection>
 
