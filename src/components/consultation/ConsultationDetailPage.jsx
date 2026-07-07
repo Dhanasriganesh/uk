@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { LuTarget, LuPuzzle, LuGauge } from 'react-icons/lu'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import CmsPageProvider from '../cms/CmsPageProvider'
+import { CmsRawImage } from '../cms/CmsMedia'
 import ProductInfoCta from '../products/ProductInfoCta'
 import {
   cmsFirstArray,
@@ -19,20 +20,11 @@ function HighlightIcon({ index }) {
 }
 
 function HeroImage({ src, alt }) {
-  const [failed, setFailed] = useState(false)
-  const url = !failed && src ? src : null
-
-  if (!url) return null
+  if (!src) return null
 
   return (
     <div className="overflow-hidden rounded-2xl bg-[#f5f5f5] shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
-      <img
-        src={url}
-        alt={alt}
-        className="aspect-[4/3] w-full object-cover"
-        loading="lazy"
-        onError={() => setFailed(true)}
-      />
+      <CmsRawImage src={src} alt={alt} className="aspect-[4/3] w-full object-cover" loading="lazy" />
     </div>
   )
 }
@@ -44,8 +36,9 @@ export default function ConsultationDetailPage({
   parentLink = '/consultation',
   defaults = {},
 }) {
-  const { content, fromFirestore } = useCmsPage(pageId)
-
+  return (
+    <CmsPageProvider pageId={pageId}>
+      {({ content, fromFirestore }) => {
   const eyebrow = cmsStringOrFallback(
     content.eyebrow,
     fromFirestore ? '' : defaults.eyebrow
@@ -269,5 +262,8 @@ export default function ConsultationDetailPage({
         />
       ) : null}
     </div>
+  )
+      }}
+    </CmsPageProvider>
   )
 }

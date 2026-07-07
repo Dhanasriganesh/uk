@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useCmsPage } from '../../../hooks/useCmsPage'
+import CmsPageProvider from '../../cms/CmsPageProvider'
 import { CmsImage } from '../../cms/CmsMedia'
 import GlancePageTitle from '../../glance/GlancePageTitle'
 import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
@@ -39,9 +39,7 @@ function LogoMarquee({ items }) {
   )
 }
 
-function Partners() {
-  const { content } = useCmsPage('partners')
-
+function PartnersContent({ content }) {
   const supportedCustomers = useMemo(
     () =>
       resolvePartnerItems(
@@ -96,6 +94,14 @@ function Partners() {
         <LogoMarquee items={trustedPartners} />
       </section>
     </div>
+  )
+}
+
+function Partners() {
+  return (
+    <CmsPageProvider pageId="partners">
+      {({ content }) => <PartnersContent content={content} />}
+    </CmsPageProvider>
   )
 }
 

@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { LuCheck } from 'react-icons/lu'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import CmsPageProvider from '../cms/CmsPageProvider'
+import { CmsRawImage } from '../cms/CmsMedia'
 import ProductInfoCta from '../products/ProductInfoCta'
 import SectorCardIcon from '../icons/SectorCardIcon'
 import {
@@ -11,19 +12,15 @@ import {
 import { cmsStringOrFallback, mergeCmsObjectStrings } from '../../utils/cmsString'
 
 function SectorCardImage({ src, fallback, alt }) {
-  const [failed, setFailed] = useState(false)
-  const url = !failed && src ? src : fallback
-
   return (
     <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-44 lg:h-48">
-      {url ? (
-        <img
-          src={url}
+      {src || fallback ? (
+        <CmsRawImage
+          src={src}
+          fallback={fallback}
           alt={alt}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
@@ -38,7 +35,9 @@ function mergeSectors(cmsSectors) {
 }
 
 export default function Sectors() {
-  const { content } = useCmsPage('sectors')
+  return (
+    <CmsPageProvider pageId="sectors">
+      {({ content }) => {
   const hub = {
     eyebrow: cmsStringOrFallback(content.eyebrow, SECTORS_HUB_DEFAULTS.eyebrow),
     pageTitle: cmsStringOrFallback(content.pageTitle, SECTORS_HUB_DEFAULTS.pageTitle),
@@ -145,5 +144,8 @@ export default function Sectors() {
         cta={cta}
       />
     </div>
+  )
+      }}
+    </CmsPageProvider>
   )
 }

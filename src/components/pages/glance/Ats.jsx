@@ -1,11 +1,12 @@
 import React from 'react'
-import { useCmsPage } from '../../../hooks/useCmsPage'
+import CmsPageProvider from '../../cms/CmsPageProvider'
 import { CmsImage } from '../../cms/CmsMedia'
 import GlancePageTitle from '../../glance/GlancePageTitle'
 import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
 
 const serif = { fontFamily: 'Playfair Display, serif' }
 const RED = '#c00000'
+const HERO_ASPECT = 'aspect-[16/10]'
 
 const FALLBACK_IMAGES = {
   heroAircraft:
@@ -59,31 +60,23 @@ function MailIcon() {
   )
 }
 
-function CenterNav({ companyHistoryLabel, whyAtsLabel }) {
+function HeroImageFrame({ src, fallback, alt }) {
   return (
-    <nav className="mx-auto w-full max-w-[140px] border border-[#d8d8d8] bg-[#ebebeb] lg:mx-0">
-      <a
-        href="#company-history"
-        className="block border-b border-[#d8d8d8] px-3 py-4 text-center text-[13px] font-bold leading-tight text-[#c00000] hover:bg-[#e0e0e0] sm:px-4 sm:text-sm"
-      >
-        {companyHistoryLabel}
-      </a>
-      <a
-        href="#why-ats-uk"
-        className="block bg-white px-3 py-4 text-center text-[13px] font-bold leading-tight text-[#c00000] hover:bg-[#fafafa] sm:px-4 sm:text-sm"
-      >
-        {whyAtsLabel}
-      </a>
-    </nav>
+    <div className={`relative w-full overflow-hidden bg-neutral-200 ${HERO_ASPECT}`}>
+      <CmsImage
+        src={src}
+        fallback={fallback}
+        alt={alt}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+    </div>
   )
 }
 
-function Ats() {
-  const { content } = useCmsPage('ats')
-
+function AtsContent({ content }) {
   const glanceTitle = glanceTitleFromContent(content)
   const leftHeading = (content.leftHeading ?? '').trim()
-  const rightTagline =
+  const tagline =
     content.rightTagline || content.heroTagline || 'A World Leading Engineering Service Provider'
   const welcomeHeading = content.welcomeHeading || 'Welcome to Advanced Tooling Systems UK'
   const contactEmail = content.contactEmail || 'info@atsuk.com'
@@ -99,58 +92,55 @@ function Ats() {
       <GlancePageTitle
         line1={glanceTitle.line1}
         highlight={glanceTitle.highlight}
-        className="mb-8 lg:mb-10"
+        className="mb-6 lg:mb-8"
       />
-  <div className="mb-2 flex justify-end">
-            <a
-              href={`mailto:${contactEmail}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
-              style={{ backgroundColor: RED }}
-            >
-              <MailIcon />
-              {contactEmail}
-            </a>
-          </div>
-      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(110px,0.22fr)_minmax(0,1fr)] lg:gap-x-3 xl:gap-x-4">
-        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+
+      <div className="mb-6 flex justify-end sm:mb-8">
+        <a
+          href={`mailto:${contactEmail}`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
+          style={{ backgroundColor: RED }}
+        >
+          <MailIcon />
+          {contactEmail}
+        </a>
+      </div>
+
+      {tagline ? (
+        <h2
+          className="mx-auto mb-8 max-w-4xl text-center text-[clamp(1.5rem,4vw,2.5rem)] font-bold leading-tight text-black sm:mb-10"
+          style={serif}
+        >
+          {tagline}
+        </h2>
+      ) : null}
+
+      <div className="mb-8 grid grid-cols-1 items-stretch gap-5 sm:gap-6 lg:mb-10 lg:grid-cols-2 lg:gap-8">
+        <div className="flex min-w-0 flex-col">
           {leftHeading ? (
-            <h2 className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]" style={serif}>
+            <h3 className="mb-2 text-center text-lg font-bold text-[#555555] sm:text-xl lg:text-left" style={serif}>
               {leftHeading}
-            </h2>
+            </h3>
           ) : null}
-          <div className="relative overflow-hidden bg-neutral-200">
-            <CmsImage
-              src={content.heroImageUrl}
-              fallback={FALLBACK_IMAGES.heroAircraft}
-              alt="Commercial aircraft in flight"
-              className="block aspect-[16/11] w-full object-cover sm:aspect-[16/10]"
-            />
-          </div>
+          <HeroImageFrame
+            src={content.heroImageUrl}
+            fallback={FALLBACK_IMAGES.heroAircraft}
+            alt="ATS engineering and manufacturing"
+          />
         </div>
 
-      
-
-        <div className="min-w-0 lg:col-start-3 lg:row-start-1">
-          {rightTagline ? (
-            <h2
-              className="mb-2 text-[2rem] font-bold leading-none text-black sm:text-[2.35rem] lg:text-[2.5rem]"
-              style={serif}
-            >
-              {rightTagline}
-            </h2>
-          ) : null}
-          <div className="overflow-hidden bg-neutral-200">
-            <CmsImage
-              src={content.rightHeroImageUrl}
-              fallback={FALLBACK_IMAGES.cabinInterior}
-              alt="Luxury aircraft cabin interior"
-              className="block aspect-[16/10] w-full object-cover"
-            />
-          </div>
+        <div className="flex min-w-0 flex-col">
+          <HeroImageFrame
+            src={content.rightHeroImageUrl}
+            fallback={FALLBACK_IMAGES.cabinInterior}
+            alt="ATS facilities and capabilities"
+          />
           <div className="mt-3 h-px w-full sm:mt-4" style={{ backgroundColor: RED }} aria-hidden />
         </div>
+      </div>
 
-        <div id="company-history" className="scroll-mt-28 lg:col-start-1 lg:row-start-2 lg:pt-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10 xl:gap-12">
+        <div id="company-history" className="scroll-mt-28">
           <h3 className="mb-2 text-lg font-bold text-[#555555] sm:text-xl lg:text-[1.35rem]">{welcomeHeading}</h3>
           <div className="mb-4 h-px w-full sm:mb-5" style={{ backgroundColor: RED }} aria-hidden />
           <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
@@ -160,37 +150,36 @@ function Ats() {
           </div>
         </div>
 
-        <div className="hidden lg:col-start-2 lg:row-start-2 lg:block" aria-hidden />
+        <div id="why-ats-uk" className="scroll-mt-28">
+          <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
+            {rightParagraphs.map((text, i) => (
+              <p key={i}>{text}</p>
+            ))}
+          </div>
 
-        <div id="why-ats-uk" className="scroll-mt-28 lg:col-start-3 lg:row-start-2 lg:pt-6">
-          <h3
-            className="pointer-events-none mb-2 hidden text-lg font-bold sm:text-xl lg:invisible lg:block lg:text-[1.35rem]"
-            aria-hidden
-          >
-            {welcomeHeading}
-          </h3>
-          <div className="mb-4 hidden h-px w-full sm:mb-5 lg:invisible lg:block" aria-hidden />
-          <div className="flex gap-3 sm:gap-4">
-            <div className="min-w-0 flex-1 space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
-              {rightParagraphs.map((text, i) => (
-                <p key={i}>{text}</p>
-              ))}
-            </div>
-            <div className="flex w-[68px] shrink-0 flex-col gap-1.5 sm:w-[76px] sm:gap-2 lg:w-[82px]">
-              {thumbnails.map((img, i) => (
+          <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-8 sm:gap-3">
+            {thumbnails.map((img, i) => (
+              <div key={img.alt || i} className="overflow-hidden bg-neutral-200">
                 <CmsImage
-                  key={img.alt || i}
                   src={img.imageUrl}
                   fallback={FALLBACK_THUMBNAILS[i]?.imageUrl}
                   alt={img.alt || ''}
-                  className="aspect-square w-full object-cover"
+                  className="aspect-[4/3] w-full object-cover"
                 />
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function Ats() {
+  return (
+    <CmsPageProvider pageId="ats">
+      {({ content }) => <AtsContent content={content} />}
+    </CmsPageProvider>
   )
 }
 

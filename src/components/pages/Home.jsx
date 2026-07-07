@@ -4,12 +4,15 @@ import Connect from './Connect'
 import Brands from './Brands'
 import { HERO_VIDEO_URL } from '../../cms/mediaPaths'
 import WhatWeDo from '../sections/WhatWeDo'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import CmsPageProvider from '../cms/CmsPageProvider'
 import { CmsVideo } from '../cms/CmsMedia'
 
 function Home() {
   const videoRef = useRef(null)
-  const { content } = useCmsPage('home')
+
+  return (
+    <CmsPageProvider pageId="home">
+      {({ content }) => {
   const hero = content.hero || {}
 
   return (
@@ -120,6 +123,9 @@ function Home() {
         <Connect />
       </div>
     </div>
+  )
+      }}
+    </CmsPageProvider>
   )
 }
 

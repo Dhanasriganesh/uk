@@ -1,7 +1,7 @@
 import React from 'react'
-import { useCmsPage } from '../../hooks/useCmsPage'
 import SectorCardIcon from '../icons/SectorCardIcon'
-import { withPublicMediaVersion } from '../../utils/adminMediaPreview'
+import CmsPageProvider from '../cms/CmsPageProvider'
+import { CmsRawImage } from '../cms/CmsMedia'
 
 const CARD_DEFAULTS = [
   {
@@ -73,19 +73,7 @@ const CARD_DEFAULTS = [
 const CARD_IMAGE_ASPECT = 'aspect-[16/10]'
 
 function CardImage({ src, fallback, alt, priority = false }) {
-  const [currentSrc, setCurrentSrc] = React.useState(() => src || fallback || '')
-
-  React.useEffect(() => {
-    setCurrentSrc(src || fallback || '')
-  }, [src, fallback])
-
-  const handleError = () => {
-    if (fallback && currentSrc !== fallback) {
-      setCurrentSrc(fallback)
-    }
-  }
-
-  if (!currentSrc) {
+  if (!src && !fallback) {
     return (
       <div
         className={`w-full shrink-0 rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
@@ -97,14 +85,12 @@ function CardImage({ src, fallback, alt, priority = false }) {
     <div
       className={`relative w-full shrink-0 overflow-hidden rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
     >
-      <img
-        key={currentSrc}
-        src={currentSrc}
+      <CmsRawImage
+        src={src}
+        fallback={fallback}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         fetchPriority={priority ? 'high' : 'auto'}
-        decoding="async"
-        onError={handleError}
         className="h-full w-full object-cover object-center"
       />
     </div>
@@ -162,11 +148,12 @@ function mergeCards(cmsCards, { cmsReady = true } = {}) {
 }
 
 export default function WhatWeDo() {
-  const { content, loading, fromFirestore, updatedAt } = useCmsPage('home-what-we-do')
-  const cards = mergeCards(content.cards, { cmsReady: !loading || fromFirestore })
-  const mediaVersion = updatedAt
-
   return (
+    <CmsPageProvider pageId="home-what-we-do">
+      {({ content, loading, fromFirestore }) => {
+        const cards = mergeCards(content.cards, { cmsReady: !loading || fromFirestore })
+
+        return (
     <section className="section-py relative w-full overflow-x-hidden bg-white !pb-6 sm:!pb-8 lg:!pb-10">
       <div
         className="pointer-events-none absolute left-0 top-0 hidden h-full w-[min(320px,40%)] opacity-50 sm:block"
@@ -205,7 +192,7 @@ export default function WhatWeDo() {
             >
               <div className="relative shrink-0">
                 <CardImage
-                  src={withPublicMediaVersion(card.imageUrl, mediaVersion)}
+                  src={card.imageUrl}
                   fallback={card.defaultImageUrl}
                   alt={card.title}
                   priority={index < 4}
@@ -235,5 +222,8 @@ export default function WhatWeDo() {
         </div>
       </div>
     </section>
+        )
+      }}
+    </CmsPageProvider>
   )
 }

@@ -14,7 +14,7 @@ import {
   LuTarget,
   LuTruck,
 } from 'react-icons/lu'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import CmsPageProvider from '../cms/CmsPageProvider'
 import {
   cmsFirstArray,
   cmsStringOrFallback,
@@ -133,16 +133,24 @@ function sectionHasContent(section) {
   )
 }
 
-export default function ProductDetailPage({
-  pageId,
+export default function ProductDetailPage(props) {
+  return (
+    <CmsPageProvider pageId={props.pageId}>
+      {({ content, mediaUrl }) => <ProductDetailContent {...props} content={content} mediaUrl={mediaUrl} />}
+    </CmsPageProvider>
+  )
+}
+
+function ProductDetailContent({
   breadcrumbLabel,
   parentLabel = 'Services',
   parentLink = '/services',
   galleryAltPrefix = 'Product',
   fallbackImages = [],
   defaults = {},
+  content,
+  mediaUrl,
 }) {
-  const { content } = useCmsPage(pageId)
   const hero = {
     eyebrow: cmsStringOrFallback(content.hero?.eyebrow, defaults.hero?.eyebrow),
     title: cmsStringOrFallback(content.hero?.title, defaults.hero?.title),
@@ -173,7 +181,10 @@ export default function ProductDetailPage({
     'description',
   ])
   const brochureUrl =
-    cta.brochureUrl || defaults.defaultBrochureUrl || '/media/pdf_1718978495.pdf'
+    mediaUrl(cta.brochureUrl || defaults.defaultBrochureUrl || '/media/pdf_1718978495.pdf') ||
+    cta.brochureUrl ||
+    defaults.defaultBrochureUrl ||
+    '/media/pdf_1718978495.pdf'
 
   const galleryUrls = content.gallery?.filter(Boolean)?.length
     ? content.gallery.filter(Boolean)

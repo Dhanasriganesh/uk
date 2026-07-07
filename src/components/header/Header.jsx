@@ -17,11 +17,11 @@ function ChevronDown() {
 
 function Header() {
   const location = useLocation()
-  const { settings } = useSiteSettings()
+  const { settings, settingsMediaUrl } = useSiteSettings()
   const navLinks = mergeNavLinks(settings.header?.navLinks)
   const contactLink = navLinks.find((link) => link.path === '/contact')
   const mainNavLinks = navLinks.filter((link) => link.path !== '/contact')
-  const logoSrc = settings.logoUrl || logo
+  const logoSrc = settingsMediaUrl(settings.logoUrl) || logo
   const [openDropdown, setOpenDropdown] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileExpanded, setMobileExpanded] = useState(null)

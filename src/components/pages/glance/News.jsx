@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCmsPage } from '../../../hooks/useCmsPage'
+import CmsPageProvider from '../../cms/CmsPageProvider'
 import { CmsImage } from '../../cms/CmsMedia'
 import GlancePageTitle from '../../glance/GlancePageTitle'
 import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
@@ -121,8 +121,9 @@ function NewsArticle({ article, imageFallback, featured }) {
 }
 
 function News() {
-  const { content } = useCmsPage('news')
-
+  return (
+    <CmsPageProvider pageId="news">
+      {({ content }) => {
   const articles = content.articles?.length
     ? content.articles
     : DEFAULT_ARTICLES
@@ -154,6 +155,9 @@ function News() {
         </div>
       </section>
     </div>
+  )
+      }}
+    </CmsPageProvider>
   )
 }
 

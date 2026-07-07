@@ -91,10 +91,10 @@ function ColumnTitle({ children }) {
 }
 
 function Footer() {
-  const { settings } = useSiteSettings()
+  const { settings, settingsMediaUrl } = useSiteSettings()
   const currentYear = new Date().getFullYear()
   const footer = settings.footer || {}
-  const logoSrc = settings.logoUrl || logo
+  const logoSrc = settingsMediaUrl(settings.logoUrl) || logo
 
   const linkColumns = mergeLinkColumns(footer.linkColumns)
   const highlights = mergeFooterHighlights(footer.highlights)

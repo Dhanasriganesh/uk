@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { subscribePageContent } from '../firebase/cmsService'
 import { getDefaultContent } from '../cms/defaultContent'
 import { mergePageContent } from '../cms/mergePageContent'
 import { readPageContentCache, writePageContentCache } from '../cms/pageContentCache'
-import { toCacheVersion } from '../utils/adminMediaPreview'
+import { toCacheVersion, withPublicMediaVersion } from '../utils/adminMediaPreview'
 
 export function useCmsPage(pageId) {
   const [content, setContent] = useState(() => {
@@ -40,5 +40,10 @@ export function useCmsPage(pageId) {
     return unsub
   }, [pageId])
 
-  return { content, loading, fromFirestore, updatedAt }
+  const mediaUrl = useCallback(
+    (url) => withPublicMediaVersion(typeof url === 'string' ? url.trim() : '', updatedAt),
+    [updatedAt]
+  )
+
+  return { content, loading, fromFirestore, updatedAt, mediaUrl }
 }

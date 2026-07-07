@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { LuArrowRight } from 'react-icons/lu'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import CmsPageProvider from '../cms/CmsPageProvider'
+import { CmsRawImage } from '../cms/CmsMedia'
 import ProductInfoCta from '../products/ProductInfoCta'
 import {
   SERVICE_SLIDES,
@@ -10,19 +11,15 @@ import {
 import { PRODUCT_MARQUEE_IMAGES } from '../products/productsHubDefaults'
 
 function ServiceCardImage({ src, fallback, alt }) {
-  const [failed, setFailed] = useState(false)
-  const url = !failed && src ? src : fallback
-
   return (
     <div className="relative h-44 w-full shrink-0 overflow-hidden sm:h-48 lg:h-52">
-      {url ? (
-        <img
-          src={url}
+      {src || fallback ? (
+        <CmsRawImage
+          src={src}
+          fallback={fallback}
           alt={alt}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
@@ -64,7 +61,7 @@ function ServiceMarquee({ images }) {
             key={idx}
             className="h-14 w-24 shrink-0 overflow-hidden rounded-lg bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] sm:h-16 sm:w-28"
           >
-            <img
+            <CmsRawImage
               src={src}
               alt=""
               className="h-full w-full max-w-none object-cover select-none"
@@ -79,7 +76,9 @@ function ServiceMarquee({ images }) {
 }
 
 export default function Services() {
-  const { content } = useCmsPage('services')
+  return (
+    <CmsPageProvider pageId="services">
+      {({ content }) => {
   const hub = {
     ...SERVICES_HUB_DEFAULTS,
     eyebrow: content.eyebrow || SERVICES_HUB_DEFAULTS.eyebrow,
@@ -174,5 +173,8 @@ export default function Services() {
         cta={cta}
       />
     </div>
+  )
+      }}
+    </CmsPageProvider>
   )
 }

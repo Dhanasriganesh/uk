@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCmsPage } from '../../../hooks/useCmsPage'
+import CmsPageProvider from '../../cms/CmsPageProvider'
 import { CmsImage } from '../../cms/CmsMedia'
 import GlancePageTitle from '../../glance/GlancePageTitle'
 import { glanceTitleFromContent } from '../../glance/glanceTitleFromContent'
@@ -52,8 +52,9 @@ function TeamMemberCard({ member, imageFallback }) {
 }
 
 function Team() {
-  const { content } = useCmsPage('team')
-
+  return (
+    <CmsPageProvider pageId="team">
+      {({ content }) => {
   const members = content.members?.length ? content.members : DEFAULT_MEMBERS
 
   const introLines = content.intro
@@ -96,6 +97,9 @@ function Team() {
         ))}
       </div>
     </section>
+  )
+      }}
+    </CmsPageProvider>
   )
 }
 

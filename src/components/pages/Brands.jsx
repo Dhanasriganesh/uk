@@ -10,7 +10,7 @@ import {
 
 export default function Brands() {
   const { content: brandsContent } = useCmsPage('home-brands')
-  const { content: partnersContent } = useCmsPage('partners')
+  const { content: partnersContent, updatedAt: partnersUpdatedAt } = useCmsPage('partners')
 
   const brands = useMemo(
     () =>
@@ -45,6 +45,7 @@ export default function Brands() {
                   src={brand.resolvedLogoUrl}
                   fallback={brand.logoFallback}
                   alt={brand.name}
+                  cacheVersion={partnersUpdatedAt}
                   className="max-h-full max-w-full object-contain"
                 />
               </div>

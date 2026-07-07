@@ -150,15 +150,20 @@ export async function getSiteSettings() {
 
 export function subscribeSiteSettings(callback) {
   if (!isFirebaseConfigured || !db) {
-    callback(null)
+    callback(null, null)
     return () => {}
   }
   return onSnapshot(
     doc(db, 'cms_settings', 'global'),
     (snap) => {
-      callback(snap.exists() ? snap.data() : null)
+      if (!snap.exists()) {
+        callback(null, null)
+        return
+      }
+      const data = snap.data()
+      callback(data, data.updatedAt ?? null)
     },
-    (error) => handleSnapshotError('cms_settings/global', error, callback)
+    (error) => handleSnapshotError('cms_settings/global', error, () => callback(null, null))
   )
 }
 

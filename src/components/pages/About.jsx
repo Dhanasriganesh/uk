@@ -1,36 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import { useCmsPage } from '../../hooks/useCmsPage'
+import React from 'react'
 import { isPersistentCmsImageUrl, resolveCmsImageUrl } from '../../cms/resolveCmsImageUrl'
+import CmsPageProvider from '../cms/CmsPageProvider'
+import { CmsRawImage } from '../cms/CmsMedia'
 import engWatermark from '../../assets/ats/eng.jpg'
 
-function About() {
-  const { content } = useCmsPage('about')
+function AboutContent({ content }) {
   const paragraphs = content.paragraphs || []
   const cmsWatermark = content.watermarkImageUrl?.trim() || ''
-  const resolvedWatermark = resolveCmsImageUrl(
+  const watermarkSrc = resolveCmsImageUrl(
     isPersistentCmsImageUrl(cmsWatermark) ? cmsWatermark : '',
     engWatermark
   )
-  const [watermarkSrc, setWatermarkSrc] = useState(resolvedWatermark)
-
-  useEffect(() => {
-    setWatermarkSrc(resolvedWatermark)
-  }, [resolvedWatermark])
 
   return (
     <main className="section-py bg-gray-50">
       <div className="site-container">
         <div className="relative overflow-hidden rounded-2xl bg-white p-4 shadow-xl sm:p-6 md:p-8 lg:p-10">
           <div className="pointer-events-none absolute inset-0 flex min-h-full items-center justify-center overflow-hidden" aria-hidden>
-            <img
-              src={watermarkSrc}
+            <CmsRawImage
+              src={watermarkSrc !== engWatermark ? watermarkSrc : ''}
+              fallback={engWatermark}
               alt=""
               className="h-[min(80%,720px)] w-[min(80%,960px)] max-h-none max-w-none object-contain opacity-[0.28] sm:opacity-[0.32]"
               loading="lazy"
-              decoding="async"
-              onError={() => {
-                if (watermarkSrc !== engWatermark) setWatermarkSrc(engWatermark)
-              }}
             />
             <div
               className="absolute inset-0"
@@ -59,6 +51,14 @@ function About() {
         </div>
       </div>
     </main>
+  )
+}
+
+function About() {
+  return (
+    <CmsPageProvider pageId="about">
+      {({ content }) => <AboutContent content={content} />}
+    </CmsPageProvider>
   )
 }
 
