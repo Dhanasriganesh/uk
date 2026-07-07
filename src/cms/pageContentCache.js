@@ -5,7 +5,14 @@ function readStorage(storage, pageId) {
     const raw = storage.getItem(`${PREFIX}${pageId}`)
     if (!raw) return null
     const parsed = JSON.parse(raw)
-    return parsed && typeof parsed === 'object' ? parsed : null
+    if (!parsed || typeof parsed !== 'object') return null
+    if (parsed.content && typeof parsed.content === 'object') {
+      return {
+        content: parsed.content,
+        updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : 0,
+      }
+    }
+    return { content: parsed, updatedAt: 0 }
   } catch {
     return null
   }
@@ -16,9 +23,12 @@ export function readPageContentCache(pageId) {
   return readStorage(localStorage, pageId) ?? readStorage(sessionStorage, pageId)
 }
 
-export function writePageContentCache(pageId, remote) {
+export function writePageContentCache(pageId, remote, updatedAt = Date.now()) {
   if (!pageId || !remote || typeof window === 'undefined') return
-  const payload = JSON.stringify(remote)
+  const payload = JSON.stringify({
+    content: remote,
+    updatedAt: typeof updatedAt === 'number' ? updatedAt : Date.now(),
+  })
   try {
     localStorage.setItem(`${PREFIX}${pageId}`, payload)
   } catch {

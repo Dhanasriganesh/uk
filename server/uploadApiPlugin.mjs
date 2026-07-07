@@ -78,8 +78,8 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body))
 }
 
-function withVersion(url, shouldVersion) {
-  if (!shouldVersion || !url || typeof url !== 'string') return url
+function withVersion(url) {
+  if (!url || typeof url !== 'string') return url
   try {
     const u = new URL(url)
     u.searchParams.set('v', Date.now().toString())
@@ -102,7 +102,7 @@ async function uploadToVercelBlob(fileBuffer, fileName, mimeType, replaceUrl, { 
 
   const blob = await put(pathname, fileBuffer, options)
   return {
-    url: withVersion(blob.url, Boolean(replaceUrl)),
+    url: withVersion(blob.url),
     storagePath: pathname,
     source: 'blob',
   }

@@ -99,15 +99,20 @@ export async function getPageContent(pageId) {
 
 export function subscribePageContent(pageId, callback) {
   if (!isFirebaseConfigured || !db) {
-    callback(null)
+    callback(null, null)
     return () => {}
   }
   return onSnapshot(
     doc(db, PAGES_COLLECTION, pageId),
     (snap) => {
-      callback(snap.exists() ? snap.data().content : null)
+      if (!snap.exists()) {
+        callback(null, null)
+        return
+      }
+      const data = snap.data()
+      callback(data.content ?? null, data.updatedAt ?? null)
     },
-    (error) => handleSnapshotError(`cms_pages/${pageId}`, error, callback)
+    (error) => handleSnapshotError(`cms_pages/${pageId}`, error, () => callback(null, null))
   )
 }
 
@@ -124,7 +129,7 @@ export async function savePageContent(pageId, content, userEmail) {
     },
     { merge: true }
   )
-  writePageContentCache(pageId, content)
+  writePageContentCache(pageId, content, Date.now())
 }
 
 export async function getAllPagesFromFirestore() {

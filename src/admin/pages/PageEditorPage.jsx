@@ -10,7 +10,8 @@ import {
   subscribeSiteSettings,
 } from '../../firebase/cmsService'
 import { mergePageContent } from '../../cms/mergePageContent'
-import { readPageContentCache } from '../../cms/pageContentCache'
+import { readPageContentCache, writePageContentCache } from '../../cms/pageContentCache'
+import { toCacheVersion } from '../../utils/adminMediaPreview'
 import { useAuth } from '../../context/AuthContext'
 import DynamicForm from '../components/DynamicForm'
 import SettingsEditor from '../components/SettingsEditor'
@@ -40,8 +41,8 @@ export default function PageEditorPage() {
 
     if (!isSettings) {
       const cached = readPageContentCache(pageId)
-      if (cached) {
-        setData(mergePageContent(pageId, defaults, cached))
+      if (cached?.content) {
+        setData(mergePageContent(pageId, defaults, cached.content))
         setLoading(false)
       } else {
         setData(null)
@@ -52,7 +53,7 @@ export default function PageEditorPage() {
       setLoading(true)
     }
 
-    const applyRemote = (remote) => {
+    const applyRemote = (remote, remoteUpdatedAt) => {
       if (isDirtyRef.current) return
       if (isSettings) {
         const rest = remote ? { ...remote } : {}
@@ -61,6 +62,9 @@ export default function PageEditorPage() {
         setData(mergePageContent('settings', defaults, rest))
       } else {
         setData(mergePageContent(pageId, defaults, remote))
+        if (remote) {
+          writePageContentCache(pageId, remote, toCacheVersion(remoteUpdatedAt) || Date.now())
+        }
       }
       setLoading(false)
     }

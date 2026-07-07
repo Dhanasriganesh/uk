@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import { resolveHeroVideoUrl } from '../../cms/mediaPaths'
 import { resolveCmsImageUrl } from '../../cms/resolveCmsImageUrl'
+import { withPublicMediaVersion } from '../../utils/adminMediaPreview'
 import { isFirebaseStoragePath } from '../../cms/mediaSeed'
 import { resolveFirebaseStorageMediaUrl } from '../../firebase/resolveStorageMediaUrl'
 import { getVideoPlayback } from '../../utils/videoEmbed'
@@ -19,6 +20,7 @@ export function CmsImage({
   className = '',
   loading = 'lazy',
   decoding = 'async',
+  cacheVersion = 0,
   ...props
 }) {
   const initial = needsStorageResolve(src) ? '' : resolveCmsImageUrl(src, fallback)
@@ -26,21 +28,23 @@ export function CmsImage({
 
   useEffect(() => {
     let cancelled = false
-    const sync = resolveCmsImageUrl(src, fallback)
+    const sync = withPublicMediaVersion(resolveCmsImageUrl(src, fallback), cacheVersion)
     setUrl(sync)
 
     async function resolveStorage() {
       const trimmed = typeof src === 'string' ? src.trim() : ''
       if (!trimmed || !needsStorageResolve(trimmed)) return
       const resolved = await resolveFirebaseStorageMediaUrl(trimmed)
-      if (!cancelled && resolved) setUrl(resolved)
+      if (!cancelled && resolved) {
+        setUrl(withPublicMediaVersion(resolved, cacheVersion))
+      }
     }
 
     resolveStorage()
     return () => {
       cancelled = true
     }
-  }, [src, fallback])
+  }, [src, fallback, cacheVersion])
 
   if (!url) return null
 

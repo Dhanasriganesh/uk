@@ -1,6 +1,7 @@
 import React from 'react'
 import { useCmsPage } from '../../hooks/useCmsPage'
 import SectorCardIcon from '../icons/SectorCardIcon'
+import { withPublicMediaVersion } from '../../utils/adminMediaPreview'
 
 const CARD_DEFAULTS = [
   {
@@ -161,8 +162,9 @@ function mergeCards(cmsCards, { cmsReady = true } = {}) {
 }
 
 export default function WhatWeDo() {
-  const { content, loading, fromFirestore } = useCmsPage('home-what-we-do')
+  const { content, loading, fromFirestore, updatedAt } = useCmsPage('home-what-we-do')
   const cards = mergeCards(content.cards, { cmsReady: !loading || fromFirestore })
+  const mediaVersion = updatedAt
 
   return (
     <section className="section-py relative w-full overflow-x-hidden bg-white !pb-6 sm:!pb-8 lg:!pb-10">
@@ -203,7 +205,7 @@ export default function WhatWeDo() {
             >
               <div className="relative shrink-0">
                 <CardImage
-                  src={card.imageUrl}
+                  src={withPublicMediaVersion(card.imageUrl, mediaVersion)}
                   fallback={card.defaultImageUrl}
                   alt={card.title}
                   priority={index < 4}

@@ -131,8 +131,8 @@ function blobUploadResult(blob, pathname) {
   }
 }
 
-function withVersion(url, shouldVersion) {
-  if (!shouldVersion || !url || typeof url !== 'string') return url
+function withVersion(url) {
+  if (!url || typeof url !== 'string') return url
   try {
     const u = new URL(url)
     u.searchParams.set('v', Date.now().toString())
@@ -308,7 +308,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       // When replacing an existing file path, append a version query to bypass stale CDN/browser cache.
-      url: withVersion(result.url, Boolean(replaceUrl)),
+      url: withVersion(result.url),
       storagePath: result.storagePath,
       size: fileBuffer.length,
       type: mimeType,
