@@ -72,15 +72,19 @@ const CARD_DEFAULTS = [
 const CARD_IMAGE_ASPECT = 'aspect-[16/10]'
 
 function CardImage({ src, fallback, alt, priority = false }) {
-  const [activeUrl, setActiveUrl] = React.useState(src || fallback || '')
-  const [loaded, setLoaded] = React.useState(false)
+  const [currentSrc, setCurrentSrc] = React.useState(() => src || fallback || '')
 
   React.useEffect(() => {
-    setActiveUrl(src || fallback || '')
-    setLoaded(false)
+    setCurrentSrc(src || fallback || '')
   }, [src, fallback])
 
-  if (!activeUrl) {
+  const handleError = () => {
+    if (fallback && currentSrc !== fallback) {
+      setCurrentSrc(fallback)
+    }
+  }
+
+  if (!currentSrc) {
     return (
       <div
         className={`w-full shrink-0 rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
@@ -92,25 +96,15 @@ function CardImage({ src, fallback, alt, priority = false }) {
     <div
       className={`relative w-full shrink-0 overflow-hidden rounded-t-[10px] bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb] ${CARD_IMAGE_ASPECT}`}
     >
-      {!loaded ? (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f5f5f5] to-[#ebebeb]" aria-hidden />
-      ) : null}
       <img
-        src={activeUrl}
+        key={currentSrc}
+        src={currentSrc}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         fetchPriority={priority ? 'high' : 'auto'}
         decoding="async"
-        onLoad={() => setLoaded(true)}
-        onError={() => {
-          if (fallback && activeUrl !== fallback) {
-            setActiveUrl(fallback)
-            setLoaded(false)
-          }
-        }}
-        className={`h-full w-full object-cover object-center transition-opacity duration-200 ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        }`}
+        onError={handleError}
+        className="h-full w-full object-cover object-center"
       />
     </div>
   )
@@ -129,15 +123,19 @@ const BROKEN_IMAGE_URLS = new Set([
 function resolveImageUrl(cmsUrl, defaultUrl) {
   const trimmed = cmsUrl?.trim()
   if (!trimmed || BROKEN_IMAGE_URLS.has(trimmed)) return defaultUrl
+  if (import.meta.env.PROD && (trimmed.startsWith('/media/') || trimmed.startsWith('/videos/'))) {
+    return defaultUrl
+  }
   if (trimmed.includes('blob.vercel-storage.com') || trimmed.includes('firebasestorage.googleapis.com')) {
     return trimmed
   }
-  return trimmed
+  return trimmed || defaultUrl
 }
 
-function isUploadedImage(url) {
+function isRemoteUpload(url) {
   return (
-    url.includes('blob.vercel-storage.com') || url.includes('firebasestorage.googleapis.com')
+    url.includes('blob.vercel-storage.com') ||
+    url.includes('firebasestorage.googleapis.com')
   )
 }
 
@@ -147,12 +145,11 @@ function mergeCards(cmsCards, { cmsReady = true } = {}) {
     const card = list[i] || {}
     const cmsImage = card.imageUrl?.trim()
     const hasCmsImage = cmsImage && !BROKEN_IMAGE_URLS.has(cmsImage)
-    const imageUrl =
-      hasCmsImage && isUploadedImage(cmsImage)
-        ? cmsImage
-        : cmsReady
-          ? resolveImageUrl(card.imageUrl, def.imageUrl)
-          : ''
+    const imageUrl = hasCmsImage && isRemoteUpload(cmsImage)
+      ? cmsImage
+      : cmsReady
+        ? resolveImageUrl(card.imageUrl, def.imageUrl)
+        : ''
     return {
       title: card.title || def.title,
       description: card.description || def.description,

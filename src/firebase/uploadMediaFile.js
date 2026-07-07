@@ -83,7 +83,7 @@ async function uploadImage(file, { onProgress, replaceUrl } = {}) {
   let uploadFile = file
   let compression = null
   try {
-    compression = await compressImageForUpload(file)
+    compression = await compressImageForUpload(file, { replaceUrl })
     uploadFile = compression.file
   } catch (err) {
     console.warn('[upload] Image compression skipped:', err.message)

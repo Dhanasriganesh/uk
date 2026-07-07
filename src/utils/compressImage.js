@@ -48,8 +48,20 @@ function canvasToBlob(canvas, type, quality) {
   })
 }
 
-function buildFileName(originalName, extension) {
+function buildFileName(originalName, extension, replaceUrl) {
   const base = (originalName || 'image').replace(/\.[^.]+$/, '').slice(0, 100) || 'image'
+  if (replaceUrl) {
+    try {
+      const path = new URL(replaceUrl).pathname
+      const existing = path.split('/').pop() || ''
+      const existingExt = existing.includes('.') ? existing.slice(existing.lastIndexOf('.')) : ''
+      if (existingExt) return existing
+    } catch {
+      const localName = replaceUrl.split('/').pop()?.split('?')[0] || ''
+      const localExt = localName.includes('.') ? localName.slice(localName.lastIndexOf('.')) : ''
+      if (localExt) return localName
+    }
+  }
   return `${base}${extension}`
 }
 
@@ -81,6 +93,7 @@ export async function compressImageForUpload(
     quality = DEFAULT_QUALITY,
     maxBytes = DEFAULT_MAX_BYTES,
     skipBelowBytes = SKIP_BELOW_BYTES,
+    replaceUrl,
   } = {}
 ) {
   const mime = (file.type || '').toLowerCase()
@@ -126,7 +139,7 @@ export async function compressImageForUpload(
     return { file, didCompress: false, originalBytes: file.size, finalBytes: file.size }
   }
 
-  const compressedFile = new File([blob], buildFileName(file.name, extension), {
+  const compressedFile = new File([blob], buildFileName(file.name, extension, replaceUrl), {
     type: outputMime,
     lastModified: Date.now(),
   })
