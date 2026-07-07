@@ -73,6 +73,65 @@ function HeroImageFrame({ src, fallback, alt }) {
   )
 }
 
+function ThumbnailFrame({ img, fallback }) {
+  return (
+    <div className="min-w-0 overflow-hidden bg-neutral-200">
+      <CmsImage
+        src={img.imageUrl}
+        fallback={fallback}
+        alt={img.alt || ''}
+        className="aspect-[4/3] w-full object-cover"
+      />
+    </div>
+  )
+}
+
+function ThumbnailCarousel({ thumbnails }) {
+  const looped = thumbnails.length > 0 ? [...thumbnails, ...thumbnails] : []
+
+  return (
+    <div className="mt-8 overflow-hidden lg:mt-10">
+      <div className="hidden gap-2 sm:grid sm:grid-cols-4 sm:gap-3">
+        {thumbnails.map((img, i) => (
+          <ThumbnailFrame
+            key={img.alt || i}
+            img={img}
+            fallback={FALLBACK_THUMBNAILS[i]?.imageUrl}
+          />
+        ))}
+      </div>
+
+      <div className="relative overflow-x-hidden sm:hidden">
+        <div className="animate-marquee-slow flex w-max gap-2">
+          {looped.map((img, i) => (
+            <div key={`${img.alt || 'thumb'}-${i}`} className="w-44 shrink-0">
+              <ThumbnailFrame
+                img={img}
+                fallback={FALLBACK_THUMBNAILS[i % thumbnails.length]?.imageUrl}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ParagraphBlock({ paragraphs, padWith = [] }) {
+  return (
+    <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
+      {paragraphs.map((text, i) => (
+        <p key={i}>{text}</p>
+      ))}
+      {padWith.map((text, i) => (
+        <p key={`pad-${i}`} className="invisible select-none" aria-hidden>
+          {text}
+        </p>
+      ))}
+    </div>
+  )
+}
+
 function AtsContent({ content }) {
   const glanceTitle = glanceTitleFromContent(content)
   const leftHeading = (content.leftHeading ?? '').trim()
@@ -86,6 +145,10 @@ function AtsContent({ content }) {
   const rightParagraphs =
     content.rightParagraphs?.length > 0 ? content.rightParagraphs : FALLBACK_RIGHT_PARAGRAPHS
   const thumbnails = content.thumbnails?.length > 0 ? content.thumbnails : FALLBACK_THUMBNAILS
+  const paragraphPad =
+    welcomeParagraphs.length > rightParagraphs.length
+      ? welcomeParagraphs.slice(rightParagraphs.length)
+      : []
 
   return (
     <section className="site-container bg-white pb-12 pt-8 sm:pb-16 sm:pt-10 lg:pb-20">
@@ -135,7 +198,6 @@ function AtsContent({ content }) {
             fallback={FALLBACK_IMAGES.cabinInterior}
             alt="ATS facilities and capabilities"
           />
-          <div className="mt-3 h-px w-full sm:mt-4" style={{ backgroundColor: RED }} aria-hidden />
         </div>
       </div>
 
@@ -143,34 +205,22 @@ function AtsContent({ content }) {
         <div id="company-history" className="scroll-mt-28">
           <h3 className="mb-2 text-lg font-bold text-[#555555] sm:text-xl lg:text-[1.35rem]">{welcomeHeading}</h3>
           <div className="mb-4 h-px w-full sm:mb-5" style={{ backgroundColor: RED }} aria-hidden />
-          <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
-            {welcomeParagraphs.map((text, i) => (
-              <p key={i}>{text}</p>
-            ))}
-          </div>
+          <ParagraphBlock paragraphs={welcomeParagraphs} />
         </div>
 
         <div id="why-ats-uk" className="scroll-mt-28">
-          <div className="space-y-3.5 text-[13px] leading-[1.65] text-black sm:space-y-4 sm:text-sm sm:leading-[1.7]">
-            {rightParagraphs.map((text, i) => (
-              <p key={i}>{text}</p>
-            ))}
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-8 sm:gap-3">
-            {thumbnails.map((img, i) => (
-              <div key={img.alt || i} className="overflow-hidden bg-neutral-200">
-                <CmsImage
-                  src={img.imageUrl}
-                  fallback={FALLBACK_THUMBNAILS[i]?.imageUrl}
-                  alt={img.alt || ''}
-                  className="aspect-[4/3] w-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          <h3
+            className="mb-2 text-lg font-bold text-transparent sm:text-xl lg:text-[1.35rem]"
+            aria-hidden
+          >
+            {welcomeHeading}
+          </h3>
+          <div className="mb-4 h-px w-full sm:mb-5" style={{ backgroundColor: RED }} aria-hidden />
+          <ParagraphBlock paragraphs={rightParagraphs} padWith={paragraphPad} />
         </div>
       </div>
+
+      <ThumbnailCarousel thumbnails={thumbnails} />
     </section>
   )
 }
