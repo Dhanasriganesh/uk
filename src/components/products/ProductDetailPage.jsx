@@ -210,7 +210,7 @@ function ProductDetailContent({
   }
 
   return (
-    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+    <div className="page-shell bg-white text-[#111111]">
       <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
         <div className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]" aria-hidden />
         <div className="site-container relative">
@@ -232,7 +232,7 @@ function ProductDetailContent({
             </ol>
           </nav>
 
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="split-hero-grid">
             <div className="min-w-0">
               {hero.eyebrow ? (
                 <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
@@ -240,7 +240,7 @@ function ProductDetailContent({
                 </p>
               ) : null}
               {hero.title || hero.titleHighlight ? (
-                <h1 className="text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+                <h1 className="page-hero-title text-[#111111]">
                   {hero.title}
                   {hero.title && hero.titleHighlight ? ' ' : null}
                   {hero.titleHighlight ? (
@@ -422,7 +422,7 @@ function ProductDetailContent({
             key={`${section.title || 'section'}-${idx}`}
             className={`site-container py-10 sm:py-12 lg:py-14 ${idx > 0 ? 'border-t border-[#f1f1f1]' : ''}`}
           >
-            <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="split-hero-grid">
               {reversed ? (
                 <>
                   <div className="order-2 lg:order-1">{mediaBlock}</div>

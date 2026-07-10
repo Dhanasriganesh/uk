@@ -10,7 +10,7 @@ export default function GlancePageTitle({
 }) {
   return (
     <header className={`text-center ${className}`}>
-      <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-black">
+      <h1 className="page-hero-title-sm text-black">
         {line1}{' '}
         <span className="text-[#dc2626]">{highlight}</span>
       </h1>

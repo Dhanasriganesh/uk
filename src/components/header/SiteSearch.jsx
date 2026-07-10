@@ -97,8 +97,8 @@ export default function SiteSearch({ navLinks, className = '', onNavigate }) {
           aria-expanded={showDropdown}
           aria-controls={`${listId}-results`}
           aria-autocomplete="list"
-          className={`h-10 rounded-[10px] border border-[#e5e7eb] bg-[#fafafa] pl-9 pr-3 text-[14px] text-[#111111] placeholder:text-[#9ca3af] transition-colors focus:border-[#dc2626] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dc2626]/15 ${
-            fullWidth ? 'w-full' : 'w-[11rem] xl:w-[14rem]'
+          className={`h-9 rounded-[10px] border border-[#e5e7eb] bg-[#fafafa] pl-9 pr-3 text-[13px] text-[#111111] placeholder:text-[#9ca3af] transition-colors focus:border-[#dc2626] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dc2626]/15 md:h-10 md:text-[14px] ${
+            fullWidth ? 'w-full' : 'w-[8.5rem] md:w-[9.5rem] lg:w-[10rem] xl:w-[12rem] 2xl:w-[14rem]'
           }`}
         />
       </div>

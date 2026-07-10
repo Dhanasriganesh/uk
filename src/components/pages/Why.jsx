@@ -17,7 +17,7 @@ function Why() {
     <section className="section-py w-full bg-gray-50 !pt-6 sm:!pt-8 lg:!pt-10">
       <div className="site-container">
         <div className="mb-8 text-center sm:mb-12 lg:mb-16">
-          <h2 className="mb-3 text-[clamp(1.75rem,5vw,3rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-black sm:mb-4">
+          <h2 className="page-hero-title-lg mb-3 text-black sm:mb-4">
             {content.titleLine1 || 'Why Choose'}{' '}
             <span className="text-[#dc2626]">{content.titleHighlight || 'ATS UK?'}</span>
           </h2>

@@ -72,10 +72,10 @@ function Connect() {
             }}
           >
             <div className="absolute inset-0 bg-blue-900/80" />
-            <div className="site-container relative z-10 flex flex-col items-stretch gap-8 py-10 sm:gap-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-20">
-              <div className="flex-1 text-center text-white lg:max-w-xl lg:text-left">
+            <div className="site-container relative z-10 flex flex-col items-stretch gap-8 py-10 sm:gap-10 sm:py-14 md:flex-row md:items-center md:justify-between md:gap-12 lg:gap-16 lg:py-20">
+              <div className="flex-1 text-center text-white md:max-w-xl md:text-left">
                 <h2
-                  className="mb-2 text-[clamp(1.35rem,4vw,3rem)] font-bold sm:mb-4"
+                  className="page-hero-title-lg mb-2 text-white sm:mb-4"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   {content.title || "Let's Connect"}

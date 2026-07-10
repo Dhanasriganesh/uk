@@ -68,7 +68,7 @@ function PartnersContent({ content }) {
   const glanceTitle = glanceTitleFromContent(content)
 
   return (
-    <div className="w-full overflow-x-hidden bg-white">
+    <div className="page-shell bg-white">
       <div className="site-container pt-8 sm:pt-10 lg:pt-12">
         <GlancePageTitle
           line1={glanceTitle.line1}

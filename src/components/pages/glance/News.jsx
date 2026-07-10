@@ -55,12 +55,12 @@ function NewsArticle({ article, imageFallback, featured }) {
   return (
     <article
       className={`overflow-hidden rounded-2xl border border-[#f1f1f1] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.06)] ${
-        featured ? 'lg:flex lg:min-h-[320px]' : ''
+        featured ? 'md:flex md:flex-row md:items-stretch' : ''
       }`}
     >
       <div
         className={`relative shrink-0 bg-[#f8f8f8] ${
-          featured ? 'lg:w-[42%]' : ''
+          featured ? 'md:w-[42%]' : ''
         }`}
       >
         <CmsImage
@@ -69,7 +69,7 @@ function NewsArticle({ article, imageFallback, featured }) {
           alt={article.title || 'News'}
           className={`w-full object-cover ${
             featured
-              ? 'aspect-[16/10] lg:h-full lg:min-h-[280px] lg:aspect-auto'
+              ? 'aspect-[16/10] md:h-full md:max-h-[420px] md:object-cover lg:max-h-none'
               : 'aspect-[16/10]'
           }`}
         />
@@ -79,7 +79,7 @@ function NewsArticle({ article, imageFallback, featured }) {
         />
       </div>
 
-      <div className={`flex flex-col justify-center p-6 sm:p-8 lg:p-10 ${featured ? 'lg:flex-1' : ''}`}>
+      <div className={`flex flex-col justify-center p-6 sm:p-8 lg:p-10 ${featured ? 'md:flex-1' : ''}`}>
         {article.date && (
           <time
             dateTime={article.date}

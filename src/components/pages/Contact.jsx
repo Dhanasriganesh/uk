@@ -86,7 +86,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+    <div className="page-shell bg-white text-[#111111]">
       <section className="relative overflow-hidden bg-[#111111] pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#1a1a1a]"
@@ -120,7 +120,7 @@ export default function Contact() {
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#fca5a5] sm:text-sm">
               {hub.eyebrow}
             </p>
-            <h1 className="mt-3 text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-white">
+            <h1 className="page-hero-title mt-3 text-white">
               {hub.pageTitle}{' '}
               <span className="text-[#dc2626]">{hub.pageTitleHighlight}</span>
             </h1>
@@ -156,7 +156,7 @@ export default function Contact() {
 
       <section className="border-y border-[#f1f1f1] bg-[#fafafa] py-12 sm:py-16 lg:py-20">
         <div className="site-container">
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="grid gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
             <div className="rounded-2xl border border-[#f1f1f1] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-8">
               <h2 className="mb-6 text-2xl font-bold text-[#111111] sm:text-3xl">
                 {hub.formSectionTitle}

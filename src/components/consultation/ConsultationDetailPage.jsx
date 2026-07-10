@@ -103,7 +103,7 @@ export default function ConsultationDetailPage({
     cta.brochureUrl
 
   return (
-    <div className="w-full overflow-x-hidden bg-white text-[#111111]">
+    <div className="page-shell bg-white text-[#111111]">
       <section className="relative overflow-hidden bg-white pb-10 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-[68%] rounded-br-[min(28vw,200px)] bg-[#f5f5f5]"
@@ -139,19 +139,19 @@ export default function ConsultationDetailPage({
 
           {(showHeroText || showHeroImage) && (
             <div
-              className={`grid grid-cols-1 gap-8 ${
-                showHeroText && showHeroImage ? 'lg:grid-cols-2 lg:gap-12' : ''
+              className={`${
+                showHeroText && showHeroImage ? 'split-hero-grid' : 'grid grid-cols-1 gap-8'
               } items-center`}
             >
               {showHeroText ? (
-                <div className={`min-w-0 ${showHeroImage ? 'order-2 lg:order-1' : ''}`}>
+                <div className={`min-w-0 ${showHeroImage ? 'order-2 md:order-1' : ''}`}>
                   {eyebrow ? (
                     <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#dc2626] sm:text-sm">
                       {eyebrow}
                     </p>
                   ) : null}
                   {title || titleHighlight ? (
-                    <h1 className="text-[clamp(1.75rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-[#111111]">
+                    <h1 className="page-hero-title text-[#111111]">
                       {title ? <>{title} </> : null}
                       {titleHighlight ? (
                         <span className="text-[#dc2626]">{titleHighlight}</span>
@@ -169,7 +169,7 @@ export default function ConsultationDetailPage({
                 </div>
               ) : null}
               {showHeroImage ? (
-                <div className={showHeroText ? 'order-1 lg:order-2' : ''}>
+                <div className={showHeroText ? 'order-1 md:order-2' : ''}>
                   <HeroImage src={heroImageUrl} alt={breadcrumbLabel} />
                 </div>
               ) : null}

@@ -34,7 +34,7 @@ function AboutContent({ content }) {
           </div>
 
           <div className="relative z-10 flex flex-col gap-4 sm:gap-5">
-            <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-black">
+            <h1 className="page-hero-title-sm text-black">
               {content.pageTitleLine1 || 'About'}{' '}
               <span className="text-[#dc2626]">{content.pageTitleHighlight || 'Us'}</span>
             </h1>

@@ -166,13 +166,13 @@ export default function WhatWeDo() {
         aria-hidden
       />
 
-      <div className="site-container relative">
+      <div className="site-container relative min-w-0">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#dc2626] sm:text-xs">
             {content.eyebrow || 'WHAT WE DO'}
           </p>
           <h2
-            className="mt-3 text-[28px] font-bold leading-tight tracking-tight text-[#111111] sm:mt-4 sm:text-[34px] lg:text-[40px]"
+            className="mt-3 text-[clamp(1.5rem,3vw+0.5rem,2.5rem)] font-bold leading-tight tracking-tight text-[#111111] sm:mt-4"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             {content.heading || 'Our Services and'}{' '}

@@ -3,7 +3,7 @@ import React from 'react'
 /** Standard page hero: stacks on mobile, two columns from md up */
 export function PageHero({ children, className = '' }) {
   return (
-    <section className={`site-container py-8 sm:py-12 lg:py-14 ${className}`}>
+    <section className={`site-container min-w-0 py-8 sm:py-12 lg:py-14 ${className}`}>
       <div className="page-hero-grid">{children}</div>
     </section>
   )

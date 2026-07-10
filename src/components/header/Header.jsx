@@ -19,8 +19,6 @@ function Header() {
   const location = useLocation()
   const { settings, settingsMediaUrl } = useSiteSettings()
   const navLinks = mergeNavLinks(settings.header?.navLinks)
-  const contactLink = navLinks.find((link) => link.path === '/contact')
-  const mainNavLinks = navLinks.filter((link) => link.path !== '/contact')
   const logoSrc = settingsMediaUrl(settings.logoUrl) || logo
   const [openDropdown, setOpenDropdown] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -82,18 +80,18 @@ function Header() {
         showHeader ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="mx-auto flex h-full w-full max-w-[1280px] items-center gap-3 px-4 sm:gap-4 sm:px-6">
+      <div className="site-container flex h-full min-w-0 items-center gap-2 sm:gap-3 lg:gap-4">
         <Link to="/" className="flex h-full shrink-0 items-center py-1" aria-label="ATS home">
           <img
             src={logoSrc}
             alt={settings.siteName || 'ATS'}
-            className="h-10 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-11 lg:h-12"
+            className="h-9 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-10 lg:h-11 xl:h-12"
           />
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-center lg:flex" aria-label="Main">
-          <ul className="flex items-center gap-6 xl:gap-[42px]">
-            {mainNavLinks.map((link) => (
+        <nav className="hidden min-w-0 flex-1 items-center justify-center xl:flex" aria-label="Main">
+          <ul className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-1 lg:gap-x-3 xl:gap-x-5 2xl:gap-x-8">
+            {navLinks.map((link) => (
               <li key={link.name} className="relative flex list-none items-center">
                 <div
                   className="relative"
@@ -102,7 +100,7 @@ function Header() {
                 >
                   <Link
                     to={link.path}
-                    className={`relative inline-flex items-center gap-1 py-1 text-[15px] font-semibold leading-none transition-colors xl:text-[16px] ${
+                    className={`relative inline-flex items-center gap-0.5 whitespace-nowrap py-1 text-[13px] font-semibold leading-none transition-colors lg:text-[13px] xl:text-[14px] 2xl:text-[15px] ${
                       isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
                     }`}
                   >
@@ -142,25 +140,15 @@ function Header() {
           </ul>
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center justify-end gap-2 sm:gap-3 lg:ml-0">
-          {contactLink && (
-            <Link
-              to={contactLink.path}
-              className={`hidden py-1 text-[15px] font-semibold leading-none transition-colors xl:text-[16px] lg:inline-flex ${
-                isActive(contactLink.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
-              }`}
-            >
-              {contactLink.name}
-            </Link>
-          )}
-
-          <SiteSearch navLinks={navLinks} className="hidden lg:block" onNavigate={closeMobile} />
+        <div className="ml-auto flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 lg:ml-0 lg:gap-2 xl:gap-3">
+          <SiteSearch navLinks={navLinks} className="hidden md:block" onNavigate={closeMobile} />
 
           <Link
             to="/contact"
-            className="hidden h-10 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#dc2626] lg:inline-flex"
+            className="hidden h-9 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#dc2626] md:inline-flex xl:h-10 xl:px-5 xl:text-[14px]"
           >
-            Request a Quote
+            <span className="hidden xl:inline">Request a Quote</span>
+            <span className="xl:hidden">Quote</span>
             <svg className="h-4 w-4 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7-7 7M21 12H3" />
             </svg>
@@ -168,7 +156,7 @@ function Header() {
 
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] lg:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] xl:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -190,7 +178,7 @@ function Header() {
       {mobileOpen && (
         <div
           id="mobile-nav"
-          className="fixed inset-0 z-40 bg-black/40 pt-[var(--header-height)] transition-opacity duration-300 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 pt-[var(--header-height)] transition-opacity duration-300 xl:hidden"
           onClick={closeMobile}
         >
           <div
@@ -198,7 +186,7 @@ function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col p-6" aria-label="Mobile">
-              <SiteSearch navLinks={navLinks} className="mb-4 w-full lg:hidden" onNavigate={closeMobile} />
+              <SiteSearch navLinks={navLinks} className="mb-4 w-full xl:hidden" onNavigate={closeMobile} />
               {navLinks.map((link) => (
                 <div key={link.name} className="border-b border-[#f1f1f1] py-3 last:border-0">
                   <div className="flex items-center justify-between gap-2">
