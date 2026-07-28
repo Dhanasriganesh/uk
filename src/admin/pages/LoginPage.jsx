@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { LuLock, LuMail, LuPanelLeft, LuShield } from 'react-icons/lu'
 import { useAuth } from '../../context/AuthContext'
+import { formatAuthError } from '../../firebase/formatAuthError'
 import Alert from '../components/ui/Alert'
 
 export default function LoginPage() {
@@ -24,7 +25,7 @@ export default function LoginPage() {
       await login(email, password)
       navigate('/admin')
     } catch (err) {
-      setError(err.message || 'Login failed. Check your email and password.')
+      setError(formatAuthError(err))
     } finally {
       setSubmitting(false)
     }

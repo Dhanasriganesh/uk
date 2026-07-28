@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { LuPlus, LuTrash2 } from 'react-icons/lu'
 import MediaUrlField from './MediaUrlField'
+import ImageListField from './ImageListField'
 import IconPickerField from './IconPickerField'
 import BrochureUrlField from './BrochureUrlField'
 
@@ -18,7 +19,8 @@ function isMediaUrlField(key) {
 }
 
 function formatLabel(key) {
-  return key
+  const str = String(key ?? '')
+  return str
     .replace(/([A-Z])/g, ' $1')
     .replace(/[_-]/g, ' ')
     .replace(/^\w/, (c) => c.toUpperCase())
@@ -79,7 +81,15 @@ function StringField({ path, value, onChange }) {
 function ArrayOfStrings({ path, value, onChange }) {
   const items = Array.isArray(value) ? value : []
   const key = path[path.length - 1]
-  const useMediaUpload = key === 'gallery' || key === 'galleryImageUrls'
+  const useImageList =
+    key === 'gallery' ||
+    key === 'galleryImageUrls' ||
+    key === 'carouselLeft' ||
+    key === 'carouselRight'
+
+  if (useImageList) {
+    return <ImageListField path={path} value={value} onChange={onChange} />
+  }
 
   return (
     <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
@@ -87,34 +97,18 @@ function ArrayOfStrings({ path, value, onChange }) {
       <div className="space-y-2">
         {items.map((item, i) => (
           <div key={i} className="flex gap-2">
-            {useMediaUpload ? (
-              <div className="min-w-0 flex-1">
-                <MediaUrlField
-                  path={[...path, i]}
-                  value={item}
-                  onChange={(_, url, options) => {
-                    const next = [...items]
-                    next[i] = url
-                    onChange(path, next, options)
-                  }}
-                />
-              </div>
-            ) : (
-              <input
-                className={inputClass}
-                value={item}
-                onChange={(e) => {
-                  const next = [...items]
-                  next[i] = e.target.value
-                  onChange(path, next)
-                }}
-              />
-            )}
+            <input
+              className={inputClass}
+              value={item}
+              onChange={(e) => {
+                const next = [...items]
+                next[i] = e.target.value
+                onChange(path, next)
+              }}
+            />
             <button
               type="button"
-              className={`flex shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-600 transition-colors hover:bg-red-50 ${
-                useMediaUpload ? 'h-10 w-10 self-start' : 'h-10 w-10'
-              }`}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-600 transition-colors hover:bg-red-50"
               onClick={() => onChange(path, items.filter((_, j) => j !== i))}
               aria-label="Remove item"
             >
@@ -245,13 +239,30 @@ function DynamicFormFields({ data, path = [], onChange }) {
 }
 
 export default function DynamicForm({ data, onChange, onAutoSave }) {
+  const dataRef = useRef(data)
+  dataRef.current = data
+
   const handleChange = (path, newValue, options = {}) => {
-    const next = structuredClone(data)
+    const next = structuredClone(dataRef.current)
     let cursor = next
     for (let i = 0; i < path.length - 1; i++) {
       cursor = cursor[path[i]]
     }
-    cursor[path[path.length - 1]] = newValue
+    const fieldKey = path[path.length - 1]
+    if (options.appendUrl) {
+      const current = Array.isArray(cursor[fieldKey]) ? cursor[fieldKey].filter(Boolean) : []
+      cursor[fieldKey] = [...current, options.appendUrl]
+    } else if (options.replaceIndex !== undefined && options.replaceUrl) {
+      const current = Array.isArray(cursor[fieldKey]) ? cursor[fieldKey].filter(Boolean) : []
+      const idx = options.replaceIndex
+      if (idx >= 0 && idx < current.length) {
+        current[idx] = options.replaceUrl
+        cursor[fieldKey] = current
+      }
+    } else {
+      cursor[fieldKey] = newValue
+    }
+    dataRef.current = next
     onChange(next)
     if (options.autoSave) onAutoSave?.(next)
   }

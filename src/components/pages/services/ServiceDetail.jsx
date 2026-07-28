@@ -9,6 +9,7 @@ export default function ServiceDetail({ serviceId }) {
   return (
     <ProductDetailPage
       pageId={serviceId}
+      showServiceCarousels
       breadcrumbLabel={service.shortTitle}
       parentLabel="Services"
       parentLink="/services"

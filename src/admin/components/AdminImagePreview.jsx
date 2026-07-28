@@ -1,46 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withAdminPreviewBust } from '../../utils/adminMediaPreview'
 
 export default function AdminImagePreview({ src, alt = '', className = '' }) {
-  const [displaySrc, setDisplaySrc] = useState('')
-  const [ready, setReady] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const displaySrc = withAdminPreviewBust((src || '').trim())
 
-  useEffect(() => {
-    let cancelled = false
-    const trimmed = (src || '').trim()
-
-    if (!trimmed) {
-      setDisplaySrc('')
-      setReady(false)
-      return undefined
-    }
-
-    const busted = withAdminPreviewBust(trimmed)
-    setReady(false)
-
-    const img = new Image()
-    img.onload = () => {
-      if (!cancelled) {
-        setDisplaySrc(busted)
-        setReady(true)
-      }
-    }
-    img.onerror = () => {
-      if (!cancelled) {
-        setDisplaySrc(busted)
-        setReady(true)
-      }
-    }
-    img.src = busted
-
-    return () => {
-      cancelled = true
-    }
-  }, [src])
-
-  if (!ready || !displaySrc) {
+  if (!displaySrc) {
     return <div className="h-full w-full bg-slate-100" aria-hidden />
   }
 
-  return <img src={displaySrc} alt={alt} className={className} decoding="async" />
+  if (failed) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-100 px-3 text-center text-xs text-slate-500">
+        <span>Preview unavailable</span>
+        <span className="truncate font-mono text-[10px]">{displaySrc}</span>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      key={displaySrc}
+      src={displaySrc}
+      alt={alt}
+      className={className}
+      decoding="async"
+      onError={() => setFailed(true)}
+    />
+  )
 }

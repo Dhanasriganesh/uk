@@ -83,6 +83,7 @@ export default function PageEditorPage() {
 
   const handleAutoSave = async (nextData) => {
     setData(nextData)
+    writePageContentCache(pageId, nextData, Date.now())
     try {
       if (isSettings) {
         await saveSiteSettings(stripSettingsMeta(nextData), user?.email)

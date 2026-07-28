@@ -10,6 +10,8 @@ function makeServiceDefault(service, { intro, bullets = [], sections = [], highl
       bullets,
     },
     gallery: [],
+    carouselLeft: [],
+    carouselRight: [],
     featureCards,
     sections,
     highlights,

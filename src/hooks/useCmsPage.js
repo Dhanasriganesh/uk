@@ -31,9 +31,16 @@ export function useCmsPage(pageId) {
         setUpdatedAt(remoteVersion || Date.now())
         setFromFirestore(true)
       } else {
-        setContent(defaults)
-        setUpdatedAt(0)
-        setFromFirestore(false)
+        const cached = readPageContentCache(pageId)
+        if (cached?.content) {
+          setContent(mergePageContent(pageId, defaults, cached.content))
+          setUpdatedAt(cached.updatedAt ?? 0)
+          setFromFirestore(false)
+        } else {
+          setContent(defaults)
+          setUpdatedAt(0)
+          setFromFirestore(false)
+        }
       }
       setLoading(false)
     })

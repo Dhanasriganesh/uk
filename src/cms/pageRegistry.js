@@ -41,7 +41,7 @@ export const PAGE_GROUPS = [
       ...SERVICES.map((service) => ({
         id: service.id,
         label: service.shortTitle,
-        description: `${service.path} — hero, gallery, case study sections, CTA`,
+        description: `${service.path} — hero, gallery, dual carousels, case study sections, CTA`,
       })),
     ],
   },

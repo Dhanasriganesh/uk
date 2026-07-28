@@ -7,6 +7,8 @@ export function isPersistentCmsImageUrl(url) {
   const trimmed = url.trim()
   if (!trimmed) return false
   if (trimmed.startsWith('data:')) return true
+  if (trimmed.startsWith('cms/')) return true
+  if (trimmed.startsWith('/media/') || trimmed.startsWith('/videos/')) return true
   if (/^https?:\/\//i.test(trimmed)) {
     return !/localhost|127\.0\.0\.1/i.test(trimmed)
   }
@@ -14,6 +16,9 @@ export function isPersistentCmsImageUrl(url) {
 }
 
 export function resolveCmsImageUrl(src, fallback) {
-  if (isPersistentCmsImageUrl(src)) return src.trim()
-  return fallback || ''
+  const trimmed = typeof src === 'string' ? src.trim() : ''
+  if (isPersistentCmsImageUrl(trimmed)) return trimmed
+  const fallbackTrimmed = typeof fallback === 'string' ? fallback.trim() : ''
+  if (isPersistentCmsImageUrl(fallbackTrimmed)) return fallbackTrimmed
+  return ''
 }

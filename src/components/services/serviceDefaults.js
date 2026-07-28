@@ -36,6 +36,8 @@ export function getServiceLocalDefaults(serviceId) {
     highlights: cmsDefaults.highlights,
     ctaSection: cmsDefaults.ctaSection,
     cta: cmsDefaults.cta,
+    carouselLeft: cmsDefaults.carouselLeft || [],
+    carouselRight: cmsDefaults.carouselRight || [],
     defaultBrochureUrl: '/media/pdf_1718978495.pdf',
   }
 }

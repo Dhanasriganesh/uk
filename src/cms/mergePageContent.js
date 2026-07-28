@@ -286,6 +286,14 @@ export function mergePageContent(pageId, defaults, remote) {
     merged.highlights = (defaults.highlights || []).map((def, i) =>
       mergeProductHighlight(def, merged.highlights?.[i] || remote?.highlights?.[i] || {})
     )
+    merged.carouselLeft = mergeIndexedStrings(
+      defaults.carouselLeft,
+      remote?.carouselLeft ?? merged.carouselLeft
+    )
+    merged.carouselRight = mergeIndexedStrings(
+      defaults.carouselRight,
+      remote?.carouselRight ?? merged.carouselRight
+    )
     merged.ctaSection = {
       title: cmsStringOrFallback(merged.ctaSection?.title, defaults.ctaSection?.title),
       description: cmsStringOrFallback(

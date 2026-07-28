@@ -24,6 +24,8 @@ import {
 } from '../../utils/cmsString'
 import { CmsImage, CmsVideo } from '../cms/CmsMedia'
 import ProductInfoCta from './ProductInfoCta'
+import AutoSlideCarousel from './AutoSlideCarousel'
+import { SERVICE_PAGE_IDS } from '../../cms/servicesRegistry'
 
 const AUTO_SLIDE_MS = 4000
 
@@ -142,6 +144,8 @@ export default function ProductDetailPage(props) {
 }
 
 function ProductDetailContent({
+  pageId,
+  showServiceCarousels = false,
   breadcrumbLabel,
   parentLabel = 'Services',
   parentLink = '/services',
@@ -189,6 +193,11 @@ function ProductDetailContent({
   const galleryUrls = content.gallery?.filter(Boolean)?.length
     ? content.gallery.filter(Boolean)
     : fallbackImages
+  const carouselLeft = content.carouselLeft?.filter(Boolean) || []
+  const carouselRight = content.carouselRight?.filter(Boolean) || []
+  const isServicePage = showServiceCarousels || SERVICE_PAGE_IDS.includes(pageId)
+  const showDualCarousels =
+    isServicePage && (carouselLeft.length > 0 || carouselRight.length > 0)
 
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -340,6 +349,27 @@ function ProductDetailContent({
           </div>
         </div>
       </section>
+
+      {showDualCarousels ? (
+        <section className="bg-white pb-10 pt-4 sm:pb-14 sm:pt-6 lg:pb-16">
+          <div className="site-container">
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-8">
+              <div className="min-w-0 max-w-full">
+                <AutoSlideCarousel
+                  images={carouselLeft}
+                  altPrefix={`${galleryAltPrefix} gallery left`}
+                />
+              </div>
+              <div className="min-w-0 max-w-full">
+                <AutoSlideCarousel
+                  images={carouselRight}
+                  altPrefix={`${galleryAltPrefix} gallery right`}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {featureCards.length > 0 && (
         <section className="site-container pb-12 sm:pb-16 lg:pb-20">

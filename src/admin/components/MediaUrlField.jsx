@@ -8,26 +8,46 @@ import { isFirebaseStoragePath } from '../../cms/mediaSeed'
 import { withAdminPreviewBust } from '../../utils/adminMediaPreview'
 
 function formatLabel(key) {
-  return key
+  const str = String(key ?? '')
+  return str
     .replace(/([A-Z])/g, ' $1')
     .replace(/[_-]/g, ' ')
     .replace(/^\w/, (c) => c.toUpperCase())
 }
 
+function fieldKeyFromPath(path) {
+  if (!Array.isArray(path) || path.length === 0) return 'media'
+  const last = path[path.length - 1]
+  const isIndex =
+    typeof last === 'number' || (typeof last === 'string' && /^\d+$/.test(last))
+  if (isIndex && path.length > 1) {
+    return String(path[path.length - 2] ?? 'media')
+  }
+  return String(last ?? 'media')
+}
+
+function labelFromPath(path, label) {
+  if (label) return label
+  const fieldKey = fieldKeyFromPath(path)
+  const last = path[path.length - 1]
+  if (typeof last === 'number') {
+    return `${formatLabel(fieldKey)} ${last + 1}`
+  }
+  return formatLabel(fieldKey)
+}
+
 const inputClass =
   'w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-base text-slate-900 transition-colors placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 sm:text-sm'
 
-export default function MediaUrlField({ path, value, onChange }) {
-  const key = path[path.length - 1]
-  const accept = /video/i.test(key) ? 'video' : /image|logo|photo|background/i.test(key) ? 'image' : 'any'
+export default function MediaUrlField({ path, value, onChange, label }) {
+  const fieldKey = fieldKeyFromPath(path)
+  const accept =
+    /video/i.test(fieldKey) ? 'video' : /image|logo|photo|background|gallery|carousel/i.test(fieldKey) ? 'image' : 'any'
   const [editingUrl, setEditingUrl] = useState(false)
   const [previewVersion, setPreviewVersion] = useState(0)
   const trimmed = (value || '').trim()
-  const isVideo = isVideoUrl(trimmed) || /video/i.test(key)
-  const previewSrc =
-    trimmed && previewVersion > 0
-      ? withAdminPreviewBust(trimmed, previewVersion)
-      : trimmed
+  const isVideo = isVideoUrl(trimmed) || /video/i.test(fieldKey)
+  const previewSrc = trimmed ? withAdminPreviewBust(trimmed, previewVersion || Date.now()) : ''
   const canOpenDirectly =
     trimmed.startsWith('http://') ||
     trimmed.startsWith('https://') ||
@@ -35,7 +55,7 @@ export default function MediaUrlField({ path, value, onChange }) {
   return (
     <div className="mb-5">
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {formatLabel(key)}
+        {labelFromPath(path, label)}
       </label>
 
       {trimmed ? (
