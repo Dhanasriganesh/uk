@@ -80,21 +80,17 @@ function Header() {
         showHeader ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="site-container flex h-full min-w-0 items-center gap-3 xl:gap-4">
-        <Link
-          to="/"
-          className="flex h-full shrink-0 items-center py-1"
-          aria-label="ATS home"
-        >
+      <div className="site-container flex h-full min-w-0 items-center gap-2 sm:gap-3 lg:gap-4">
+        <Link to="/" className="flex h-full shrink-0 items-center py-1" aria-label="ATS home">
           <img
             src={logoSrc}
             alt={settings.siteName || 'ATS'}
-            className="h-9 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-10 lg:h-11 xl:h-11"
+            className="h-9 w-auto max-h-[calc(var(--header-height)-0.75rem)] object-contain sm:h-10 lg:h-11 xl:h-12"
           />
         </Link>
 
-        <nav className="hidden shrink-0 xl:block" aria-label="Main">
-          <ul className="flex items-center gap-x-4 2xl:gap-x-5">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center xl:flex" aria-label="Main">
+          <ul className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-1 lg:gap-x-3 xl:gap-x-5 2xl:gap-x-8">
             {navLinks.map((link) => (
               <li key={link.name} className="relative flex list-none items-center">
                 <div
@@ -104,7 +100,7 @@ function Header() {
                 >
                   <Link
                     to={link.path}
-                    className={`relative inline-flex items-center gap-0.5 whitespace-nowrap py-1 text-[14px] font-semibold leading-none transition-colors 2xl:text-[15px] ${
+                    className={`relative inline-flex items-center gap-0.5 whitespace-nowrap py-1 text-[13px] font-semibold leading-none transition-colors lg:text-[13px] xl:text-[14px] 2xl:text-[15px] ${
                       isActive(link.path) ? 'text-[#dc2626]' : 'text-[#111111] hover:text-[#dc2626]'
                     }`}
                   >
@@ -144,16 +140,12 @@ function Header() {
           </ul>
         </nav>
 
-        <SiteSearch
-          navLinks={navLinks}
-          className="hidden min-w-0 flex-1 md:block"
-          onNavigate={closeMobile}
-        />
+        <div className="ml-auto flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 lg:ml-0 lg:gap-2 xl:gap-3">
+          <SiteSearch navLinks={navLinks} className="hidden md:block" onNavigate={closeMobile} />
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 xl:ml-0">
           <Link
             to="/contact"
-            className="hidden h-8 shrink-0 items-center gap-1.5 rounded-lg bg-[#ef4444] px-3.5 text-[12px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#dc2626] md:inline-flex md:h-9 xl:px-4 xl:text-[13px]"
+            className="hidden h-9 items-center gap-1.5 rounded-[10px] bg-[#ef4444] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#dc2626] md:inline-flex xl:h-10 xl:px-5 xl:text-[14px]"
           >
             <span className="hidden xl:inline">Request a Quote</span>
             <span className="xl:hidden">Quote</span>
@@ -164,7 +156,7 @@ function Header() {
 
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] xl:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#f1f1f1] text-[#111111] xl:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}

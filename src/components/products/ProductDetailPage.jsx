@@ -350,27 +350,6 @@ function ProductDetailContent({
         </div>
       </section>
 
-      {showDualCarousels ? (
-        <section className="bg-white pb-10 pt-4 sm:pb-14 sm:pt-6 lg:pb-16">
-          <div className="site-container">
-            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-8">
-              <div className="min-w-0 max-w-full">
-                <AutoSlideCarousel
-                  images={carouselLeft}
-                  altPrefix={`${galleryAltPrefix} gallery left`}
-                />
-              </div>
-              <div className="min-w-0 max-w-full">
-                <AutoSlideCarousel
-                  images={carouselRight}
-                  altPrefix={`${galleryAltPrefix} gallery right`}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       {featureCards.length > 0 && (
         <section className="site-container pb-12 sm:pb-16 lg:pb-20">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
@@ -468,6 +447,27 @@ function ProductDetailContent({
           </section>
         )
       })}
+
+      {showDualCarousels ? (
+        <section className="bg-white pb-10 pt-4 sm:pb-14 sm:pt-6 lg:pb-16">
+          <div className="site-container">
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-8">
+              <div className="min-w-0 max-w-full">
+                <AutoSlideCarousel
+                  images={carouselLeft}
+                  altPrefix={`${galleryAltPrefix} gallery left`}
+                />
+              </div>
+              <div className="min-w-0 max-w-full">
+                <AutoSlideCarousel
+                  images={carouselRight}
+                  altPrefix={`${galleryAltPrefix} gallery right`}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {highlights.length > 0 && (
         <section className="border-y border-[#f1f1f1] bg-[#f5f5f5] py-8 sm:py-10">

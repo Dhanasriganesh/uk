@@ -18,7 +18,7 @@ export default function SiteSearch({ navLinks, className = '', onNavigate }) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
-  const fullWidth = className.includes('w-full') || className.includes('flex-1')
+  const fullWidth = className.includes('w-full')
 
   const searchIndex = useMemo(() => buildSiteSearchIndex(navLinks), [navLinks])
   const results = useMemo(() => filterSiteSearch(searchIndex, query), [searchIndex, query])
@@ -74,12 +74,12 @@ export default function SiteSearch({ navLinks, className = '', onNavigate }) {
   }
 
   return (
-    <div ref={rootRef} className={`relative ${fullWidth ? 'min-w-0 w-full' : ''} ${className}`}>
+    <div ref={rootRef} className={`relative ${className}`}>
       <label htmlFor={listId} className="sr-only">
         Search site pages
       </label>
-      <div className="relative w-full">
-        <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9ca3af]" />
+      <div className="relative">
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9ca3af]" />
         <input
           ref={inputRef}
           id={listId}
@@ -91,14 +91,14 @@ export default function SiteSearch({ navLinks, className = '', onNavigate }) {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="Search pages…"
+          placeholder="Search…"
           autoComplete="off"
           role="combobox"
           aria-expanded={showDropdown}
           aria-controls={`${listId}-results`}
           aria-autocomplete="list"
-          className={`h-8 rounded-lg border border-[#e5e7eb] bg-[#fafafa] py-0 pl-8 pr-3 text-[13px] leading-none text-[#111111] placeholder:text-[#9ca3af] transition-colors focus:border-[#dc2626] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dc2626]/15 md:h-9 md:pl-9 md:text-sm ${
-            fullWidth ? 'w-full' : 'w-[10rem] sm:w-[11rem] md:w-[11.5rem] lg:w-[12.5rem] xl:w-[13.5rem] 2xl:w-[15rem]'
+          className={`h-9 rounded-[10px] border border-[#e5e7eb] bg-[#fafafa] pl-9 pr-3 text-[13px] text-[#111111] placeholder:text-[#9ca3af] transition-colors focus:border-[#dc2626] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dc2626]/15 md:h-10 md:text-[14px] ${
+            fullWidth ? 'w-full' : 'w-[8.5rem] md:w-[9.5rem] lg:w-[10rem] xl:w-[12rem] 2xl:w-[14rem]'
           }`}
         />
       </div>
